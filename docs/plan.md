@@ -102,19 +102,25 @@ Paste the **preamble** first, then the step prompt, into a fresh agent with the 
 ```
 You are implementing one step of a larger plan for "The Austin Collection", a direct-booking website for three short-term rental houses in Austin, TX run by three hosts (Alexis, Gabe, Aaron). Guests book through Hospitable's embeddable widgets; Airbnb is a secondary link.
 
+Where to look first (all in the repo, read before writing any code):
+- `docs/plan.md`: the full plan. Read the Context, Decisions, and Steps sections, then your step's prompt, then the "Open items" checklist to see which inputs for your step are still missing. If an input you need is unchecked there, use the placeholder the step describes and say so in your PR; do not invent real-looking values.
+- `design/artifact.html`: the visual source of truth. Open it in a browser (not just the source) and compare your work against it at desktop and phone widths. Its `:root` CSS variables are the light-theme design tokens. It is a static reference; do not edit it.
+- `README.md` (once step 1 creates it): how to run, lint, test, and where content lives.
+- Earlier steps' PRs on GitHub: if your step depends on a component or file from a prior step, read that step's prompt in `docs/plan.md` and the merged code before reusing it.
+
 Stack and conventions (already decided, do not change):
 - Next.js App Router (latest), TypeScript strict, Tailwind v4, pnpm, ESLint flat config, Prettier, Playwright. Node 22, pnpm 10.
 - In current Next.js, `params` and `searchParams` are Promises in pages, layouts, generateMetadata, and route handlers. Always `await` them.
 - Content is typed data in `content/*.ts`. Never hardcode property copy in components.
 - Design tokens are CSS variables in `app/globals.css` mapped into Tailwind via `@theme inline`. Light and dark themes switch on `[data-theme]`. Use token utilities (`bg-paper`, `text-ink`, `border-hairline`, `font-display`, `font-mono`), never raw hex in components.
-- The design reference is `design/artifact.html` in the repo. Match it faithfully; the site name is "The Austin Collection", not "Keep Austin Staying".
+- Match `design/artifact.html` faithfully; the site name is "The Austin Collection", not "Keep Austin Staying".
 - Reusable components live in `components/ui`, `components/layout`, `components/property`, `components/hospitable`, `components/home`, etc. Prefer composing existing primitives over new one-off styles.
 - Keep files focused. Server Components by default; add "use client" only where needed.
 - Accessibility: semantic HTML, visible focus rings, `prefers-reduced-motion` respected, alt text from content data.
 - Repo: `rojaswestall/str-website`, default branch `main`, local clone at `~/Documents/github/str-website`.
 - Work on a branch `step-<nn>-<slug>`. Commit in small, logical commits. Open a PR when done.
 - Done means: `pnpm lint && pnpm typecheck && pnpm build && pnpm test:e2e` pass. Report exactly what passed and what you could not verify.
-- Read the plan at `docs/plan.md` for the full context before starting.
+- If you learn something later steps need (a real Hospitable snippet shape, a changed file path, a decision you had to make), add it to the relevant step or open item in `docs/plan.md` in the same PR.
 ```
 
 ### Step 1 — Scaffold
