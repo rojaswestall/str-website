@@ -1,0 +1,378 @@
+# The Austin Collection — direct-booking site plan
+
+## Context
+
+Three short-term rental houses in Austin (An Oak Hill Home, South Austin Stay, Fire Side Home), run by Alexis, Gabe, and Aaron, currently book only through Airbnb. Airbnb's guest-side fee adds roughly 15% to what guests pay. The goal is a site at our own domain where guests can book direct through Hospitable's embeddable widgets, with Airbnb kept as a secondary option.
+
+The design reference is the "Keep Austin Staying" artifact (https://claude.ai/artifact/8bKWdaGXgFA41g5RrFBa32). The name changes to **The Austin Collection**. The artifact's look is ported faithfully (warm paper palette, Newsreader headlines, IBM Plex Sans body, IBM Plex Mono labels) and a dark mode is added.
+
+This plan was written in plan mode with no code touched. It is meant to be executed step by step by separate coding agents using the prompts in the last section.
+
+## Decisions made
+
+| Area | Decision |
+|---|---|
+| Hosting / repo | Repo `rojaswestall/str-website` (created, empty, `main`, local at `~/Documents/github/str-website`). Vercel deploy. Transfer to an org later if wanted. |
+| Stack | Next.js App Router, TypeScript strict, Tailwind v4, pnpm, ESLint + Prettier, Playwright |
+| Structure | Home page (artifact sections) + one page per house at `/stays/<slug>` |
+| Booking | Direct booking live at launch via Hospitable per-property booking widget; Hospitable search widget on home; Airbnb link secondary |
+| Content | Typed data files in repo (`content/*.ts`), photos in `public/` |
+| Design | Port artifact faithfully, rename, add dark mode (system preference + toggle) |
+| Email signup | Replaced by a contact form that emails hosts via Resend |
+| Analytics | Vercel Web Analytics |
+| Rate limiting | Honeypot + per-instance in-memory limiter (Upstash optional later) |
+
+## Recommended changes to the artifact (beyond rename)
+
+- **"Book direct next time" becomes "Why book direct."** Ledger of benefits plus the contact form. The waitlist pitch no longer applies since booking is live.
+- **Add a short "Your hosts" strip** (three names, one line each, optional photo). Direct booking asks guests to trust strangers; faces and names convert.
+- **Add two or three guest quotes per property page** pulled from Airbnb reviews. Off-platform social proof matters once the Airbnb badge is gone.
+- **Add direct-booking FAQ rows to Practicals** (how payment works, who holds the deposit, cancellation). These are the questions that stop a direct booking.
+- **Make the TikTok embed optional and data-driven.** It is a heavy third-party script that ignores the theme; keep it only if you like the clip.
+- **Show "from $X / night" and min nights** on each property band once rates are confirmed; the artifact leaves these as t.b.c.
+
+## Steps
+
+Dependencies: 1 → 2 → 3 → 4 → {5, 6, 9} → {7, 8} → {10, 11} → {12, 13} → 14. Steps in braces can run in parallel.
+
+1. **Scaffold.** In the existing empty repo, scaffold Next.js App Router, TS strict, Tailwind v4, pnpm, ESLint, Prettier, Playwright, CI. Keep `design/artifact.html` and `docs/plan.md`.
+2. **Tokens and theme.** Define light and dark CSS variables, map to Tailwind theme, load fonts via next/font, add next-themes provider and toggle.
+3. **Content model.** Typed schema and seed data for properties, hosts, area picks, policies, FAQ, licenses, site config. Placeholder photos. Zod check script.
+4. **UI primitives.** Section, SectionHead, Eyebrow, Button, Tag, SpecRow, Credential, PhotoFrame, Ledger, Container. Dev-only kitchen-sink route for visual parity.
+5. **Site shell.** SiteHeader, SiteFooter with STR licenses, skip link, root metadata, Vercel Analytics, branded 404.
+6. **Hospitable widgets.** HospitableWidget and HospitableSearch with stub and live modes, shared script-injection hook, CSP headers in report-only mode.
+7. **Home page.** Hero with CityMap SVG and search widget, three PropertyBands, hosts strip, area guide, practicals, why-book-direct placeholder.
+8. **Property pages.** `/stays/[slug]` with gallery, specs, amenities, quotes, booking panel (widget + Airbnb link). Static params, 404 on unknown slug.
+9. **Contact API.** `POST /api/contact` with zod validation, honeypot, rate limit, Resend send, dry-run when key absent.
+10. **Contact form.** ContactForm client component with pending, success, error states mounted in the WhyBookDirect section.
+11. **SEO.** Per-page metadata, generateMetadata for stays, OG image routes, sitemap, robots, JSON-LD VacationRental per property.
+12. **Dark mode and accessibility audit.** Contrast, focus rings, reduced motion, stray hex in SVG and gradients. axe clean in both themes.
+13. **Test suite and CI.** Playwright smoke specs for all routes, theme toggle, contact stub, widget stub, 404. Run against production build in CI.
+14. **Go live.** Vercel project, domain, env vars, real Hospitable embed codes, Resend domain, CSP switched to enforce. Verify a real booking flow.
+
+## Open items (human)
+
+### Needed before step 1
+- [x] Repo: `rojaswestall/str-website`, empty, branch `main`, cloned to `~/Documents/github/str-website`. `docs/plan.md` and `design/artifact.html` are already in the working tree (uncommitted).
+- [ ] If you still want a GitHub org, create it and transfer the repo later (Settings → Transfer). Nothing in the plan depends on it.
+- [ ] Confirm Node 22 LTS and pnpm 10 are acceptable pins.
+
+### Needed before step 3 (content)
+- [ ] Final house names for the two still-placeholder listings (artifact notes "two house names" still to come).
+- [ ] URL slugs for each house (suggest `oak-hill`, `south-austin`, `fire-side`).
+- [ ] Nightly rate range and minimum nights per house (artifact shows t.b.c.).
+- [ ] Pet fee per stay.
+- [ ] Confirm the placeholder policies: 4 pm check-in, 11 am checkout, late checkout to 1 pm, 14-day / 7-day cancellation.
+- [ ] Three area-guide picks (eat, outdoors, locals-only): name, one or two sentences, distance from houses, a photo.
+- [ ] Keep the TikTok clip (@exploretex Barton Springs)? If yes, confirm URL. If no, it is dropped.
+- [ ] Host bios: one line each for Alexis, Gabe, Aaron, and whether to show photos.
+- [ ] Two or three guest review quotes per house with first name and month.
+- [ ] Photos per house (hero 3:2, gallery set), plus hero collage and area pick photos. Confirm you own the rights.
+- [ ] Brand assets: wordmark treatment (text-only is fine), favicon, default OG image.
+
+### Needed before step 6 / 14 (Hospitable)
+- [ ] Confirm Hospitable plan includes Direct with self-hosted widgets.
+- [ ] From Hospitable → Direct → self-hosted site: copy the raw widget embed snippet for one property and paste it into the step 6 prompt so the component matches the real loader shape (docs do not publish it; the August 2026 loader replaced the old iframe).
+- [ ] Widget IDs for all three booking widgets and the search widget.
+- [ ] Style the widget in the Hospitable dashboard to match the paper palette.
+- [ ] Confirm Stripe or payment setup is complete inside Hospitable Direct.
+
+### Needed before step 9 / 14 (contact and deploy)
+- [ ] Domain name and who controls DNS.
+- [ ] Resend account, verified sending domain, `from` address, recipient list (all three or one inbox).
+- [ ] Vercel account and team to deploy under.
+- [ ] Public contact email and Instagram handle for the footer (artifact: t.b.c.).
+- [ ] Approve or adjust the proposed dark palette in step 2.
+- [ ] Decide whether a privacy policy page is required (contact form collects name and email; analytics is cookieless).
+
+## Verification
+
+- Every step ends with `pnpm lint && pnpm typecheck && pnpm build && pnpm test:e2e` green, locally and in CI.
+- Step 4 and 12 include screenshot comparison against `design/artifact.html` in both themes.
+- Step 14 ends with a real test booking on each house's page on the production domain, a received contact email, and a console free of CSP violations.
+
+---
+
+## Prompts
+
+Paste the **preamble** first, then the step prompt, into a fresh agent with the repo cloned. Each step should be done on a branch named `step-<nn>-<slug>` and opened as a PR.
+
+### Preamble (paste before every step prompt)
+
+```
+You are implementing one step of a larger plan for "The Austin Collection", a direct-booking website for three short-term rental houses in Austin, TX run by three hosts (Alexis, Gabe, Aaron). Guests book through Hospitable's embeddable widgets; Airbnb is a secondary link.
+
+Stack and conventions (already decided, do not change):
+- Next.js App Router (latest), TypeScript strict, Tailwind v4, pnpm, ESLint flat config, Prettier, Playwright. Node 22, pnpm 10.
+- In current Next.js, `params` and `searchParams` are Promises in pages, layouts, generateMetadata, and route handlers. Always `await` them.
+- Content is typed data in `content/*.ts`. Never hardcode property copy in components.
+- Design tokens are CSS variables in `app/globals.css` mapped into Tailwind via `@theme inline`. Light and dark themes switch on `[data-theme]`. Use token utilities (`bg-paper`, `text-ink`, `border-hairline`, `font-display`, `font-mono`), never raw hex in components.
+- The design reference is `design/artifact.html` in the repo. Match it faithfully; the site name is "The Austin Collection", not "Keep Austin Staying".
+- Reusable components live in `components/ui`, `components/layout`, `components/property`, `components/hospitable`, `components/home`, etc. Prefer composing existing primitives over new one-off styles.
+- Keep files focused. Server Components by default; add "use client" only where needed.
+- Accessibility: semantic HTML, visible focus rings, `prefers-reduced-motion` respected, alt text from content data.
+- Repo: `rojaswestall/str-website`, default branch `main`, local clone at `~/Documents/github/str-website`.
+- Work on a branch `step-<nn>-<slug>`. Commit in small, logical commits. Open a PR when done.
+- Done means: `pnpm lint && pnpm typecheck && pnpm build && pnpm test:e2e` pass. Report exactly what passed and what you could not verify.
+- Read the plan at `docs/plan.md` for the full context before starting.
+```
+
+### Step 1 — Scaffold
+
+```
+Step 1 of 14: Scaffold the repository.
+
+The repo `rojaswestall/str-website` already exists and is cloned at `~/Documents/github/str-website`. It has no commits yet; the working tree contains only `docs/plan.md` and `design/artifact.html`. Keep both files. Scaffold in place:
+- `pnpm create next-app@latest .` in the repo root (it will complain the directory is not empty; if so, scaffold into a temp dir and move the files in, then verify nothing overwrote `docs/` or `design/`). App Router, TypeScript, Tailwind v4, ESLint, `src/` directory OFF, import alias `@/*`.
+- Pin `"packageManager": "pnpm@10"` and add `.nvmrc` with Node 22.
+- Enable TS `strict` and `noUncheckedIndexedAccess`.
+- Add Prettier (with prettier-plugin-tailwindcss) and an ESLint flat config that includes Prettier compatibility.
+- Add Playwright with one smoke spec that loads `/` and asserts the page title contains "The Austin Collection". Configure `playwright.config.ts` to run `pnpm build && pnpm start` as the web server (production build, not dev).
+- Add `@vercel/analytics` and render `<Analytics />` in `app/layout.tsx`.
+- Add scripts: `dev`, `build`, `start`, `lint`, `typecheck` (tsc --noEmit), `format`, `test:e2e`.
+- Add `.github/workflows/ci.yml` that runs install, lint, typecheck, build, and e2e on pull requests and main.
+- Add `.env.example` (empty for now, with a comment header).
+- Make the first commit on `main` with just `docs/plan.md` and `design/artifact.html` before scaffolding, so the design reference has its own history. Then do the scaffold on the `step-01-scaffold` branch.
+- Write a short README: what the site is, how to run it, where content lives.
+- Set `app/layout.tsx` metadata title to "The Austin Collection" and a placeholder description.
+
+Done when CI is green on the first PR and `pnpm test:e2e` passes locally against the production build.
+```
+
+### Step 2 — Tokens and theme
+
+```
+Step 2 of 14: Design tokens, fonts, and dark mode.
+
+Source of truth for light tokens is the `:root` block in `design/artifact.html`. Port every variable: ink, ink-soft, muted, accent, hairline, paper, paper-2, slot-a, slot-b, and the five map colors (map-ground, map-road, map-road-major, map-water, map-park).
+
+1. In `app/globals.css`:
+   - Define raw light values on `:root` and dark values on `[data-theme="dark"]`. Proposed dark palette (adjust only if contrast fails): paper #161513, paper-2 #1E1C19, slot-a #22201C, slot-b #2A2823, ink #ECE8E1, ink-soft #CFCAC1, muted #A19B91, accent #8E887F, hairline #2E2B27, map-ground #1E1C19, map-road #3A3732, map-road-major #4A463F, map-water #5F7B88, map-park #6E8060.
+   - Set `color-scheme: light` on `:root` and `color-scheme: dark` on `[data-theme="dark"]`.
+   - Map tokens into Tailwind with `@theme inline { --color-paper: var(--paper); ... --font-display: var(--font-newsreader); --font-body: var(--font-plex-sans); --font-mono: var(--font-plex-mono); }`.
+   - Add `@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));` so `dark:` utilities key on the attribute.
+   - Port the base styles: body background/color/font, `:focus-visible` outline, `prefers-reduced-motion` rule, `--measure: 62ch`, `--gutter`, `--maxw: 1180px`.
+   - Verify muted-on-paper and ink-soft-on-paper reach 4.5:1 in both themes; adjust dark values if needed and note what you changed.
+2. Fonts via `next/font/google` in `lib/fonts.ts`: Newsreader (weights 300, 400, 500, italic 300, optical size axis), IBM Plex Sans (400, 500), IBM Plex Mono (400, 500). Expose as CSS variables on `<html>`.
+3. Install `next-themes`. Add `components/theme/ThemeProvider.tsx` (`attribute="data-theme"`, `enableSystem`, `disableTransitionOnChange`) and wrap the app in `app/layout.tsx`. Add `suppressHydrationWarning` on `<html>`.
+4. Add `components/theme/ThemeToggle.tsx`: a small mono-labelled button cycling light / dark / system, icon rendered only after mount to avoid hydration mismatch, accessible label.
+5. Temporarily render the toggle and a few token swatches on `/` so the PR is reviewable; step 4 replaces this.
+
+Done when toggling flips the theme with no flash on reload, system preference is honoured, and `bg-paper text-ink font-display` utilities resolve in both themes.
+```
+
+### Step 3 — Content model
+
+```
+Step 3 of 14: Typed content model and seed data.
+
+Create `content/` with:
+- `types.ts`: zod schemas and inferred types for Property, Host, AreaPick, PolicyRow, FaqRow, License, SiteConfig, Photo, Quote, HospitableConfig.
+  - Property: slug, name, shortName, neighborhood, locationLine (e.g. "Oak Hill, Austin · off Hwy 290 & 71"), summary (1–2 sentences), description (paragraph), sleeps, bedrooms, beds, bathrooms (number, 2.5 allowed), minNights (number | null), rateFrom (number | null, USD per night), amenities (string[]), rating (number), reviewCount (number), guestFavorite (boolean), airbnbUrl, strLicense, hospitable: { bookingWidgetId: string | null }, photos: Photo[] (src, alt, width, height, role: "hero" | "gallery"), quotes: Quote[] (text, author, month), mapPin: { x, y } in the CityMap 400×400 viewBox.
+  - Host: name, line (one sentence), photo (optional).
+  - AreaPick: title, kind ("eat" | "outdoors" | "local"), blurb, distanceLine, link (optional), photo (optional).
+  - SiteConfig: name "The Austin Collection", tagline, domain, contactEmail, instagram, hospitable: { searchWidgetId: string | null, mode: "stub" | "live" }, tiktok: { url, handle } | null.
+- `properties.ts`: seed the three houses from `design/artifact.html` (names, copy, specs, amenities, ratings, review counts, Airbnb URLs, STR licenses OL2026086598 / OL2026040319 / OL2026031718). Slugs: `oak-hill`, `south-austin`, `fire-side`. Leave rateFrom and minNights null. Map pins: Oak Hill (85, 299); both South Austin houses near (266, 299), offset slightly so they don't overlap.
+- `hosts.ts`: Alexis, Gabe, Aaron with placeholder lines.
+- `area.ts`: three picks with placeholder text clearly marked `[TBC]`.
+- `policies.ts`: the six Practicals rows from the artifact plus three direct-booking FAQ rows (how payment works, deposit/damage, cancellation) with placeholder answers marked `[TBC]`.
+- `site.ts`: SiteConfig with placeholders.
+- `index.ts`: `getAllProperties()`, `getProperty(slug)`, `getSite()`, etc. Parse through zod at import so bad data fails the build.
+- `scripts/check-content.ts` and a `check:content` script that parses all content and asserts unique slugs and that each property has at least one hero photo. Run it in CI before build.
+- Placeholder photos: generate neutral SVG or PNG placeholders in `public/photos/<slug>/hero.jpg` etc. with the correct aspect ratios (3:2 hero, 1:1 area picks, 21:9 hero collage).
+
+Done when `pnpm check:content` passes and `getProperty("oak-hill")` returns typed data.
+```
+
+### Step 4 — UI primitives
+
+```
+Step 4 of 14: UI primitives matching the artifact.
+
+Read `design/artifact.html` closely. Build these in `components/ui/`, each a small focused file, styled only with token utilities:
+- `Container` (max-w from --maxw, horizontal padding from --gutter).
+- `Section` (vertical rhythm `py-[clamp(3rem,6vw,5rem)]`, optional top hairline, `id` prop for anchors).
+- `SectionHead` (h2 in display font + right-aligned mono uppercase meta line; optional lede paragraph with the artifact's negative-margin treatment).
+- `Eyebrow` (mono, uppercase, tracking 0.13em, muted).
+- `Button` (variants `primary` and `ghost`; mono uppercase; renders `<a>` when `href` is given, `<button>` otherwise; supports `external` to add target/rel).
+- `Tag` and `TagList` (hairline-bordered mono chips).
+- `SpecRow` (the hairline-top-and-bottom mono spec strip with `·` separators; accepts items, marks `tbc` items with the dashed underline).
+- `Credential` (★ rating · N reviews · optional "Guest favorite" badge).
+- `PhotoFrame` (next/image wrapper with hairline border, aspect ratio prop 3:2 / 1:1 / 21:9, optional mono figcaption; falls back to the striped placeholder with a label when no src).
+- `Ledger` (the paper-2 panel with mono heading and em-dash list; also usable as a definition list via `rows` prop).
+- `Prose` (max-width --measure, ink-soft color).
+- `Tbc` inline span (dashed underline for unconfirmed values).
+
+Add a dev-only route `app/(dev)/kitchen-sink/page.tsx` that renders every primitive with sample data in a two-column light/dark comparison (wrap one column in a `data-theme="dark"` container). Guard it with `notFound()` when `process.env.NODE_ENV === "production"`.
+
+Remove the temporary swatches from step 2 on `/`.
+
+Done when a screenshot of the kitchen sink is visually indistinguishable from the matching artifact elements in light mode, and nothing uses raw hex.
+```
+
+### Step 5 — Site shell
+
+```
+Step 5 of 14: Site shell.
+
+- `components/layout/SiteHeader.tsx`: masthead from the artifact. Wordmark "The Austin Collection" in display font linking to `/`; mono uppercase nav: Stays (`/#stays`), The area (`/#area`), Practicals (`/#practicals`), Book direct (`/#direct`); ThemeToggle at the end. Collapses gracefully at narrow widths (wrap, no hamburger needed).
+- `components/layout/SiteFooter.tsx`: colophon with site name and domain, contact column (email, Instagram, "Phone shared with guests after booking"), and the STR license line listing each property's name and license from `content/properties.ts`. Use `Ledger`-style mono typography.
+- `components/layout/SkipLink.tsx` to `#main`.
+- `app/layout.tsx`: compose SkipLink, SiteHeader, `<main id="main">`, SiteFooter, ThemeProvider, Analytics. Root `metadata` with title template `%s · The Austin Collection`, description, `metadataBase` from `NEXT_PUBLIC_SITE_URL`.
+- `app/not-found.tsx`: branded 404 with a link home.
+- Delete the preview "notice" bar concept from the artifact; it is not part of the real site.
+
+Done when every route shows header and footer, the footer lists three license numbers, and `/does-not-exist` renders the branded 404 with status 404.
+```
+
+### Step 6 — Hospitable widgets
+
+```
+Step 6 of 14: Hospitable booking and search widgets.
+
+Context: Hospitable serves its widget through a dynamic script loader from `cdn.hsptb.com` (requires HTTPS and that domain in CSP `script-src`). The loader populates a container element, very likely with an iframe from `booking.hospitable.com`. The exact snippet shape is pasted below by the human; if it is missing, build against the abstract contract and leave a clearly marked TODO.
+
+REAL SNIPPET FROM HOSPITABLE DASHBOARD (human pastes here):
+<<<
+[paste one property's widget embed code]
+>>>
+
+Build:
+1. `lib/hooks/useInjectedScript.ts`: a client hook that on mount appends a `<script>` with the given src and attributes to `document.body` (or a target node) and on cleanup removes that script and calls `container.replaceChildren()`. Must be safe under React strict mode double-mount and must re-run when the `key` prop changes, so client-side navigation between `/stays/a` and `/stays/b` repopulates the container. Do not use `next/script` (it dedupes by src and will not re-run). Never inject scripts via dangerouslySetInnerHTML.
+2. `components/hospitable/HospitableWidget.tsx` ("use client"): props `widgetId`, `propertyName`, `airbnbUrl`. Reads `NEXT_PUBLIC_HOSPITABLE_MODE` (`stub` | `live`). In `live` mode with a widgetId, renders the container matching the real snippet and injects the loader via the hook. If live but widgetId is null, falls back to stub and `console.warn`s once. Container sits on a `PhotoFrame`-style hairline surface that works in both themes (the iframe itself stays light; that is accepted).
+3. `components/hospitable/HospitableStub.tsx`: placeholder with `data-testid="hospitable-stub"`, the property name, disabled date and guest fields in the site's style, and a ghost Button to the Airbnb URL labelled "Check availability on Airbnb".
+4. `components/hospitable/HospitableSearch.tsx`: same pattern for the multi-property search widget using `site.hospitable.searchWidgetId`.
+5. `components/embeds/TikTokEmbed.tsx`: reuse the hook with `https://www.tiktok.com/embed.js` and the `blockquote.tiktok-embed` markup from the artifact. Renders nothing when `site.tiktok` is null.
+6. CSP in `next.config.ts` `headers()`, as `Content-Security-Policy-Report-Only` for now: `default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.hsptb.com https://va.vercel-scripts.com https://www.tiktok.com; frame-src https://booking.hospitable.com https://*.hospitable.com https://www.tiktok.com; connect-src 'self' https://*.hospitable.com https://vitals.vercel-insights.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; frame-ancestors 'none'`. Put the policy string in `lib/csp.ts`.
+7. `.env.example`: add `NEXT_PUBLIC_HOSPITABLE_MODE=stub`.
+8. Playwright `e2e/hospitable.spec.ts`: in stub mode asserts the stub renders on the kitchen sink or a temp route; in a second test sets live mode via env, intercepts `**/cdn.hsptb.com/**` with `page.route` serving a tiny fake loader that writes `<div data-testid="hospitable-live-marker">` into the container, and asserts exactly one marker exists after navigating between two mounts.
+
+Done when both modes behave as described, strict mode produces one script and one populated container, and `curl -I` on the production build shows the report-only CSP header.
+```
+
+### Step 7 — Home page
+
+```
+Step 7 of 14: Home page.
+
+Rebuild the artifact's landing page in `app/page.tsx` as a Server Component composed from sections, all content from `content/`:
+1. `components/home/Hero.tsx`: eyebrow "Three houses · one small team", h1 "Places we look after, <em>properly.</em>", lede from `site.tagline` (rewrite the artifact lede to name the three hosts), hero collage `PhotoFrame` 21:9 with the three-place figcaption, then the `HospitableSearch` widget directly under the collage with a mono label "Check dates across all three".
+2. `components/map/CityMap.tsx`: port the circular Austin SVG from the artifact exactly (paths, clip, rings). All fills and strokes must use the token CSS variables (`var(--map-road)` etc.), never hex, so dark mode recolours it. Pins come from `property.mapPin`; include the key/legend as in the artifact. Accept an optional `highlightSlug` prop for reuse on property pages.
+3. `components/property/PropertyBand.tsx`: the alternating two-column band (photo / body) with place line, h3, Credential, summary, SpecRow (sleeps, bed, beds, bath, min nights or Tbc, rate or Tbc), TagList of amenities, actions: primary Button "Book direct" → `/stays/<slug>#book`, ghost Button "See the whole house" → `/stays/<slug>`. Even bands flip column order at ≥760px.
+4. `components/home/HostsStrip.tsx`: compact three-up strip of hosts (name in display font, one mono line, optional photo). Place it between the stays and area sections.
+5. `components/area/AreaGuide.tsx`: section "What's worth doing" with the optional `TikTokEmbed` feature row (hidden when null) and the three `AreaPick` cards (1:1 PhotoFrame, mono distance line, h4, blurb).
+6. `components/practicals/PracticalsList.tsx`: two-column definition list from `policies.ts`, including the FAQ rows under a "Booking direct" sub-heading.
+7. `components/home/WhyBookDirect.tsx`: section id `direct`, h2 "Why book direct", pitch paragraphs (rewrite: fees go to the platform not the house; booking here is the same calendar and the same people), the `Ledger` "What direct booking changes" with the four items from the artifact, and a placeholder slot where step 10 mounts the contact form.
+Use `Section` ids `stays`, `area`, `practicals`, `direct` so header anchors work.
+
+Done when Playwright finds all four section headings, three bands link to the right slugs, and the CityMap recolours when toggling the theme.
+```
+
+### Step 8 — Property pages
+
+```
+Step 8 of 14: Property pages at /stays/[slug].
+
+- `app/stays/[slug]/page.tsx`: `generateStaticParams` from `getAllProperties()`; `await params`; `notFound()` on unknown slug.
+- `components/property/PropertyHeader.tsx`: place line, h1 name, Credential, summary.
+- `components/property/Gallery.tsx`: hero 3:2 PhotoFrame plus a responsive grid of gallery photos. Keyboard-accessible lightbox is optional; if included keep it dependency-free and focus-trapped.
+- `components/property/AmenityList.tsx`: TagList grouped under a mono heading.
+- `components/property/Quotes.tsx`: two or three guest quotes in display italic with mono attribution.
+- `components/property/BookingPanel.tsx`: section id `book`, h2 "Book direct", the `HospitableWidget` for this property, a short mono note "Same calendar as Airbnb, no platform fee", and a ghost Button "Or view on Airbnb" (external).
+- Reuse `SpecRow`, `PracticalsList` (filtered to check-in/out, pets, cancellation), and `CityMap` with `highlightSlug`.
+- A "Back to all stays" link and a small "Other houses" row with the other two `PropertyCard`s (`components/property/PropertyCard.tsx`, compact card with hero photo, name, Credential, link).
+- Layout: on wide screens, BookingPanel sits in a sticky right column beside the description; stacks on mobile.
+
+Done when `next build` emits three static pages, `/stays/nope` 404s, each page shows the widget stub with the correct property name, and the Airbnb link has target="_blank" rel="noopener noreferrer".
+```
+
+### Step 9 — Contact API
+
+```
+Step 9 of 14: Contact API route.
+
+Implement `app/api/contact/route.ts` (POST only):
+- `lib/contact/schema.ts`: zod schema { name (2–80), email (valid), message (10–2000), property (optional slug from content), checkIn/checkOut (optional ISO dates, checkOut > checkIn), website (honeypot, must be empty) }.
+- Honeypot filled → return 200 with `{ ok: true }` and do nothing.
+- `lib/contact/rateLimit.ts`: in-memory sliding window, 5 requests per IP per 10 minutes, keyed on `x-forwarded-for`. Document that it is per-instance on Vercel and that Upstash can replace it later.
+- `lib/contact/email.ts`: send via Resend (`resend` package) from `CONTACT_FROM` to `CONTACT_TO` (comma-separated), `replyTo` the guest, subject "Inquiry: <property or General> — <name>", plain-text body plus a simple HTML version. When `RESEND_API_KEY` is absent, log the payload and return success (dry-run) so local and CI work without secrets.
+- Responses: 200 ok, 400 with field errors, 429 on rate limit, 500 on send failure (message logged, generic error returned).
+- `.env.example`: `RESEND_API_KEY=`, `CONTACT_FROM=`, `CONTACT_TO=`.
+- Playwright `e2e/contact-api.spec.ts` using `request` fixture: valid → 200; honeypot → 200 silent; invalid email → 400; sixth request → 429.
+
+Done when all four API tests pass against the production build without a Resend key.
+```
+
+### Step 10 — Contact form
+
+```
+Step 10 of 14: Contact form component.
+
+- `components/contact/ContactForm.tsx` ("use client"): fields name, email, property (select populated from `getAllProperties()`, passed in as props from the server parent), check-in and check-out (native date inputs, optional), message, hidden honeypot `website`. Styled like the artifact's signup input and button (hairline borders, mono uppercase button, paper background). States: idle, pending (button disabled, mono "Sending…"), success (replace form with a short display-font thank-you and a mono line "We reply within the hour, usually"), error (inline field errors from the 400 response, general error banner otherwise). No form library; use `fetch` to `/api/contact` and `useState`/`useTransition`.
+- Mount it in `components/home/WhyBookDirect.tsx` in the slot left in step 7, under a mono heading "Ask us anything before you book". Replace the step 7 placeholder.
+- Add a `ContactForm` mount to the kitchen sink.
+- Playwright `e2e/contact-form.spec.ts`: fill and submit, assert success state (API dry-run).
+
+Done when the form submits end to end locally, validation errors render inline, and the kitchen sink shows it in both themes.
+```
+
+### Step 11 — SEO
+
+```
+Step 11 of 14: Metadata and SEO.
+
+- `lib/seo.ts`: helpers for canonical URLs from `NEXT_PUBLIC_SITE_URL`, default OG fields, and a `vacationRentalJsonLd(property)` builder (schema.org `VacationRental` with name, description, address locality "Austin", numberOfRooms, occupancy, amenityFeature, aggregateRating from rating/reviewCount, image, url). Also an `Organization` block for the site.
+- `components/seo/JsonLd.tsx`: renders a `<script type="application/ld+json">` safely.
+- `app/stays/[slug]/page.tsx`: `generateMetadata` (await params) with title, description from summary, openGraph image from the OG route, canonical.
+- `app/opengraph-image.tsx` and `app/stays/[slug]/opengraph-image.tsx` using `ImageResponse`: paper background, site name in display font, property name, and the ★ rating line. Load Newsreader via `fetch` of the font file at build time.
+- `app/sitemap.ts`: home plus three stays with lastModified. `app/robots.ts`: allow all, disallow `/kitchen-sink`, sitemap URL.
+- Favicon and `apple-icon` placeholders in `app/` (simple "AC" monogram SVG in ink on paper).
+
+Done when `/sitemap.xml` lists four URLs, both OG routes return image/png, and each property page's JSON-LD validates with the schema.org validator.
+```
+
+### Step 12 — Dark mode and accessibility audit
+
+```
+Step 12 of 14: Dark mode and accessibility audit.
+
+Audit every route in both themes and fix drift:
+- Grep `components/` and `app/` for raw hex, `rgb(`, and hardcoded `white`/`black`; replace with tokens.
+- Check the CityMap, striped placeholder gradient, PhotoFrame borders, Ledger panel, form inputs, and the Hospitable stub surface in dark mode. Photos should not glow: add a subtle `dark:brightness-95` or hairline treatment if needed.
+- Display font weight: if Newsreader 300 looks too thin on dark paper, bump display weight to 400 under `[data-theme="dark"]` only.
+- Verify `:focus-visible` rings are visible in both themes, `prefers-reduced-motion` disables transitions, every image has alt from content, headings are in order, nav and footer are landmarks, the theme toggle has an accessible name.
+- Add `@axe-core/playwright` and `e2e/a11y.spec.ts` running axe on `/`, one stay page, and `/does-not-exist` in both themes; fail on serious or critical violations.
+- Add `e2e/visual.spec.ts` capturing full-page screenshots of `/` and one stay in both themes (store under `e2e/__screenshots__`, not for strict comparison yet, just for PR review).
+
+Done when axe reports zero serious/critical violations on all tested pages in both themes and no raw colors remain in components.
+```
+
+### Step 13 — Test suite and CI
+
+```
+Step 13 of 14: Complete the Playwright smoke suite and CI.
+
+- Consolidate `e2e/`: `home.spec.ts` (sections, band links, search stub), `stays.spec.ts` (all three slugs render, widget stub with correct name, Airbnb link attrs, 404 on bad slug), `theme.spec.ts` (toggle sets data-theme, persists on reload, respects system via `colorScheme` emulation), `contact-api.spec.ts`, `contact-form.spec.ts`, `hospitable.spec.ts`, `a11y.spec.ts`, `seo.spec.ts` (sitemap, robots, OG images, JSON-LD present).
+- `playwright.config.ts`: chromium only, `webServer` runs `pnpm build && pnpm start` with `NEXT_PUBLIC_HOSPITABLE_MODE=stub`, `reuseExistingServer` locally, retries 1 in CI, trace on first retry.
+- `.github/workflows/ci.yml`: cache pnpm, run `check:content`, lint, typecheck, build, e2e; upload the Playwright report as an artifact on failure. Add a `pnpm test` alias.
+- Make sure the suite runs in under about two minutes.
+
+Done when CI is green on the PR and the report artifact appears on a deliberately failing run (then fix it).
+```
+
+### Step 14 — Go live
+
+```
+Step 14 of 14: Deploy and switch to live booking. Parts of this need a human with Vercel, DNS, Hospitable, and Resend access; do what you can and list exactly what remains.
+
+1. Vercel: create the project from the GitHub repo (`vercel link`), framework Next.js, set env vars for Production and Preview: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_HOSPITABLE_MODE=live` (production) / `stub` (preview), `RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO`. Enable Web Analytics in the Vercel dashboard.
+2. Domain: add the custom domain to the Vercel project and output the DNS records the human must set.
+3. Hospitable: fill `hospitable.bookingWidgetId` for each property in `content/properties.ts` and `searchWidgetId` in `content/site.ts` from the values the human provides. Re-check the container markup in `HospitableWidget` against the real snippet and fix any mismatch.
+4. Resend: confirm the sending domain is verified; send one real test inquiry and confirm receipt.
+5. CSP: deploy with report-only, open each page in production, collect any violations from the console, add the missing origins to `lib/csp.ts`, then switch the header to enforcing `Content-Security-Policy`.
+6. Replace remaining `[TBC]` content and placeholder photos with the real assets supplied by the human; run `pnpm check:content`.
+7. Verify on the production domain: the booking widget loads for each house, a test booking reaches checkout, the search widget works, the theme toggle persists, and analytics events appear in Vercel.
+8. Update README with the deploy and content-editing runbook.
+
+Done when a real test booking reaches Hospitable checkout on all three property pages and the console shows no CSP violations.
+```
