@@ -1,0 +1,992 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Keep Austin Staying</title>
+<meta name="color-scheme" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300&display=swap">
+
+<style>
+  :root {
+    --ink:        #34312D;
+    --ink-soft:   #55524C;
+    --muted:      #6E6961;
+    --accent:     #8E887F;
+    --hairline:   #E5E2DC;
+    --paper:      #FAF9F7;
+    --paper-2:    #F2F0EC;
+    --slot-a:     #EFEDE8;
+    --slot-b:     #E8E5DF;
+
+    /* the map is the one place the page carries real color */
+    --map-ground:     #F1EFEA;
+    --map-road:       #D2CCC4;
+    --map-road-major: #BAB3A9;
+    --map-water:      #7E9AA6;
+    --map-park:       #9FB18F;
+
+    --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --body:    "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --measure: 62ch;
+    --gutter: clamp(1.25rem, 4vw, 4rem);
+    --maxw: 1180px;
+  }
+
+  /* Light theme only — deliberate. Every color above is defined once on :root and
+     every rule below draws from those tokens, so the page renders identically
+     whatever theme the viewer's browser or OS is set to. */
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  /* ---------- preview notice ---------- */
+
+  .notice {
+    background: var(--paper-2);
+    color: var(--muted);
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding-block: 0.7rem;
+  }
+  .notice .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.9rem;
+    align-items: baseline;
+  }
+  .notice b { font-weight: 500; color: var(--ink); }
+
+  /* ---------- masthead ---------- */
+
+  header.masthead {
+    border-bottom: 1px solid var(--hairline);
+  }
+  .masthead .wrap {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding-block: 1.5rem;
+  }
+  .wordmark {
+    font-family: var(--display);
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: 400;
+    letter-spacing: 0.005em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  nav.top {
+    display: flex;
+    gap: clamp(1rem, 3vw, 2.2rem);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  nav.top a { text-decoration: none; color: var(--muted); padding-block: 0.2rem; border-bottom: 1px solid transparent; }
+  nav.top a:hover { color: var(--ink); border-bottom-color: var(--accent); }
+
+  /* ---------- hero ---------- */
+
+  .hero { padding-block: clamp(3rem, 7vw, 5.5rem) clamp(2rem, 4vw, 3rem); }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 1.1rem;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: clamp(2.4rem, 6.4vw, 4.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0;
+    max-width: 16ch;
+  }
+  h1 em { font-style: italic; font-weight: 300; }
+  .hero p.lede {
+    font-size: clamp(1.02rem, 1.6vw, 1.18rem);
+    color: var(--ink-soft);
+    max-width: var(--measure);
+    margin: 1.4rem 0 0;
+  }
+
+  .hero-slot { margin: clamp(2rem, 4vw, 3rem) 0 0; }
+  .hero-slot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--hairline);
+  }
+  .hero-slot figcaption {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-top: 0.7rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.6rem;
+  }
+
+  /* ---------- circular city map ---------- */
+
+  .hero-map {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+  .city-map {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: clamp(0.9rem, 2vw, 1.4rem);
+  }
+  .city-map svg { display: block; width: 200px; height: 200px; flex: none; }
+
+  .m-ground     { fill: var(--map-ground); }
+  .m-park       { fill: var(--map-park); fill-opacity: 0.55; }
+  .m-greenbelt  { fill: none; stroke: var(--map-park); stroke-opacity: 0.42;
+                  stroke-width: 12; stroke-linecap: round; }
+  .m-creek      { fill: none; stroke: var(--map-water); stroke-opacity: 0.55;
+                  stroke-width: 3; stroke-linecap: round; }
+  .m-lake       { fill: none; stroke: var(--map-water); stroke-width: 19;
+                  stroke-linecap: round; }
+  .m-road       { fill: none; stroke: var(--map-road); stroke-width: 5;
+                  stroke-linecap: round; stroke-linejoin: round; }
+  .m-road.major { stroke: var(--map-road-major); stroke-width: 7; }
+  .m-water      { fill: none; stroke: var(--map-water); stroke-width: 12;
+                  stroke-linecap: round; }
+  .m-ring       { fill: none; stroke: var(--ink); stroke-width: 3; }
+  .m-halo       { fill: var(--ink); fill-opacity: 0.13; }
+  .m-dot        { fill: var(--ink); }
+  .m-city       { fill: var(--paper); stroke: var(--ink); stroke-width: 3; }
+
+  .city-map__key {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .city-map__key .key-title {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.25rem;
+  }
+  .city-map__key ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.34rem;
+  }
+  .city-map__key li { display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
+  .city-map__key .key { width: 0.55rem; height: 0.55rem; border-radius: 50%; flex: none; }
+  .key--house { background: var(--ink); }
+  .key--city  { background: var(--paper); border: 1.5px solid var(--ink); }
+  .key--water { background: var(--map-water); width: 0.7rem; height: 0.25rem; border-radius: 1px; }
+  .key--park  { background: var(--map-park); }
+  .city-map__key .note { color: var(--muted); font-size: 0.68rem; margin: 0.4rem 0 0; }
+
+  /* ---------- photo slots ---------- */
+
+  .slot {
+    position: relative;
+    background:
+      repeating-linear-gradient(
+        135deg,
+        var(--slot-a) 0 14px,
+        var(--slot-b) 14px 28px
+      );
+    border: 1px solid var(--hairline);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .slot::after {
+    content: attr(data-label);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 0.4rem 0.7rem;
+  }
+  .slot.wide { aspect-ratio: 21 / 9; }
+  .slot.three-two { aspect-ratio: 3 / 2; }
+  .slot.square { aspect-ratio: 1 / 1; }
+
+  /* ---------- section scaffolding ---------- */
+
+  section { padding-block: clamp(3rem, 6vw, 5rem); }
+  section + section { border-top: 1px solid var(--hairline); }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .section-head p {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+  .section-lede {
+    font-size: 1.02rem;
+    color: var(--ink-soft);
+    max-width: var(--measure);
+    margin: calc(clamp(2rem, 4vw, 3rem) * -1) 0 clamp(2rem, 4vw, 3rem);
+  }
+
+  /* ---------- property bands ---------- */
+
+  .properties { display: flex; flex-direction: column; }
+
+  .property {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+    padding-block: clamp(2rem, 4vw, 3.25rem);
+  }
+  .property + .property { border-top: 1px solid var(--hairline); }
+  .property:nth-child(even) .property-media { order: 2; }
+
+  .property-body { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; }
+
+  .place {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(1.55rem, 3vw, 2.05rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .property-body p {
+    margin: 0;
+    color: var(--ink-soft);
+    max-width: 46ch;
+  }
+
+  .spec {
+    font-family: var(--mono);
+    font-size: 0.79rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    padding-block: 0.6rem;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.75rem;
+  }
+  .spec .rate { color: var(--ink); font-weight: 500; }
+  .spec .sep { color: var(--accent); }
+
+  /* a value still to be confirmed — visible as a gap, not invented */
+  .tbc {
+    color: var(--muted);
+    text-decoration: underline dashed var(--accent);
+    text-underline-offset: 3px;
+  }
+
+  /* review credential pulled from the live listing */
+  .cred {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.5rem;
+    align-items: baseline;
+  }
+  .cred .star { color: var(--ink); }
+  .cred .badge {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.68rem;
+    color: var(--ink);
+    border: 1px solid var(--hairline);
+    background: var(--paper-2);
+    padding: 0.16rem 0.45rem;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin: 0; padding: 0; }
+  .tags li {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    border: 1px solid var(--hairline);
+    padding: 0.22rem 0.55rem;
+  }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.35rem; }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.68rem 1.15rem;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    display: inline-block;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  }
+  .btn:hover { background: var(--muted); border-color: var(--muted); color: var(--paper); }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--hairline); }
+  .btn.ghost:hover { background: transparent; color: var(--ink); border-color: var(--muted); }
+
+  /* ---------- area guide ---------- */
+
+  .guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(1.5rem, 3vw, 2.5rem); }
+  .guide article { display: flex; flex-direction: column; gap: 0.75rem; }
+  .guide h4 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.25rem;
+    margin: 0;
+  }
+  .guide p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
+  .guide .dist {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- video feature ---------- */
+
+  .video-feature {
+    display: grid;
+    grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: start;
+    padding-bottom: clamp(2.5rem, 5vw, 3.5rem);
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  /* The blockquote is what TikTok's embed script replaces with its player, so it
+     carries no styling of its own. Everything visual lives on the inner <section>,
+     which that script hides once the real player has loaded. */
+  .tiktok-embed {
+    margin: 0;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .tiktok-embed section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.85rem;
+    aspect-ratio: 9 / 16;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    border: 1px solid var(--hairline);
+    background:
+      repeating-linear-gradient(
+        135deg,
+        var(--slot-a) 0 14px,
+        var(--slot-b) 14px 28px
+      );
+  }
+  .video-kicker {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+  .video-handle {
+    font-family: var(--display);
+    font-size: 1.35rem;
+    margin: 0;
+  }
+  .video-handle a { text-decoration: none; border-bottom: 1px solid var(--hairline); }
+  .video-handle a:hover { border-bottom-color: var(--ink); }
+  .video-note {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin: 0;
+    max-width: 24ch;
+  }
+  .video-copy { display: flex; flex-direction: column; gap: 0.85rem; align-items: flex-start; }
+  .video-copy h4 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(1.35rem, 2.6vw, 1.7rem);
+    margin: 0;
+  }
+  .video-copy p { margin: 0; color: var(--ink-soft); max-width: 48ch; }
+
+  /* ---------- practicals ---------- */
+
+  .practicals { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0 clamp(2rem, 5vw, 4rem); }
+  .practicals dl { margin: 0; }
+  .practicals div.row {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, 9rem) 1fr;
+    gap: 1rem;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .practicals dt {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 0.15rem;
+  }
+  .practicals dd { margin: 0; color: var(--ink-soft); font-size: 0.95rem; }
+
+  /* ---------- direct list ---------- */
+
+  .direct {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    gap: clamp(1.75rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+  .direct .pitch p { color: var(--ink-soft); max-width: 46ch; }
+  .signup { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem; }
+  .signup input {
+    flex: 1 1 15rem;
+    min-width: 0;
+    font-family: var(--body);
+    font-size: 0.95rem;
+    padding: 0.66rem 0.8rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+  }
+  .signup input::placeholder { color: var(--muted); }
+  .signup button {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.68rem 1.15rem;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    transition: background 120ms ease, border-color 120ms ease;
+  }
+  .signup button:hover { background: var(--muted); border-color: var(--muted); }
+  .form-note {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.8rem;
+  }
+  .ledger {
+    background: var(--paper-2);
+    border: 1px solid var(--hairline);
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+  }
+  .ledger h4 {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 1rem;
+  }
+  .ledger ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
+  .ledger li {
+    display: grid;
+    grid-template-columns: 1.1rem 1fr;
+    gap: 0.6rem;
+    font-size: 0.93rem;
+    color: var(--ink-soft);
+  }
+  .ledger li::before {
+    content: "—";
+    color: var(--accent);
+    font-family: var(--mono);
+  }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    border-top: 1px solid var(--hairline);
+    padding-block: clamp(2.5rem, 5vw, 3.5rem);
+  }
+  footer .wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 3rem;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  footer .colophon {
+    font-family: var(--display);
+    font-size: 1.35rem;
+    line-height: 1.3;
+  }
+  footer .colophon .domain {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+  footer .contact {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    align-items: flex-start;
+  }
+  footer .contact a {
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 1px;
+  }
+  footer .contact a:hover { border-bottom-color: var(--ink); }
+  footer .license {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--ink-soft);
+    width: 100%;
+    margin: 1.25rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.75rem;
+  }
+  footer .license dfn {
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+  footer .fine {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 760px) {
+    .property { grid-template-columns: 1fr; }
+    .property:nth-child(even) .property-media { order: 0; }
+    .direct { grid-template-columns: 1fr; }
+    .video-feature { grid-template-columns: 1fr; }
+    .video-frame { max-width: 320px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="notice">
+  <div class="wrap">
+    <span><b>All three houses are live from your Airbnb listings.</b></span>
+    <span>Still to come: photos of the houses, rates, the area guide, and two house names.</span>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="wordmark" href="#top">Keep Austin Staying</a>
+    <nav class="top">
+      <a href="#stays">Stays</a>
+      <a href="#area">The area</a>
+      <a href="#practicals">Practicals</a>
+      <a href="#direct">Book direct</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Three houses · one small team</p>
+      <h1>Places we look after, <em>properly.</em></h1>
+      <p class="lede">Three houses in Austin, looked after by the three of us — Alexis, Gabe, and Aaron — rather than by a management company. The same standard at every one, and a real person on the other end of every message.</p>
+      <figure class="hero-slot">
+        <img src="assets/hero-collage.jpg" width="2100" height="900"
+             alt="Four Austin scenes: the State Capitol seen looking north up South Congress Avenue, Zilker Park's great lawn with the downtown skyline behind it, the painted storefronts and barber shop on South Congress, and the neon Radio Coffee &amp; Beer sign.">
+        <figcaption>
+          <span>South Congress</span>
+          <span>·</span>
+          <span>Zilker Park</span>
+          <span>·</span>
+          <span>Radio Coffee &amp; Beer</span>
+        </figcaption>
+      </figure>
+
+      <div class="hero-map">
+        <figure class="city-map">
+          <svg viewBox="0 0 400 400" role="img" aria-labelledby="map-t map-d">
+            <title id="map-t">Where the houses are in Austin</title>
+            <desc id="map-d">A circular map of Austin. The Colorado River runs east across the top through downtown. Interstate 35 and MoPac run north to south, Ben White Boulevard east to west. Two houses are marked in South Austin, below Ben White, and one in Oak Hill to the south-west where Highways 290 and 71 split. Green marks Zilker Park and the Barton Creek greenbelt.</desc>
+
+            <defs>
+              <clipPath id="map-clip"><circle cx="200" cy="200" r="196"/></clipPath>
+            </defs>
+
+            <g clip-path="url(#map-clip)">
+              <rect class="m-ground" x="0" y="0" width="400" height="400"/>
+
+              <!-- Barton Creek greenbelt, winding south-west out of Zilker -->
+              <path class="m-greenbelt" d="M 248 150 C 222 186, 196 206, 168 244 C 146 274, 120 288, 92 298"/>
+              <path class="m-creek" d="M 248 150 C 222 186, 196 206, 168 244 C 146 274, 120 288, 92 298"/>
+              <!-- Zilker Park, and the wilderness park out toward Oak Hill -->
+              <ellipse class="m-park" cx="251" cy="134" rx="25" ry="16"/>
+              <ellipse class="m-park" cx="112" cy="246" rx="23" ry="14"/>
+
+              <!-- MoPac and I-35, north to south -->
+              <path class="m-road" d="M 208 0 L 217 200 L 228 400"/>
+              <path class="m-road major" d="M 306 0 L 316 200 L 330 400"/>
+              <!-- Ben White Blvd, east to west -->
+              <path class="m-road major" d="M 150 240 L 400 226"/>
+              <!-- the Y at Oak Hill, where 290 and 71 split -->
+              <path class="m-road" d="M 85 299 L 150 240"/>
+              <path class="m-road" d="M 85 299 L 0 334"/>
+              <path class="m-road" d="M 85 299 L 2 286"/>
+              <!-- Manchaca Rd, south off Ben White -->
+              <path class="m-road" d="M 272 234 L 264 292 L 252 400"/>
+
+              <!-- the Colorado River, widening into Lady Bird Lake at downtown -->
+              <path class="m-water" d="M 104 22 C 182 66, 254 93, 316 104 C 358 111, 384 128, 400 152"/>
+              <path class="m-lake" d="M 268 97 C 296 101, 330 108, 356 118"/>
+            </g>
+
+            <circle class="m-ring" cx="200" cy="200" r="196"/>
+
+            <circle class="m-city" cx="316" cy="101" r="6"/>
+
+            <circle class="m-halo" cx="85" cy="299" r="22"/>
+            <circle class="m-dot" cx="85" cy="299" r="8"/>
+
+            <circle class="m-halo" cx="266" cy="299" r="22"/>
+            <circle class="m-dot" cx="266" cy="299" r="8"/>
+          </svg>
+
+          <figcaption class="city-map__key">
+            <p class="key-title">Where we are</p>
+            <ul>
+              <li><span class="key key--house"></span>Oak Hill &middot; one house</li>
+              <li><span class="key key--house"></span>South Austin &middot; two houses</li>
+              <li><span class="key key--city"></span>Downtown</li>
+              <li><span class="key key--water"></span>Lady Bird Lake</li>
+              <li><span class="key key--park"></span>Zilker &amp; the greenbelt</li>
+            </ul>
+            <p class="note">Approximate areas &middot; not to scale</p>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="stays">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The stays</h2>
+        <p>Three houses · all sleep 8</p>
+      </div>
+      <p class="section-lede">All three are three-bedroom houses that sleep eight, so the choice is mostly about which side of town you want and what you need out back — a fireplace and a patio, a garage to park in, or a fire pit and a spare half bath.</p>
+
+      <div class="properties">
+
+        <article class="property">
+          <div class="property-media">
+            <div class="slot three-two" data-label="photo · 3:2"></div>
+          </div>
+          <div class="property-body">
+            <p class="place">Oak Hill, Austin · off Hwy 290 &amp; 71</p>
+            <h3>An Oak Hill Home</h3>
+            <p class="cred">
+              <span class="star">★ 5.0</span><span>·</span>
+              <span>23 reviews</span><span>·</span>
+              <span class="badge">Guest favorite</span>
+            </p>
+            <p>Three bedrooms and two baths a short drive from downtown, with 290 and 71 both close by. A living room built around the fireplace, a kitchen with everything you'd actually cook with, and a fenced back yard with a patio to sit out on. Fast wi-fi and a proper desk, so a working week here isn't a compromise.</p>
+            <div class="spec">
+              <span>Sleeps 8</span><span class="sep">·</span>
+              <span>3 bed</span><span class="sep">·</span>
+              <span>4 beds</span><span class="sep">·</span>
+              <span>2 bath</span><span class="sep">·</span>
+              <span class="tbc">min nights t.b.c.</span><span class="sep">·</span>
+              <span class="tbc">rate t.b.c.</span>
+            </div>
+            <ul class="tags">
+              <li>fireplace</li><li>fast wi-fi</li><li>dedicated workspace</li><li>fenced yard + patio</li><li>free parking</li><li>pets allowed</li>
+            </ul>
+            <div class="actions">
+              <a class="btn" href="https://www.airbnb.com/rooms/1598934202273477463">Check availability</a>
+              <a class="btn ghost" href="#">See the whole house</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="property">
+          <div class="property-media">
+            <div class="slot three-two" data-label="photo · 3:2"></div>
+          </div>
+          <div class="property-body">
+            <p class="place">South Austin · garage and yard</p>
+            <h3>South Austin Stay</h3>
+            <p class="cred">
+              <span class="star">★ 4.95</span><span>·</span>
+              <span>19 reviews</span><span>·</span>
+              <span class="badge">Guest favorite</span>
+            </p>
+            <p>A bright, fully furnished three-bedroom with five beds, so a group of eight fits without anyone drawing the short straw. Open living space, smart TVs, a garage to park in rather than a curb, and a yard worth sitting in once the sun drops. Fast wi-fi and a desk, for anyone working through the week.</p>
+            <div class="spec">
+              <span>Sleeps 8</span><span class="sep">·</span>
+              <span>3 bed</span><span class="sep">·</span>
+              <span>5 beds</span><span class="sep">·</span>
+              <span>2 bath</span><span class="sep">·</span>
+              <span class="tbc">min nights t.b.c.</span><span class="sep">·</span>
+              <span class="tbc">rate t.b.c.</span>
+            </div>
+            <ul class="tags">
+              <li>garage</li><li>yard</li><li>fast wi-fi</li><li>dedicated workspace</li><li>sofa bed</li><li>pets allowed</li>
+            </ul>
+            <div class="actions">
+              <a class="btn" href="https://www.airbnb.com/rooms/1655329029936239948">Check availability</a>
+              <a class="btn ghost" href="#">See the whole house</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="property">
+          <div class="property-media">
+            <div class="slot three-two" data-label="photo · 3:2"></div>
+          </div>
+          <div class="property-body">
+            <p class="place">South Austin · near Radio Coffee &amp; Beer</p>
+            <h3>Fire Side Home</h3>
+            <p class="cred">
+              <span class="star">★ 5.0</span><span>·</span>
+              <span>27 reviews</span><span>·</span>
+              <span class="badge">Guest favorite</span>
+            </p>
+            <p>The only one of the three with a half bath to spare, which counts for a lot when eight people are getting ready at once. Bright open layout, full kitchen, and a fenced back yard with a fire pit for the end of the evening. Radio Coffee &amp; Beer is close enough to walk to.</p>
+            <div class="spec">
+              <span>Sleeps 8</span><span class="sep">·</span>
+              <span>3 bed</span><span class="sep">·</span>
+              <span>5 beds</span><span class="sep">·</span>
+              <span>2.5 bath</span><span class="sep">·</span>
+              <span class="tbc">min nights t.b.c.</span><span class="sep">·</span>
+              <span class="tbc">rate t.b.c.</span>
+            </div>
+            <ul class="tags">
+              <li>fire pit</li><li>fenced yard</li><li>fast wi-fi</li><li>dedicated workspace</li><li>sofa bed</li><li>free parking</li><li>pets allowed</li>
+            </ul>
+            <div class="actions">
+              <a class="btn" href="https://www.airbnb.com/rooms/1598953749522814358">Check availability</a>
+              <a class="btn ghost" href="#">See the whole house</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="area">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>What's worth doing</h2>
+        <p>Your picks · Austin</p>
+      </div>
+
+      <div class="video-feature">
+        <div class="video-frame">
+          <blockquote class="tiktok-embed"
+                      cite="https://www.tiktok.com/@exploretex/video/7648810803109367053"
+                      data-video-id="7648810803109367053">
+            <section>
+              <p class="video-kicker">TikTok</p>
+              <p class="video-handle"><a href="https://www.tiktok.com/@exploretex" target="_blank" rel="noopener">@exploretex</a></p>
+              <a class="btn ghost" href="https://www.tiktok.com/@exploretex/video/7648810803109367053" target="_blank" rel="noopener">Watch on TikTok</a>
+              <p class="video-note">The player loads on the published site; this preview can't reach TikTok.</p>
+            </section>
+          </blockquote>
+        </div>
+        <div class="video-copy">
+          <h4>Barton Springs, and the river through the middle of it</h4>
+          <p>Sixty-eight degrees year round, spring-fed, and busy from the first warm weekend onward. The clip runs the length of the river as it cuts through the city — the stretch of Austin most people come here for, and a short drive from all three houses.</p>
+          <p>Video does something a photograph can't: it shows what a place feels like at the hour you'd actually be standing in it.</p>
+        </div>
+      </div>
+
+      <div class="guide">
+        <article>
+          <div class="slot square" data-label="photo · 1:1"></div>
+          <p class="dist tbc">Awaiting your pick</p>
+          <h4>Somewhere to eat</h4>
+          <p>The one place you send every guest to. Tell me the name and why, and I'll write it up — a specific recommendation from the host beats a list of twenty links.</p>
+        </article>
+        <article>
+          <div class="slot square" data-label="photo · 1:1"></div>
+          <p class="dist tbc">Awaiting your pick</p>
+          <h4>Somewhere outdoors</h4>
+          <p>A greenbelt trail, a swimming hole, a park within a short drive of all three houses. Guests searching "things to do near Austin" are how people find sites like this one.</p>
+        </article>
+        <article>
+          <div class="slot square" data-label="photo · 1:1"></div>
+          <p class="dist tbc">Awaiting your pick</p>
+          <h4>Something only locals know</h4>
+          <p>The detail that makes the page worth reading — the coffee place that opens early, the shortcut that avoids 290 at rush hour, the night the music is good.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="practicals">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Practicals</h2>
+        <p class="tbc">Placeholder policies · confirm each</p>
+      </div>
+      <div class="practicals">
+        <dl>
+          <div class="row"><dt>Check-in</dt><dd>From 4:00 pm, self check-in with a keypad code sent the morning of arrival.</dd></div>
+          <div class="row"><dt>Check-out</dt><dd>By 11:00 am. Late check-out to 1:00 pm when the calendar allows — just ask.</dd></div>
+          <div class="row"><dt>Cleaning</dt><dd>One flat cleaning fee per stay, shown at booking. No hidden chore list on departure.</dd></div>
+        </dl>
+        <dl>
+          <div class="row"><dt>Pets</dt><dd>Welcome at all three houses. <span class="tbc">Fee per stay to confirm.</span></dd></div>
+          <div class="row"><dt>Cancellation</dt><dd>Full refund up to 14 days before arrival; 50% up to 7 days.</dd></div>
+          <div class="row"><dt>Questions</dt><dd>A real person answers — your Airbnb response rate is 100%, typically within the hour.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section id="direct">
+    <div class="wrap">
+      <div class="direct">
+        <div class="pitch">
+          <div class="section-head"><h2>Book direct next time</h2></div>
+          <p>Right now every booking runs through the usual platforms, and that's fine — it's simple and you're protected. But platform fees add roughly 15% to what you pay, and none of it reaches the house.</p>
+          <p>Leave an email and you'll hear first when direct booking opens, along with the dates that haven't gone public yet. A few messages a year, nothing else.</p>
+          <form class="signup" onsubmit="return false;">
+            <label for="email" hidden>Email address</label>
+            <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+            <button type="submit">Join the list</button>
+          </form>
+          <p class="form-note">Form is a placeholder — it connects to your mailing list when the site goes live.</p>
+        </div>
+        <aside class="ledger">
+          <h4>What direct booking changes</h4>
+          <ul>
+            <li>No platform service fee on the guest's side</li>
+            <li>Returning guests get first refusal on holiday weeks</li>
+            <li>Longer stays priced by the week, not by the night</li>
+            <li>Requests handled by the person who owns the house</li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="colophon">Keep Austin Staying<span class="domain tbc">domain to confirm</span></div>
+    <div class="contact">
+      <span class="tbc">email address to confirm</span>
+      <span class="tbc">Instagram handle to confirm</span>
+      <span>Phone shared with guests after booking</span>
+    </div>
+    <p class="license">
+      <dfn>City of Austin STR licenses</dfn>
+      <span>An Oak Hill Home · OL2026086598</span>
+      <span>South Austin Stay · OL2026040319</span>
+      <span>Fire Side Home · OL2026031718</span>
+    </p>
+    <p class="fine">Preview layout. Replace remaining names, copy, rates, and photos with the real listings before publishing.</p>
+  </div>
+</footer>
+
+<!-- TikTok's official embed script. Blocked in this preview; renders the player once
+     the site is hosted on its own domain. Nothing else on the page depends on it. -->
+<script async src="https://www.tiktok.com/embed.js"></script>
+
+</body></html>
