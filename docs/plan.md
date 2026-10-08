@@ -55,7 +55,7 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 9} → {7, 8} → {10, 11} → {12,
 ### Needed before step 1
 - [x] Repo: `rojaswestall/str-website`, empty, branch `main`, cloned to `~/Documents/github/str-website`. `docs/plan.md` and `design/artifact.html` are already in the working tree (uncommitted).
 - [ ] If you still want a GitHub org, create it and transfer the repo later (Settings → Transfer). Nothing in the plan depends on it.
-- [ ] Confirm Node 22 LTS and pnpm 10 are acceptable pins.
+- [x] Node and pnpm pins. Decided in step 1: latest stable of everything. Node 24 LTS (`.nvmrc`), pnpm 12 (exact `packageManager` pin), TypeScript 6.x, ESLint 10.
 
 ### Needed before step 3 (content)
 - [ ] Final house names for the two still-placeholder listings (artifact notes "two house names" still to come).
@@ -109,7 +109,7 @@ Where to look first (all in the repo, read before writing any code):
 - Earlier steps' PRs on GitHub: if your step depends on a component or file from a prior step, read that step's prompt in `docs/plan.md` and the merged code before reusing it.
 
 Stack and conventions (already decided, do not change):
-- Next.js App Router (latest), TypeScript strict, Tailwind v4, pnpm, ESLint flat config, Prettier, Playwright. Node 22, pnpm 10.
+- Next.js App Router (latest), TypeScript strict, Tailwind v4, pnpm, ESLint flat config, Prettier, Playwright. Node 24 LTS, pnpm 12.
 - In current Next.js, `params` and `searchParams` are Promises in pages, layouts, generateMetadata, and route handlers. Always `await` them.
 - Content is typed data in `content/*.ts`. Never hardcode property copy in components.
 - Design tokens are CSS variables in `app/globals.css` mapped into Tailwind via `@theme inline`. Light and dark themes switch on `[data-theme]`. Use token utilities (`bg-paper`, `text-ink`, `border-hairline`, `font-display`, `font-mono`), never raw hex in components.
@@ -153,7 +153,8 @@ Done when CI is green on the first PR and `pnpm test:e2e` passes locally against
 - `AGENTS.md` at the repo root is written by `next dev` and points agents at the Next 16 docs in `node_modules/next/dist/docs/`. It is committed so the tree stays clean.
 - `docs/plan.md` and `design/artifact.html` are in `.prettierignore`; CI runs `pnpm format:check`, so run `pnpm format` before committing.
 - Playwright runs one Chromium project against `pnpm build && pnpm start`; CI builds once explicitly and then again inside the Playwright web server. Step 13 can dedupe that if CI time matters.
-- The `packageManager` pin is `pnpm@10.7.1` (corepack needs an exact version). `.nvmrc` is `22`; the step 1 machine ran Node 23 without issue.
+- Versions: Node 24 LTS (`.nvmrc`; Node 26 is "current", not LTS, at the time of writing), pnpm 12 (exact `packageManager` pin; corepack needs an exact version), TypeScript 6.0 (7.x is the native compiler and typescript-eslint caps support below 6.1), ESLint 10, `@vercel/analytics` 2. Everything else was already on latest.
+- pnpm 11+ changes that matter here: `minimumReleaseAge` defaults to one day, so a package published in the last 24 hours resolves to the previous version (expected, do not fight it); build-script policy lives in `pnpm-workspace.yaml` under `allowBuilds` (`ignoredBuiltDependencies` is gone); settings no longer live in `.npmrc`. If pnpm 10's auto-switch fails with ENOEXEC, install pnpm 12 globally with `npm i -g pnpm@<pin>` under Node 24.
 
 ### Step 2 — Tokens and theme
 

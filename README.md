@@ -11,8 +11,9 @@ Playwright. Deployed on Vercel with Vercel Web Analytics.
 
 ## Requirements
 
-- Node 22 (see `.nvmrc`)
-- pnpm 10 (pinned in `package.json`; `corepack enable` picks it up)
+- Node 24 LTS (see `.nvmrc`; `nvm use` picks it up)
+- pnpm 12 (exact version pinned in `package.json`; install it with
+  `npm i -g pnpm@<pinned version>` or let `corepack` pick it up)
 
 ## Run
 
@@ -53,6 +54,14 @@ build, and e2e on every pull request and on pushes to `main`.
 - `e2e/` — Playwright specs.
 - `docs/plan.md` — the full implementation plan with per-step prompts and the
   open-items checklist.
+
+## Dependency policy
+
+Everything is on the latest stable release that its peers support. pnpm's
+default one-day `minimumReleaseAge` means a version published in the last 24
+hours resolves to the previous one until it ages; that is intended. TypeScript
+stays on 6.x until typescript-eslint supports 7.
+
 - `design/artifact.html` — the static visual reference. Open it in a browser;
   do not edit it.
 
