@@ -210,9 +210,16 @@ export const SiteConfigSchema = z.object({
       url: z.url({ hostname: /(^|\.)tiktok\.com$/ }),
       /** Handle without the @. */
       handle: nonEmpty,
+      /** Display heading beside the player on the home page. */
+      title: nonEmpty,
+      /** One or two short paragraphs beside the player. */
+      body: z.array(nonEmpty).min(1),
     })
     .nullable(),
-  /** The 21:9 image behind the home hero. */
-  heroCollage: ImageSchema,
+  /** The 21:9 image behind the home hero, with the places named in its caption. */
+  heroCollage: ImageSchema.extend({
+    /** Mono figcaption parts, rendered with `·` separators. */
+    caption: z.array(nonEmpty).min(1),
+  }),
 });
 export type SiteConfig = z.infer<typeof SiteConfigSchema>;

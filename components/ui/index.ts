@@ -10,3 +10,4 @@ export { SectionHead } from "./SectionHead";
 export { SpecRow, type SpecItem } from "./SpecRow";
 export { Tag, TagList } from "./Tag";
 export { Tbc } from "./Tbc";
+export { TbcText, stripTbc } from "./TbcText";
