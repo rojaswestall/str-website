@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Showcase } from "./showcase";
 
 export const metadata: Metadata = {
-  title: "Kitchen sink · The Austin Collection",
+  title: "Kitchen sink",
   robots: { index: false, follow: false },
 };
 
@@ -16,7 +16,7 @@ export default function KitchenSinkPage() {
   if (process.env.NODE_ENV === "production") notFound();
 
   return (
-    <main className="grid flex-1 lg:grid-cols-2">
+    <div className="grid flex-1 lg:grid-cols-2">
       <div data-theme="light" className="bg-paper text-ink">
         <Showcase theme="light" />
       </div>
@@ -26,6 +26,6 @@ export default function KitchenSinkPage() {
       >
         <Showcase theme="dark" />
       </div>
-    </main>
+    </div>
   );
 }
