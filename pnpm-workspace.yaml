@@ -3,3 +3,6 @@
 allowBuilds:
   sharp: false
   unrs-resolver: false
+  # tsx (used by scripts/check-content.ts) works through esbuild's optional
+  # platform packages; its postinstall is only a download fallback.
+  esbuild: false
