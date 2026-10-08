@@ -46,8 +46,9 @@ content check, build, and e2e on every pull request and on pushes to `main`.
 
 ## Where things live
 
-- `app/` — routes, root layout, and `globals.css` (design tokens: light on
-  `:root`, dark on `[data-theme="dark"]`, mapped to Tailwind utilities).
+- `app/` — routes (`/`, `/stays/[slug]` for each house, `/api/contact`),
+  root layout, and `globals.css` (design tokens: light on `:root`, dark on
+  `[data-theme="dark"]`, mapped to Tailwind utilities).
 - `components/` — reusable UI, grouped by area (`theme`, `ui`, `layout`,
   `hospitable`, `embeds`, `property`, `home`). `theme/` holds the next-themes
   provider and toggle; `ui/` holds the primitives (import from
@@ -57,11 +58,11 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   their client cores, and the stubs); `embeds/` holds `TikTokEmbed`;
   `home/` holds the landing-page sections composed by `app/page.tsx`;
   `map/` holds the `CityMap` SVG; `area/` the area guide; `practicals/`
-  the policies list; `property/` the home-page `PropertyBand` (property
-  pages arrive with step 9). `/kitchen-sink` renders every primitive in
-  light and dark side by side in `pnpm dev` only (404 in production), and
-  `/hospitable-lab` previews the widgets (dev, or a build with
-  `NEXT_PUBLIC_DEV_ROUTES=1`; 404 otherwise).
+  the policies list; `property/` the home-page `PropertyBand` and the pieces
+  of a house page (`PropertyHeader`, `Gallery`, `AmenityList`, `Quotes`,
+  `BookingPanel`, `PropertyCard`, `OtherHouses`). `/kitchen-sink` renders
+  every primitive in light and dark side by side in `pnpm dev` only (404 in
+  production).
 - `lib/` — shared code that is not a component (`fonts.ts` loads Newsreader
   and IBM Plex through `next/font`; `site-url.ts` resolves the canonical
   origin from `NEXT_PUBLIC_SITE_URL`; `cx.ts` joins class names;
@@ -108,8 +109,6 @@ falls back to `http://localhost:3000` when unset.
 (placeholder panels, the default from `content/site.ts`) and `live` (the
 loader from `cdn.hsptb.com`). It is inlined at build time. A house whose
 `hospitable.propertyId` is still null renders the stub in either mode.
-`NEXT_PUBLIC_DEV_ROUTES=1` keeps `/hospitable-lab` in a production build;
-Playwright sets it for its test servers.
 
 The contact route (`POST /api/contact`) emails inquiries through Resend using
 `RESEND_API_KEY`, `CONTACT_FROM`, and `CONTACT_TO` (comma-separated

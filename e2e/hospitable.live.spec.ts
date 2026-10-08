@@ -6,6 +6,10 @@ import { expect, test, type Page } from "@playwright/test";
  * route below answers for cdn.hsptb.com with a tiny stand-in that behaves like
  * the real one (reads its own data-* attributes, inserts its output right
  * after the script element).
+ *
+ * Fire Side Home is the only house with a Hospitable property id in content
+ * (docs/plan.md, open items), so it is the live mount; the other two exercise
+ * the stub fallback.
  */
 const FAKE_LOADER = `
   (() => {
@@ -34,18 +38,22 @@ async function interceptLoader(page: Page) {
 }
 
 const SITE_UUID = "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb";
+const FIRE_SIDE_PROPERTY_ID = "2338068";
 
 test.describe("hospitable widgets (live mode)", () => {
-  test("mounts the loader once per house and re-mounts on client-side navigation", async ({
+  test("mounts the loader once and re-mounts after client-side navigation away and back", async ({
     page,
   }) => {
     const loads = await interceptLoader(page);
-    await page.goto("/hospitable-lab/oak-hill?propertyId=2338068");
+    await page.goto("/stays/fire-side");
 
     const marker = page.getByTestId("hospitable-live-marker");
     await expect(marker).toHaveCount(1);
     await expect(marker).toHaveAttribute("data-site-uuid", SITE_UUID);
-    await expect(marker).toHaveAttribute("data-property-id", "2338068");
+    await expect(marker).toHaveAttribute(
+      "data-property-id",
+      FIRE_SIDE_PROPERTY_ID,
+    );
     await expect(marker).toHaveAttribute("data-theme", "multi");
     await expect(page.getByTestId("hospitable-stub")).toHaveCount(0);
 
@@ -54,7 +62,10 @@ test.describe("hospitable widgets (live mode)", () => {
     );
     await expect(script).toHaveCount(1);
     await expect(script).toHaveAttribute("data-site-uuid", SITE_UUID);
-    await expect(script).toHaveAttribute("data-property-id", "2338068");
+    await expect(script).toHaveAttribute(
+      "data-property-id",
+      FIRE_SIDE_PROPERTY_ID,
+    );
     await expect(script).toHaveAttribute("data-theme", "multi");
     // The loader's output lands inside the container React hands over to it.
     await expect(
@@ -63,16 +74,25 @@ test.describe("hospitable widgets (live mode)", () => {
         .locator("[data-hospitable-container] > *"),
     ).toHaveCount(2);
 
-    // Client-side navigation to another house: the old output is cleared and
-    // exactly one fresh marker appears for the new property id.
-    await page
-      .getByRole("navigation", { name: "Other houses" })
-      .getByRole("link", { name: "South Austin Stay" })
-      .click();
-    await expect(page).toHaveURL(
-      /\/hospitable-lab\/south-austin\?propertyId=2338068/,
+    // Client-side navigation to a house without an id: the live mount is torn
+    // down and the stub takes its place.
+    const others = page.getByRole("navigation", { name: "Other houses" });
+    await others.getByRole("link", { name: "An Oak Hill Home" }).click();
+    await expect(page).toHaveURL(/\/stays\/oak-hill$/);
+    await expect(page.getByTestId("hospitable-stub")).toContainText(
+      "An Oak Hill Home",
     );
-    await expect(page.getByTestId("hospitable-live-marker")).toHaveCount(1);
+    await expect(marker).toHaveCount(0);
+    await expect(script).toHaveCount(0);
+
+    // Back to the live house: exactly one fresh marker and one fresh script.
+    await others.getByRole("link", { name: "Fire Side Home" }).click();
+    await expect(page).toHaveURL(/\/stays\/fire-side$/);
+    await expect(marker).toHaveCount(1);
+    await expect(marker).toHaveAttribute(
+      "data-property-id",
+      FIRE_SIDE_PROPERTY_ID,
+    );
     await expect(script).toHaveCount(1);
     expect(loads).toHaveLength(2);
   });
@@ -86,21 +106,16 @@ test.describe("hospitable widgets (live mode)", () => {
       if (message.type() === "warning") warnings.push(message.text());
     });
 
-    await page.goto("/hospitable-lab/oak-hill");
+    await page.goto("/stays/oak-hill");
 
     await expect(page.getByTestId("hospitable-stub")).toBeVisible();
+    await expect(page.getByTestId("hospitable-stub")).toContainText(
+      "An Oak Hill Home",
+    );
     await expect(page.getByTestId("hospitable-live-marker")).toHaveCount(0);
     expect(loads).toEqual([]);
     expect(
       warnings.filter((text) => text.includes("[Hospitable] live mode")),
     ).toHaveLength(1);
-  });
-
-  test("the search widget stays a stub until its snippet exists", async ({
-    page,
-  }) => {
-    await interceptLoader(page);
-    await page.goto("/hospitable-lab");
-    await expect(page.getByTestId("hospitable-search-stub")).toBeVisible();
   });
 });
