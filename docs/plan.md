@@ -249,6 +249,19 @@ Remove the temporary swatches from step 2 on `/`.
 Done when a screenshot of the kitchen sink is visually indistinguishable from the matching artifact elements in light mode, and nothing uses raw hex.
 ```
 
+**Notes from step 4 (read before steps 5, 7, 8, 12):**
+
+- Import primitives from `@/components/ui` (barrel in `components/ui/index.ts`): `Container`, `Section`, `SectionHead`, `Eyebrow`, `Button`, `Tag`, `TagList`, `SpecRow`, `Credential`, `PhotoFrame`, `Ledger`, `Prose`, `Tbc`. All are Server Components, styled only with token utilities; `lib/cx.ts` joins class names (no clsx dependency). Class names are always literal strings so Tailwind can see them; never build them with template literals.
+- `Section` wraps its children in a `Container` by default (`bleed` opts out) and takes `hairline` for the artifact's `section + section` top rule, so the home page should pass `hairline` on every section after the hero. `id` lands on the `<section>` for `/#stays`-style anchors; `aria-labelledby` can point at the `SectionHead` `id`, which is set on the h2.
+- `SectionHead` takes `title`, `meta` (right-aligned mono line, pass `<Tbc>` for the practicals meta), and `lede`. The lede carries the artifact's negative top margin itself, so render it through the prop rather than as a sibling paragraph.
+- `Button` renders `next/link` for internal `href`s, a plain `<a target="_blank" rel="noopener noreferrer">` when `external` is set, and `<button type="button">` when there is no `href`. Variants are `primary` (ink on paper) and `ghost` (hairline border).
+- `SpecRow` takes `items: { label, tbc?, strong? }[]`; `tbc` renders the dashed `Tbc` underline, `strong` is the artifact's `.rate` (ink, weight 500) for "from $X / night" once rates are confirmed. Separators are `aria-hidden`. `Credential` formats whole ratings as "5.0" and pluralises reviews; the "Guest favorite" badge is opt-in.
+- `PhotoFrame` accepts any `{ src, alt, width, height }` (the content `Image` and `Photo` types fit), renders `next/image` with `fill` + `object-cover` inside a fixed-ratio hairline box (`3:2`, `1:1`, `21:9`), and shows the striped slot with a mono label when `image` is null. Pass `sizes` for anything not full-width and `preload` (Next 16 replaced `priority`) for the hero. `caption` takes a node or a string array joined with `·`.
+- `Ledger` takes `title` plus `items` (em-dash list), `rows` (definition rows styled like the artifact's Practicals `dt`/`dd`), or both; `as` picks `aside`/`div` and `headingAs` the heading level (default `h4`). The footer in step 5 can reuse its typography but should not nest a Ledger.
+- Tokens: `app/globals.css` now defines the light values on `:root, [data-theme="light"]` as well as dark on `[data-theme="dark"]`, so a wrapper with either attribute forces that theme for its subtree regardless of the `<html>` theme. The kitchen sink relies on this; step 12 can use it for side-by-side audits.
+- `/kitchen-sink` (`app/(dev)/kitchen-sink/`) renders every primitive twice (forced light and forced dark) from real content data and calls `notFound()` when `NODE_ENV` is `production`; `e2e/kitchen-sink.spec.ts` asserts the 404 against the production build. `/` is a holding page built from the primitives; the theme toggle still lives there for `e2e/theme.spec.ts` until step 5 moves it into `SiteHeader`.
+- Verified in the browser at 1400px and 375px against `design/artifact.html`: section head and lede margins, spec strip, tags, credential badge, buttons, ledger, striped slot gradient, and the dashed `Tbc` underline all match computed values. No raw hex outside `app/globals.css`.
+
 ### Step 5 — Site shell
 
 ```

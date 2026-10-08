@@ -50,7 +50,9 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   `:root`, dark on `[data-theme="dark"]`, mapped to Tailwind utilities).
 - `components/` — reusable UI, grouped by area (`theme`, `ui`, `layout`,
   `property`, `hospitable`, `home`). `theme/` holds the next-themes provider
-  and toggle; the rest arrive from step 4 onward.
+  and toggle; `ui/` holds the primitives (import from `@/components/ui`);
+  the rest arrive from step 5 onward. `/kitchen-sink` renders every primitive
+  in light and dark side by side in `pnpm dev` only (404 in production).
 - `lib/` — shared code that is not a component (`fonts.ts` loads Newsreader
   and IBM Plex through `next/font`).
 - `content/` — typed site content. `types.ts` holds the zod schemas; the
