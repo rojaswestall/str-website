@@ -54,8 +54,11 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   `@/components/ui`); `layout/` holds the site shell (`SkipLink`,
   `SiteHeader`, `SiteFooter`) composed in `app/layout.tsx`; `hospitable/`
   holds the booking and search widgets (`PropertyWidget`, `SearchWidget`,
-  their client cores, and the stubs); `embeds/` holds `TikTokEmbed`; the
-  rest arrive from step 8 onward. `/kitchen-sink` renders every primitive in
+  their client cores, and the stubs); `embeds/` holds `TikTokEmbed`;
+  `home/` holds the landing-page sections composed by `app/page.tsx`;
+  `map/` holds the `CityMap` SVG; `area/` the area guide; `practicals/`
+  the policies list; `property/` the home-page `PropertyBand` (property
+  pages arrive with step 9). `/kitchen-sink` renders every primitive in
   light and dark side by side in `pnpm dev` only (404 in production), and
   `/hospitable-lab` previews the widgets (dev, or a build with
   `NEXT_PUBLIC_DEV_ROUTES=1`; 404 otherwise).
