@@ -59,7 +59,7 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 9} → {7, 8} → {10, 11} → {12,
 
 ### Needed before step 3 (content)
 - [ ] Final house names for the two still-placeholder listings (artifact notes "two house names" still to come).
-- [ ] URL slugs for each house (suggest `oak-hill`, `south-austin`, `fire-side`).
+- [x] URL slugs for each house: `oak-hill`, `south-austin`, `fire-side` (fixed in step 3; changing them later means changing `content/properties.ts` and any inbound links).
 - [ ] Nightly rate range and minimum nights per house (artifact shows t.b.c.).
 - [ ] Pet fee per stay.
 - [ ] Confirm the placeholder policies: 4 pm check-in, 11 am checkout, late checkout to 1 pm, 14-day / 7-day cancellation.
@@ -211,6 +211,17 @@ Create `content/` with:
 
 Done when `pnpm check:content` passes and `getProperty("oak-hill")` returns typed data.
 ```
+
+**Notes from step 3 (read before steps 4, 5, 7, 8, 11):**
+
+- Import content only from `@/content` (`content/index.ts`). It parses every data file through zod at module load, so a bad value throws in `next build` and in `pnpm check:content`; the data files themselves are plain typed objects. `getProperty(slug)` returns `undefined` for unknown slugs (call `notFound()`), and `getPropertySlugs()` feeds `generateStaticParams`. `getLicenses()` derives the footer license lines from `properties.ts`; there is no separate license file.
+- Two photo shapes: `Image` (`src`, `alt`, `width`, `height`) for hosts, area picks, and the home hero collage (`site.heroCollage`, 21:9), and `Photo` (`Image` + `role: "hero" | "gallery"`) for properties. Every `src` is root-relative under `/photos/` and `check:content` asserts the file exists in `public/`. Placeholders are real JPEGs with the artifact's diagonal-stripe look (`public/photos/<slug>/hero.jpg`, `gallery-01..03.jpg` at 1800×1200; `area/{eat,outdoors,local}.jpg` at 1200×1200; `home/hero-collage.jpg` at 2100×900), so `next/image` works unchanged and real photos replace them at the same paths.
+- Unconfirmed values: `rateFrom` and `minNights` are `null` (render "t.b.c."); host lines, area picks, FAQ answers, domain, contact email, and Instagram handle are strings starting with `[TBC]` (`isTbc()` from `@/content` detects them; render with the step 4 `Tbc` span and never as a live `mailto:` or link). Every Practicals row and FAQ row carries `tbc: true` until the hosts confirm it. `quotes` are empty arrays because no review quotes have been supplied; step 8 must hide the quotes block when the array is empty rather than seed fake ones.
+- House names stay as the artifact has them (An Oak Hill Home, South Austin Stay, Fire Side Home) until the open item is answered; changing `name` in `properties.ts` is the only edit needed. Slugs are fixed as `oak-hill`, `south-austin`, `fire-side`.
+- Map pins (CityMap 400×400 viewBox): Oak Hill (85, 299), South Austin Stay (258, 292), Fire Side Home (274, 306). The artifact draws one dot at (266, 299) for both South Austin houses; step 7 should draw one per property from `mapPin` instead.
+- Hospitable: `site.hospitable.mode` is `"stub"` and every widget id is `null`. Step 6 reads mode from content (or lets `NEXT_PUBLIC_HOSPITABLE_MODE` override it; decide there) and falls back to the stub whenever an id is null.
+- `site.tiktok` is populated with the artifact's @exploretex clip; set it to `null` to drop the embed. `site.tagline` is the artifact hero line, "Places we look after, properly."
+- Tooling: `zod` 4 (`z.url()`, `z.prettifyError`), `tsx` runs the check script with the `@/` alias. `tsx` pulls in `esbuild`, whose postinstall is denied in `pnpm-workspace.yaml` like the others; it runs fine from the optional platform package.
 
 ### Step 4 — UI primitives
 

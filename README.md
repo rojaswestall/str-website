@@ -24,15 +24,16 @@ pnpm dev
 
 Then open http://localhost:3000.
 
-| Script           | What it does                                 |
-| ---------------- | -------------------------------------------- |
-| `pnpm dev`       | Development server                           |
-| `pnpm build`     | Production build                             |
-| `pnpm start`     | Serve the production build                   |
-| `pnpm lint`      | ESLint                                       |
-| `pnpm typecheck` | `tsc --noEmit`                               |
-| `pnpm format`    | Prettier, write mode (`format:check` for CI) |
-| `pnpm test:e2e`  | Playwright against a fresh production build  |
+| Script               | What it does                                             |
+| -------------------- | -------------------------------------------------------- |
+| `pnpm dev`           | Development server                                       |
+| `pnpm build`         | Production build                                         |
+| `pnpm start`         | Serve the production build                               |
+| `pnpm lint`          | ESLint                                                   |
+| `pnpm typecheck`     | `tsc --noEmit`                                           |
+| `pnpm check:content` | Parse `content/*.ts` through zod, check slugs and photos |
+| `pnpm format`        | Prettier, write mode (`format:check` for CI)             |
+| `pnpm test:e2e`      | Playwright against a fresh production build              |
 
 Before the first e2e run, install the browser once:
 
@@ -41,7 +42,7 @@ pnpm exec playwright install chromium
 ```
 
 CI (`.github/workflows/ci.yml`) runs install, lint, format check, typecheck,
-build, and e2e on every pull request and on pushes to `main`.
+content check, build, and e2e on every pull request and on pushes to `main`.
 
 ## Where things live
 
@@ -52,9 +53,19 @@ build, and e2e on every pull request and on pushes to `main`.
   and toggle; the rest arrive from step 4 onward.
 - `lib/` — shared code that is not a component (`fonts.ts` loads Newsreader
   and IBM Plex through `next/font`).
-- `content/` — typed site content (`*.ts`). Property copy, hosts, policies,
-  and site config live here, never hardcoded in components. Added in step 3.
-- `public/` — static assets and photos.
+- `content/` — typed site content. `types.ts` holds the zod schemas; the
+  data files (`properties.ts`, `hosts.ts`, `area.ts`, `policies.ts`,
+  `site.ts`) are plain objects; `index.ts` parses them at import and exposes
+  `getAllProperties()`, `getProperty(slug)`, `getSite()`, and friends. Import
+  from `@/content`, never from a data file. Unconfirmed values are `null` or
+  strings starting with `[TBC]`. Property copy is never hardcoded in
+  components.
+- `scripts/` — `check-content.ts`, run by `pnpm check:content` and CI before
+  the build.
+- `public/photos/` — photos referenced from `content/`, one folder per house
+  plus `area/` and `home/`. Today every file is a striped placeholder with
+  the final aspect ratio (3:2 hero and gallery, 1:1 area picks, 21:9 hero
+  collage); drop real photos in at the same paths.
 - `e2e/` — Playwright specs.
 - `docs/plan.md` — the full implementation plan with per-step prompts and the
   open-items checklist.
