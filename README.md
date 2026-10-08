@@ -107,3 +107,8 @@ loader from `cdn.hsptb.com`). It is inlined at build time. A house whose
 `hospitable.propertyId` is still null renders the stub in either mode.
 `NEXT_PUBLIC_DEV_ROUTES=1` keeps `/hospitable-lab` in a production build;
 Playwright sets it for its test servers.
+
+The contact route (`POST /api/contact`) emails inquiries through Resend using
+`RESEND_API_KEY`, `CONTACT_FROM`, and `CONTACT_TO` (comma-separated
+recipients). With no API key it runs dry: the message is written to the server
+log and the request still succeeds, so local dev and CI need no secrets.

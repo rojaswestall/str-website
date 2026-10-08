@@ -81,7 +81,7 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 7} → {8, 9} → {10, 11} → {12,
 
 ### Needed before step 7 / 14 (contact and deploy)
 - [ ] Domain name and who controls DNS.
-- [ ] Resend account, verified sending domain, `from` address, recipient list (all three or one inbox).
+- [ ] Resend account, verified sending domain, `from` address, recipient list (all three or one inbox). Step 7 built the route; the values go in `RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO` (see `.env.example`), set on Vercel in step 14.
 - [ ] Vercel account and team to deploy under.
 - [ ] Public contact email and Instagram handle for the footer (artifact: t.b.c.).
 - [ ] Approve or adjust the proposed dark palette in step 2.
@@ -353,6 +353,17 @@ Implement `app/api/contact/route.ts` (POST only):
 
 Done when all four API tests pass against the production build without a Resend key.
 ```
+
+**Notes from step 7 (read before steps 10, 13, 14):**
+
+- Files: `app/api/contact/route.ts` (POST only; any other method gets Next's automatic 405), `lib/contact/schema.ts` (`ContactInquirySchema`, `ContactInquiry`, `ContactFieldErrors`, `fieldErrors`, `isHoneypotFilled`), `lib/contact/rateLimit.ts` (`consume`, `clientKey`, `CONTACT_RATE_LIMIT`), `lib/contact/email.ts` (`buildMessage`, `sendInquiry`). The route is dynamic (`ƒ` in the build output); Cache Components do not apply to it.
+- Response contract for step 10's form: `200 { ok: true }` (sent, dry-run, or honeypot tripped, deliberately indistinguishable); `400 { ok: false, message, errors }` where `errors` maps a field name to its first message (`name`, `email`, `message`, `property`, `checkIn`, `checkOut`, `website`, the same keys the form posts); `429 { ok: false, message }` with a `Retry-After` header in seconds; `500 { ok: false, message }` with a generic message (the real reason is only logged). Each `message` is written to show the guest verbatim. A non-JSON body is a 400 with empty `errors`.
+- Schema details: strings are trimmed; optional fields (`property`, `checkIn`, `checkOut`, `website`) treat `""` as absent, so the form can post every input's value as-is, including an empty select and empty native date inputs. `property` must be a slug from `getPropertySlugs()` (send `""` for "General"); dates are `YYYY-MM-DD` (what `<input type="date">` yields), compared as strings, and `checkOut > checkIn` fails on the `checkOut` path. The honeypot is checked before validation: any non-empty `website` returns 200 without touching the limiter or the mailer. Errors use zod 4's `{ error }` option, not `message`.
+- Rate limit: 5 valid inquiries per address per 10 minutes, counted after validation so a guest fixing a typo is not locked out, and not counted for honeypot hits. The key is the first entry of `x-forwarded-for` (Vercel sets it to the client address), falling back to one shared `"unknown"` bucket when the header is missing. **`next start` on localhost does not add that header, so browser-driven posts in Playwright all share the `unknown` bucket per server process.** `e2e/contact-api.spec.ts` sends its own `x-forwarded-for` per test; step 10's form spec (and step 13) must do the same via `test.use({ extraHTTPHeaders: { "x-forwarded-for": "203.0.113.<n>" } })` per file or test, or keep to five submissions per spec run. The map is per server instance (per function instance on Vercel); the comment in `rateLimit.ts` names the Upstash drop-in if a shared limit is ever wanted.
+- Mail: `resend` 6.x (`new Resend(key)`, `resend.emails.send({ from, to, replyTo, subject, text, html })` returns `{ data, error }`; `replyTo` is camelCase). Subject is `Inquiry: <property name or General> — <name>`; the guest's address is the Reply-To; the HTML body is a plain table plus the escaped message, no template. Without `RESEND_API_KEY` the route logs the whole message under `[contact] RESEND_API_KEY is not set; dry run` and returns 200, which is what local, CI, and Vercel Preview run on until step 14. With a key but no `CONTACT_FROM` / `CONTACT_TO` the route returns 500 and logs why.
+- Step 14: set `RESEND_API_KEY`, `CONTACT_FROM` (must be on the domain verified in Resend; a `Name <addr>` form is fine), and `CONTACT_TO` (comma-separated) for Production. The open item for the Resend account, domain, sender, and recipients is still unchecked; `.env.example` describes each value and nothing in the repo contains a real address. After deploying, send one inquiry through the live form and confirm it lands; a `500` in the function log with `[contact] send failed:` names the Resend error.
+- Tests: `e2e/contact-api.spec.ts` runs in the default `chromium` project (not `*.live.spec.ts`) with the `request` fixture and covers 200, honeypot, invalid email, checkout-before-check-in, unknown slug, non-JSON body, the sixth request 429 with `Retry-After`, and GET 405. Step 13 can keep it as the API half of the contact coverage.
+- `app/(dev)/dev-routes.ts` still said steps 7 and 8 mount the widgets; corrected to 8 and 9 after the renumbering.
 
 ### Step 8 — Home page
 
