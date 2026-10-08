@@ -178,6 +178,17 @@ Source of truth for light tokens is the `:root` block in `design/artifact.html`.
 Done when toggling flips the theme with no flash on reload, system preference is honoured, and `bg-paper text-ink font-display` utilities resolve in both themes.
 ```
 
+**Notes from step 2 (read before steps 4, 6, 12):**
+
+- Tokens live in `app/globals.css`: raw values on `:root` and `[data-theme="dark"]`, mapped in `@theme inline` as `--color-*` (`bg-paper`, `text-ink-soft`, `border-hairline`, `bg-map-water`, ...), `--font-display` / `--font-body` / `--font-mono` (`--font-sans` is aliased to body so `font-sans` also resolves to Plex Sans), and three layout helpers for step 4: `max-w-maxw` (1180px), `px-gutter` (the clamp), `max-w-measure` (62ch).
+- Dark palette used exactly as proposed; no value needed adjusting. Contrast on paper (light / dark): ink 12.3 / 14.9, ink-soft 7.4 / 11.2, muted 5.2 / 6.6, accent 3.3 / 5.2. `accent` fails 4.5:1 on light paper, same as the artifact; keep it for rules and decoration, not body text. On `slot-b`, light `muted` drops to 4.3:1, so avoid muted text on slot surfaces or use ink-soft there.
+- `dark:` is a custom variant keyed on `[data-theme="dark"]`, not `prefers-color-scheme`. A `data-theme="dark"` wrapper element therefore also flips `dark:` utilities inside it, which the step 4 kitchen sink relies on.
+- Fonts are self-hosted by `next/font` (`lib/fonts.ts`); no Google Fonts requests at runtime. `next/font` only allows `axes` on variable fonts, so Newsreader is loaded as a variable font (all weights, normal + italic, `opsz`) rather than the artifact's 300/400/500 subset. Plex Sans and Plex Mono are 400 + 500 as specified. The variables `--font-newsreader`, `--font-plex-sans`, `--font-plex-mono` are set on `<html>` via `fontVariables`.
+- Theme: `next-themes` 0.4 with `attribute="data-theme"`, `defaultTheme="system"`, `enableSystem`, `disableTransitionOnChange` (`components/theme/ThemeProvider.tsx`). It injects an inline `<script>` into `<body>` to set the attribute before paint. **Step 6 CSP:** that script will violate a strict `script-src`; pass a `nonce` prop to `ThemeProvider` (next-themes supports it) or allow its hash. `ThemeToggle` (`components/theme/ThemeToggle.tsx`) cycles light → dark → system, uses `useSyncExternalStore` for the mounted check (the `react-hooks` lint rules reject `setState` in `useEffect`), and exposes `data-theme-toggle` / `data-mode` attributes for tests.
+- `e2e/theme.spec.ts` covers system preference, the toggle cycle, persistence across reload, and that `font-display` resolves to Newsreader. Step 13 can extend it rather than rewrite it.
+- The temporary swatch page on `/` imports `ThemeToggle` directly; step 4 removes the swatches and step 5 moves the toggle into `SiteHeader`.
+- Local gotcha: if the shell's default Node is not 24, run `nvm use` first or pnpm 12 fails to launch with ENOEXEC. `/_vercel/insights/script.js` 404s outside Vercel; that console error is expected locally.
+
 ### Step 3 — Content model
 
 ```

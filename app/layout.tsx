@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { fontVariables } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,10 +12,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col">
-        {children}
-        <Analytics />
+    // suppressHydrationWarning: next-themes sets data-theme on <html> before hydration.
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fontVariables} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col bg-paper font-body text-ink">
+        <ThemeProvider>
+          {children}
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );
