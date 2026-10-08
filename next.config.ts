@@ -1,12 +1,20 @@
 import type { NextConfig } from "next";
 import { contentSecurityPolicy, CSP_REPORT_ONLY_HEADER } from "./lib/csp";
 
+// Playwright builds a second, live-mode copy of the site next to the default one.
+const distDir = process.env.NEXT_DIST_DIR ?? ".next";
+
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
-  // Playwright builds a second, live-mode copy of the site next to the default one.
-  distDir: process.env.NEXT_DIST_DIR ?? ".next",
+  distDir,
+  // The live copy type-checks against its own generated types (tsconfig.live.json),
+  // so a stale `.next-live` cannot break the default build or `pnpm typecheck`.
+  typescript: {
+    tsconfigPath:
+      distDir === ".next-live" ? "tsconfig.live.json" : "tsconfig.json",
+  },
   turbopack: {
     rules: {
       "*.css": {
