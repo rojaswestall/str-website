@@ -277,6 +277,16 @@ Step 5 of 14: Site shell.
 Done when every route shows header and footer, the footer lists three license numbers, and `/does-not-exist` renders the branded 404 with status 404.
 ```
 
+**Notes from step 5 (read before steps 7, 8, 11, 12, 13):**
+
+- `app/layout.tsx` now composes `SkipLink`, `SiteHeader`, `<main id="main" className="flex flex-1 flex-col">`, and `SiteFooter` inside `ThemeProvider`, with `Analytics` last. Pages must not render their own `<main>` (the holding `/` and the kitchen sink were changed to match). `main` is a flex column so a short page still pushes the footer to the bottom; a page whose only child is a `Section` can pass `className="flex-1"` as `app/not-found.tsx` does.
+- Root metadata is `title: { default: site.name, template: "%s · The Austin Collection" }`, so a page exporting `title: "An Oak Hill Home"` renders "An Oak Hill Home · The Austin Collection". `metadataBase` comes from `getSiteUrl()` in `lib/site-url.ts`, which reads `NEXT_PUBLIC_SITE_URL` (added to `.env.example`) and falls back to `http://localhost:3000`. Step 11 should build canonical URLs, the sitemap, and OG image URLs from the same helper; step 14 sets the variable on Vercel.
+- `app/not-found.tsx` is the branded 404 and exports its own `metadata` (Next 16 supports that on the root `not-found`). `next build` prerenders it as `/_not-found`; `/does-not-exist` returns status 404 with the full shell. `notFound()` from step 8's unknown-slug pages renders the same component. Per the Next docs the status drops to 200 if `notFound()` is thrown after streaming starts, so call it before any `Suspense` boundary.
+- `SiteHeader` nav links are `next/link`s to `/#stays`, `/#area`, `/#practicals`, `/#direct`; step 7 must give those `Section`s matching `id`s. `ThemeToggle` now lives in the header and was removed from `/`; `e2e/theme.spec.ts` still finds it through `[data-theme-toggle]`. At phone widths the nav wraps under the wordmark and the toggle onto its own line; there is no hamburger.
+- `SiteFooter` reads `getSite()` and `getLicenses()`. `[TBC]` contact values render as `Tbc` gaps with the artifact's wording ("domain to confirm", "email address to confirm", "Instagram handle to confirm"); once real values land in `content/site.ts` they become a `mailto:` link and an `instagram.com/<handle>` link (a leading `@` is stripped). The license line carries `data-testid="str-licenses"` for tests. The artifact's preview notice bar and its "Preview layout" footer line were dropped on purpose.
+- `e2e/shell.spec.ts` covers the header links, the toggle, the three license numbers, the skip link as first tab stop, and the 404 status, title, and shell. Step 13 can fold it into `home.spec.ts` / `stays.spec.ts` or keep it.
+- Computed styles were compared against `design/artifact.html` at 1400px and 375px, light and dark: masthead padding, wordmark size, nav size and gap, footer colophon, domain, contact, and license typography all match the artifact's values.
+
 ### Step 6 — Hospitable widgets
 
 ```

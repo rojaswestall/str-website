@@ -51,10 +51,12 @@ content check, build, and e2e on every pull request and on pushes to `main`.
 - `components/` — reusable UI, grouped by area (`theme`, `ui`, `layout`,
   `property`, `hospitable`, `home`). `theme/` holds the next-themes provider
   and toggle; `ui/` holds the primitives (import from `@/components/ui`);
-  the rest arrive from step 5 onward. `/kitchen-sink` renders every primitive
+  `layout/` holds the site shell (`SkipLink`, `SiteHeader`, `SiteFooter`)
+  composed in `app/layout.tsx`; the rest arrive from step 6 onward. `/kitchen-sink` renders every primitive
   in light and dark side by side in `pnpm dev` only (404 in production).
 - `lib/` — shared code that is not a component (`fonts.ts` loads Newsreader
-  and IBM Plex through `next/font`).
+  and IBM Plex through `next/font`; `site-url.ts` resolves the canonical
+  origin from `NEXT_PUBLIC_SITE_URL`; `cx.ts` joins class names).
 - `content/` — typed site content. `types.ts` holds the zod schemas; the
   data files (`properties.ts`, `hosts.ts`, `area.ts`, `policies.ts`,
   `site.ts`) are plain objects; `index.ts` parses them at import and exposes
@@ -84,4 +86,6 @@ stays on 6.x until typescript-eslint supports 7.
 
 ## Environment
 
-Copy `.env.example` to `.env.local`. No variables are needed yet.
+Copy `.env.example` to `.env.local`. Nothing is required locally:
+`NEXT_PUBLIC_SITE_URL` (the canonical origin used for absolute metadata URLs)
+falls back to `http://localhost:3000` when unset.
