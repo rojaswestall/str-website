@@ -104,6 +104,7 @@ You are implementing one step of a larger plan for "The Austin Collection", a di
 
 Where to look first (all in the repo, read before writing any code):
 - `docs/plan.md`: the full plan. Read the Context, Decisions, and Steps sections, then your step's prompt, then the "Open items" checklist to see which inputs for your step are still missing. If an input you need is unchecked there, use the placeholder the step describes and say so in your PR; do not invent real-looking values.
+- Notes from earlier steps, in `docs/plan.md` under the Prompts section. Each finished step leaves a block headed `**Notes from step N (read before steps ...)**` directly after its prompt. Before writing any code, grep `docs/plan.md` for `Notes from step` and read every block whose header lists your step number, plus the block from the step immediately before yours. These notes override your assumptions and your training data about the stack; they record file paths, decisions, and gotchas the prompts do not mention. In your PR description, list the notes blocks you read. If a block that should name your step does not, read it anyway and add your step number to its header in the same PR.
 - `design/artifact.html`: the visual source of truth. Open it in a browser (not just the source) and compare your work against it at desktop and phone widths. Its `:root` CSS variables are the light-theme design tokens. It is a static reference; do not edit it.
 - `README.md` (once step 1 creates it): how to run, lint, test, and where content lives.
 - Earlier steps' PRs on GitHub: if your step depends on a component or file from a prior step, read that step's prompt in `docs/plan.md` and the merged code before reusing it.
@@ -121,6 +122,7 @@ Stack and conventions (already decided, do not change):
 - Work on a branch `step-<nn>-<slug>`. Commit in small, logical commits. Open a PR when done.
 - Done means: `pnpm lint && pnpm typecheck && pnpm build && pnpm test:e2e` pass. Report exactly what passed and what you could not verify.
 - If you learn something later steps need (a real Hospitable snippet shape, a changed file path, a decision you had to make), add it to the relevant step or open item in `docs/plan.md` in the same PR.
+- When you finish, add your own `**Notes from step N (read before steps ...)**` block directly after your step's prompt in `docs/plan.md`, naming every later step that depends on what you built or decided.
 ```
 
 ### Step 1 — Scaffold
