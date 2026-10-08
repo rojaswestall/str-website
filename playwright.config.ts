@@ -11,13 +11,20 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: process.env.CI ? [["github"], ["list"]] : "list",
+  // CI also writes playwright-report/, which ci.yml uploads on failure.
+  reporter: process.env.CI
+    ? [
+        ["github"],
+        ["list"],
+        ["html", { open: "never", outputFolder: "playwright-report" }],
+      ]
+    : "list",
   use: {
     baseURL,
     trace: "on-first-retry",
   },
   projects: [
-    // Default build: stub-mode widgets (NEXT_PUBLIC_HOSPITABLE_MODE unset).
+    // Default build: stub-mode widgets (NEXT_PUBLIC_HOSPITABLE_MODE pinned to stub).
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
@@ -32,9 +39,12 @@ export default defineConfig({
   ],
   // Always test production builds, never the dev server.
   webServer: [
+    // Default build: stub mode is pinned so a .env.local with
+    // NEXT_PUBLIC_HOSPITABLE_MODE=live cannot flip it (process env wins).
     {
       command: `pnpm build && pnpm start --port ${port}`,
       url: baseURL,
+      env: { NEXT_PUBLIC_HOSPITABLE_MODE: "stub" },
       reuseExistingServer: !process.env.CI,
       timeout: 300_000,
     },

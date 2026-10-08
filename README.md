@@ -30,7 +30,7 @@ Then open http://localhost:3000.
 | `pnpm build`         | Production build                                         |
 | `pnpm start`         | Serve the production build                               |
 | `pnpm lint`          | ESLint                                                   |
-| `pnpm typecheck`     | `tsc --noEmit`                                           |
+| `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                       |
 | `pnpm check:content` | Parse `content/*.ts` through zod, check slugs and photos |
 | `pnpm format`        | Prettier, write mode (`format:check` for CI)             |
 | `pnpm test:e2e`      | Playwright against a fresh production build              |
@@ -88,6 +88,8 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   `NEXT_PUBLIC_HOSPITABLE_MODE=live` into `.next-live` on port 3001.
 - `docs/plan.md` — the full implementation plan with per-step prompts and the
   open-items checklist.
+- `design/artifact.html` — the static visual reference. Open it in a browser;
+  do not edit it.
 
 ## Dependency policy
 
@@ -95,9 +97,6 @@ Everything is on the latest stable release that its peers support. pnpm's
 default one-day `minimumReleaseAge` means a version published in the last 24
 hours resolves to the previous one until it ages; that is intended. TypeScript
 stays on 6.x until typescript-eslint supports 7.
-
-- `design/artifact.html` — the static visual reference. Open it in a browser;
-  do not edit it.
 
 ## Environment
 

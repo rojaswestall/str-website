@@ -1,4 +1,5 @@
 import { Ledger, Section, SectionHead, Tbc } from "@/components/ui";
+import { getSite } from "@/content";
 
 /** The four lines from the artifact's "What direct booking changes" ledger. */
 const LEDGER_ITEMS = [
@@ -9,27 +10,21 @@ const LEDGER_ITEMS = [
 ] as const;
 
 /*
- * `#direct`: the pitch on the left, the ledger on the right. The artifact's
- * waitlist signup is gone because booking is live; its place is the slot
- * where step 10 mounts the contact form.
+ * `#direct`: the pitch (`site.directPitch`) on the left, the ledger on the
+ * right. The artifact's waitlist signup is gone because booking is live; its
+ * place is the slot where step 10 mounts the contact form.
  */
 export function WhyBookDirect() {
+  const site = getSite();
   return (
     <Section id="direct" hairline aria-labelledby="direct-heading">
       <div className="grid items-start gap-[clamp(1.75rem,4vw,3.5rem)] min-[760px]:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
         <div>
           <SectionHead id="direct-heading" title="Why book direct" />
           <div className="max-w-[46ch] text-ink-soft [&>p+p]:mt-4">
-            <p>
-              Book through a platform and roughly 15% of what you pay is a
-              service fee that goes to the platform, not to the house. Booking
-              here, that fee simply isn&rsquo;t there.
-            </p>
-            <p>
-              Everything else is the same: the same calendar the listings use,
-              the same houses, and the same three people answering your messages
-              before and during the stay.
-            </p>
+            {site.directPitch.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
           </div>
 
           {/*
