@@ -71,6 +71,9 @@ test.describe("home page", () => {
   test("hero mounts the search stub and the area guide mounts the TikTok embed", async ({
     page,
   }) => {
+    // Keep TikTok off the network: the fallback must stay visible for the
+    // assertions below, and the real player would hide it once it loads.
+    await page.route(/tiktok(cdn-us)?\.com/, (route) => route.abort());
     await page.goto("/");
 
     await expect(page.getByText("Check dates across all three")).toBeVisible();
@@ -88,7 +91,8 @@ test.describe("home page", () => {
     await expect(
       tiktok.getByRole("link", { name: "Watch on TikTok" }),
     ).toHaveAttribute("href", /tiktok\.com\/@exploretex\/video\/\d+/);
-    // embed.js is injected into the leaf container and scans for the blockquote it finds there.
+    // embed.js is injected into the leaf container and scans for the blockquote it finds there
+    // (blocked above, so the fallback stays and the blockquote is never swapped).
     await expect(tiktok.locator("blockquote.tiktok-embed")).toHaveCount(1);
     await expect(
       tiktok.locator('script[src="https://www.tiktok.com/embed.js"]'),
