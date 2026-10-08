@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SkipLink } from "@/components/layout/SkipLink";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { getSite } from "@/content";
 import { fontVariables } from "@/lib/fonts";
+import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
+const site = getSite();
+
 export const metadata: Metadata = {
-  title: "The Austin Collection",
+  metadataBase: getSiteUrl(),
+  title: {
+    default: site.name,
+    template: `%s · ${site.name}`,
+  },
   description:
-    "Book three short-term rental houses in Austin, Texas directly with their hosts.",
+    "Three short-term rental houses in Austin, Texas, booked directly with the hosts who look after them.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -20,7 +31,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col bg-paper font-body text-ink">
         <ThemeProvider>
-          {children}
+          <SkipLink />
+          <SiteHeader />
+          <main id="main" className="flex flex-1 flex-col">
+            {children}
+          </main>
+          <SiteFooter />
           <Analytics />
         </ThemeProvider>
       </body>
