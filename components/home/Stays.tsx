@@ -1,6 +1,6 @@
 import { PropertyBand } from "@/components/property/PropertyBand";
 import { Section, SectionHead } from "@/components/ui";
-import { getAllProperties } from "@/content";
+import { getAllProperties, getSite } from "@/content";
 
 const COUNT_WORDS = ["no", "one", "two", "three", "four", "five", "six"];
 
@@ -16,13 +16,14 @@ function staysMeta(sleeps: readonly number[]) {
 /** `#stays`: section head, lede, and one alternating band per house. */
 export function Stays() {
   const properties = getAllProperties();
+  const site = getSite();
   return (
     <Section id="stays" hairline aria-labelledby="stays-heading">
       <SectionHead
         id="stays-heading"
         title="The stays"
         meta={staysMeta(properties.map((property) => property.sleeps))}
-        lede="All three are three-bedroom houses that sleep eight, so the choice is mostly about which side of town you want and what you need out back — a fireplace and a patio, a garage to park in, or a fire pit and a spare half bath."
+        lede={site.staysLede}
       />
       <div className="flex flex-col">
         {properties.map((property, index) => (

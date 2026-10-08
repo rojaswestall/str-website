@@ -216,6 +216,10 @@ export const SiteConfigSchema = z.object({
       body: z.array(nonEmpty).min(1),
     })
     .nullable(),
+  /** Lede under "The stays" on the home page: how the houses differ. One paragraph. */
+  staysLede: nonEmpty,
+  /** The "Why book direct" pitch paragraphs beside the ledger, in order. */
+  directPitch: z.array(nonEmpty).min(1),
   /** The 21:9 image behind the home hero, with the places named in its caption. */
   heroCollage: ImageSchema.extend({
     /** Mono figcaption parts, rendered with `·` separators. */

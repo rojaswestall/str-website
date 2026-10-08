@@ -35,6 +35,12 @@ export const site: SiteConfig = {
       "Video does something a photograph can't: it shows what a place feels like at the hour you'd actually be standing in it.",
     ],
   },
+  staysLede:
+    "All three are three-bedroom houses that sleep eight, so the choice is mostly about which side of town you want and what you need out back — a fireplace and a patio, a garage to park in, or a fire pit and a spare half bath.",
+  directPitch: [
+    "Book through a platform and roughly 15% of what you pay is a service fee that goes to the platform, not to the house. Booking here, that fee simply isn’t there.",
+    "Everything else is the same: the same calendar the listings use, the same houses, and the same three people answering your messages before and during the stay.",
+  ],
   heroCollage: {
     src: "/photos/home/hero-collage.jpg",
     alt: "[TBC] Placeholder for the hero collage of the three houses",
