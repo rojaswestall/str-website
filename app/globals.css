@@ -12,7 +12,8 @@
 /* `dark:` utilities key on the data attribute, not prefers-color-scheme. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-:root {
+:root,
+[data-theme="light"] {
   color-scheme: light;
 
   --ink: #34312d;
