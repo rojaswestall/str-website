@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/*
+ * Step 2 replaces this file with the design tokens ported from
+ * design/artifact.html (light values on :root, dark on [data-theme="dark"])
+ * and maps them into Tailwind via @theme inline.
+ */
+
+body {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
