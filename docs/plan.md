@@ -371,7 +371,7 @@ Done when all four API tests pass against the production build without a Resend 
 Step 8 of 14: Home page.
 
 Rebuild the artifact's landing page in `app/page.tsx` as a Server Component composed from sections, all content from `content/`:
-1. `components/home/Hero.tsx`: eyebrow "Three houses · one small team", h1 "Places we look after, <em>properly.</em>", lede from `site.tagline` (rewrite the artifact lede to name the three hosts), hero collage `PhotoFrame` 21:9 with the three-place figcaption, then the `HospitableSearch` widget directly under the collage with a mono label "Check dates across all three".
+1. `components/home/Hero.tsx`: eyebrow "Three houses · one small team", h1 "Places we look after, <em>properly.</em>", lede from `site.tagline` (rewrite the artifact lede to name the three hosts), hero collage `PhotoFrame` 21:9 with the three-place figcaption, then the `SearchWidget` Server Component (`@/components/hospitable`) directly under the collage with a mono label "Check dates across all three".
 2. `components/map/CityMap.tsx`: port the circular Austin SVG from the artifact exactly (paths, clip, rings). All fills and strokes must use the token CSS variables (`var(--map-road)` etc.), never hex, so dark mode recolours it. Pins come from `property.mapPin`; include the key/legend as in the artifact. Accept an optional `highlightSlug` prop for reuse on property pages.
 3. `components/property/PropertyBand.tsx`: the alternating two-column band (photo / body) with place line, h3, Credential, summary, SpecRow (sleeps, bed, beds, bath, min nights or Tbc, rate or Tbc), TagList of amenities, actions: primary Button "Book direct" → `/stays/<slug>#book`, ghost Button "See the whole house" → `/stays/<slug>`. Even bands flip column order at ≥760px.
 4. `components/home/HostsStrip.tsx`: compact three-up strip of hosts (name in display font, one mono line, optional photo). Place it between the stays and area sections.
@@ -393,7 +393,7 @@ Step 9 of 14: Property pages at /stays/[slug].
 - `components/property/Gallery.tsx`: hero 3:2 PhotoFrame plus a responsive grid of gallery photos. Keyboard-accessible lightbox is optional; if included keep it dependency-free and focus-trapped.
 - `components/property/AmenityList.tsx`: TagList grouped under a mono heading.
 - `components/property/Quotes.tsx`: two or three guest quotes in display italic with mono attribution.
-- `components/property/BookingPanel.tsx`: section id `book`, h2 "Book direct", the `HospitableWidget` for this property, a short mono note "Same calendar as Airbnb, no platform fee", and a ghost Button "Or view on Airbnb" (external).
+- `components/property/BookingPanel.tsx`: section id `book`, h2 "Book direct", the `PropertyWidget` Server Component (`@/components/hospitable`) for this property, a short mono note "Same calendar as Airbnb, no platform fee", and a ghost Button "Or view on Airbnb" (external).
 - Reuse `SpecRow`, `PracticalsList` (filtered to check-in/out, pets, cancellation), and `CityMap` with `highlightSlug`.
 - A "Back to all stays" link and a small "Other houses" row with the other two `PropertyCard`s (`components/property/PropertyCard.tsx`, compact card with hero photo, name, Credential, link).
 - Layout: on wide screens, BookingPanel sits in a sticky right column beside the description; stacks on mobile.
@@ -465,7 +465,7 @@ Step 14 of 14: Deploy and switch to live booking. Parts of this need a human wit
 
 1. Vercel: create the project from the GitHub repo (`vercel link`), framework Next.js, set env vars for Production and Preview: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_HOSPITABLE_MODE=live` (production) / `stub` (preview), `RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO`. Enable Web Analytics in the Vercel dashboard.
 2. Domain: add the custom domain to the Vercel project and output the DNS records the human must set.
-3. Hospitable: fill `hospitable.bookingWidgetId` for each property in `content/properties.ts` and `searchWidgetId` in `content/site.ts` from the values the human provides. Re-check the container markup in `HospitableWidget` against the real snippet and fix any mismatch.
+3. Hospitable: fill `hospitable.propertyId` (the `data-property-id` from each house's dashboard snippet) for An Oak Hill Home and South Austin Stay in `content/properties.ts` from the values the human provides (Fire Side Home already has `2338068`). Paste the multi-property search widget snippet, set `searchWidgetId` in `content/site.ts`, and wire it in `components/hospitable/HospitableSearch.tsx` at the `TODO(step 14)`. Re-check the loader attributes in `lib/hospitable.ts` (`bookingWidgetAttributes`) against the real snippet and fix any mismatch.
 4. Resend: confirm the sending domain is verified; send one real test inquiry and confirm receipt.
 5. CSP: deploy with report-only, open each page in production, collect any violations from the console, add the missing origins to `lib/csp.ts`, then switch the header to enforcing `Content-Security-Policy`.
 6. Replace remaining `[TBC]` content and placeholder photos with the real assets supplied by the human; run `pnpm check:content`.
