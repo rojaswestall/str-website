@@ -5,9 +5,6 @@ const livePort = 3001;
 const baseURL = `http://localhost:${port}`;
 const liveBaseURL = `http://localhost:${livePort}`;
 
-// Env shared by both production builds: keeps the widget lab routes available.
-const devRoutes = { NEXT_PUBLIC_DEV_ROUTES: "1" };
-
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -40,7 +37,7 @@ export default defineConfig({
     {
       command: `pnpm build && pnpm start --port ${port}`,
       url: baseURL,
-      env: { ...devRoutes, NEXT_PUBLIC_HOSPITABLE_MODE: "stub" },
+      env: { NEXT_PUBLIC_HOSPITABLE_MODE: "stub" },
       reuseExistingServer: !process.env.CI,
       timeout: 300_000,
     },
@@ -48,7 +45,6 @@ export default defineConfig({
       command: `pnpm build && pnpm start --port ${livePort}`,
       url: liveBaseURL,
       env: {
-        ...devRoutes,
         NEXT_PUBLIC_HOSPITABLE_MODE: "live",
         NEXT_DIST_DIR: ".next-live",
       },
