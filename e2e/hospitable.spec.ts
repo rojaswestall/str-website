@@ -13,7 +13,7 @@ test.describe("hospitable widgets (stub mode)", () => {
         loaderRequests.push(request.url());
     });
 
-    await page.goto("/hospitable-lab/oak-hill");
+    await page.goto("/stays/oak-hill");
 
     const stub = page.getByTestId("hospitable-stub");
     await expect(stub).toBeVisible();
@@ -33,30 +33,8 @@ test.describe("hospitable widgets (stub mode)", () => {
     expect(loaderRequests).toEqual([]);
   });
 
-  test("the lab index renders the search stub and the TikTok fallback", async ({
-    page,
-  }) => {
-    await page.goto("/hospitable-lab");
-
-    const search = page.getByTestId("hospitable-search-stub");
-    await expect(search).toContainText("Search all 3 houses");
-    await expect(
-      search.getByRole("link", { name: "See the houses" }),
-    ).toHaveAttribute("href", "/#stays");
-
-    const tiktok = page.getByTestId("tiktok-embed");
-    await expect(
-      tiktok.getByRole("link", { name: "Watch on TikTok" }),
-    ).toHaveAttribute("href", /tiktok\.com\/@exploretex\/video\/\d+/);
-    // embed.js is injected into the leaf container and scans for the blockquote it finds there.
-    await expect(tiktok.locator("blockquote.tiktok-embed")).toHaveCount(1);
-    await expect(
-      tiktok.locator('script[src="https://www.tiktok.com/embed.js"]'),
-    ).toHaveCount(1);
-  });
-
   test("every page carries the report-only CSP header", async ({ page }) => {
-    for (const path of ["/", "/hospitable-lab/oak-hill", "/does-not-exist"]) {
+    for (const path of ["/", "/stays/oak-hill", "/does-not-exist"]) {
       const response = await page.goto(path);
       const csp = response?.headers()["content-security-policy-report-only"];
       expect(csp, path).toBeTruthy();
