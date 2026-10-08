@@ -11,6 +11,8 @@ import {
   propertySpecItems,
   Quotes,
 } from "@/components/property";
+import { CityMap } from "@/components/map/CityMap";
+import { PracticalsList } from "@/components/practicals/PracticalsList";
 import { Button, Prose, Section, SpecRow } from "@/components/ui";
 import { getAllProperties, getProperty, getPropertySlugs } from "@/content";
 
@@ -88,18 +90,24 @@ export default async function StayPage({ params }: PageProps<"/stays/[slug]">) {
 
             <Quotes quotes={property.quotes} />
 
-            {/*
-              TODO(step 8 merge): mount `PracticalsList` from
-              components/practicals/PracticalsList.tsx here, filtered to the
-              Check-in, Check-out, Pets, and Cancellation rows, under a
-              MonoHeading "Good to know".
-            */}
+            <section
+              aria-labelledby="practicals-heading"
+              className="flex flex-col gap-4"
+            >
+              <MonoHeading id="practicals-heading">Good to know</MonoHeading>
+              <PracticalsList
+                terms={["Check-in", "Check-out", "Pets", "Cancellation"]}
+                faq={false}
+              />
+            </section>
 
-            {/*
-              TODO(step 8 merge): mount `CityMap` from components/map/CityMap.tsx
-              here with `highlightSlug={property.slug}`, under a MonoHeading
-              "Where it is".
-            */}
+            <section
+              aria-labelledby="map-heading"
+              className="flex flex-col gap-4"
+            >
+              <MonoHeading id="map-heading">Where it is</MonoHeading>
+              <CityMap highlightSlug={property.slug} />
+            </section>
           </div>
 
           <BookingPanel property={property} className="lg:sticky lg:top-8" />

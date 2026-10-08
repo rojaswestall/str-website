@@ -88,6 +88,29 @@ test.describe("property pages", () => {
     await expect(page.getByText("What guests say")).toHaveCount(0);
   });
 
+  test("shows the four relevant practicals rows and the map with this house highlighted", async ({
+    page,
+  }) => {
+    await page.goto("/stays/south-austin");
+
+    const practicals = page.getByTestId("practicals");
+    const terms = practicals.locator("dt");
+    await expect(terms).toHaveText([
+      "Check-in",
+      "Check-out",
+      "Pets",
+      "Cancellation",
+    ]);
+    await expect(page.getByTestId("practicals-faq")).toHaveCount(0);
+
+    const map = page.getByTestId("city-map");
+    await expect(map.locator("[data-map-pin]")).toHaveCount(3);
+    await expect(
+      map.locator("[data-map-pin][data-highlighted]"),
+    ).toHaveAttribute("data-map-pin", "south-austin");
+    await expect(map).toContainText("South Austin · this house");
+  });
+
   test("the booking column is sticky on wide screens and stacks on phones", async ({
     page,
   }) => {

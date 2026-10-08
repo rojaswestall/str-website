@@ -5,5 +5,5 @@ export { MonoHeading } from "./MonoHeading";
 export { OtherHouses } from "./OtherHouses";
 export { PropertyCard } from "./PropertyCard";
 export { PropertyHeader } from "./PropertyHeader";
-export { propertySpecItems } from "./propertySpecs";
+export { PropertyBand, propertySpecItems } from "./PropertyBand";
 export { Quotes } from "./Quotes";

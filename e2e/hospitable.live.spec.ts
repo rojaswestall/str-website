@@ -118,4 +118,13 @@ test.describe("hospitable widgets (live mode)", () => {
       warnings.filter((text) => text.includes("[Hospitable] live mode")),
     ).toHaveLength(1);
   });
+
+  test("the home search widget stays a stub until its snippet exists", async ({
+    page,
+  }) => {
+    const loads = await interceptLoader(page);
+    await page.goto("/");
+    await expect(page.getByTestId("hospitable-search-stub")).toBeVisible();
+    expect(loads).toEqual([]);
+  });
 });

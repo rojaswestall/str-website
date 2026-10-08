@@ -3,7 +3,7 @@ import { Credential, PhotoFrame } from "@/components/ui";
 import type { Property } from "@/content";
 import { cx } from "@/lib/cx";
 
-/** Compact card: hero photo, place line, name (the link), and credential. */
+/** Compact card: hero photo, place line, name (the link), credential, and the one-line summary. */
 export function PropertyCard({
   property,
   className,
@@ -38,6 +38,9 @@ export function PropertyCard({
         reviewCount={property.reviewCount}
         guestFavorite={property.guestFavorite}
       />
+      <p className="max-w-[46ch] text-[0.95rem] text-ink-soft">
+        {property.summary}
+      </p>
     </article>
   );
 }
