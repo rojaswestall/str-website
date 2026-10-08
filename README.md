@@ -55,7 +55,7 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   `SiteHeader`, `SiteFooter`) composed in `app/layout.tsx`; `hospitable/`
   holds the booking and search widgets (`PropertyWidget`, `SearchWidget`,
   their client cores, and the stubs); `embeds/` holds `TikTokEmbed`; the
-  rest arrive from step 7 onward. `/kitchen-sink` renders every primitive in
+  rest arrive from step 8 onward. `/kitchen-sink` renders every primitive in
   light and dark side by side in `pnpm dev` only (404 in production), and
   `/hospitable-lab` previews the widgets (dev, or a build with
   `NEXT_PUBLIC_DEV_ROUTES=1`; 404 otherwise).

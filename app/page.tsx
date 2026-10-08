@@ -1,7 +1,7 @@
 import { Eyebrow, Prose, Section } from "@/components/ui";
 import { getSite } from "@/content";
 
-/* Holding page until step 7 builds the real home. */
+/* Holding page until step 8 builds the real home. */
 export default function Home() {
   const site = getSite();
   return (

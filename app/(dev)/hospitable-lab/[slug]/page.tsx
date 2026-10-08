@@ -22,7 +22,7 @@ export function generateStaticParams() {
 }
 
 /*
- * One booking widget, as step 8 will mount it. `?propertyId=` overrides the
+ * One booking widget, as step 9 will mount it. `?propertyId=` overrides the
  * content value so the live build can be exercised before the houses are
  * matched to their Hospitable ids; the links carry it across client-side
  * navigation so the widget re-mounts with a different id.

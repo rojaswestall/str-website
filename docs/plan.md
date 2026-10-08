@@ -33,7 +33,7 @@ This plan was written in plan mode with no code touched. It is meant to be execu
 
 ## Steps
 
-Dependencies: 1 → 2 → 3 → 4 → {5, 6, 9} → {7, 8} → {10, 11} → {12, 13} → 14. Steps in braces can run in parallel.
+Dependencies: 1 → 2 → 3 → 4 → {5, 6, 7} → {8, 9} → {10, 11} → {12, 13} → 14. Steps in braces can run in parallel. (Renumbered after step 6 merged so the numbers follow execution order: Contact API was 9, home and property pages were 7 and 8. PR titles and branch names from before that keep the old numbers.)
 
 1. **Scaffold.** In the existing empty repo, scaffold Next.js App Router, TS strict, Tailwind v4, pnpm, ESLint, Prettier, Playwright, CI. Keep `design/artifact.html` and `docs/plan.md`.
 2. **Tokens and theme.** Define light and dark CSS variables, map to Tailwind theme, load fonts via next/font, add next-themes provider and toggle.
@@ -41,9 +41,9 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 9} → {7, 8} → {10, 11} → {12,
 4. **UI primitives.** Section, SectionHead, Eyebrow, Button, Tag, SpecRow, Credential, PhotoFrame, Ledger, Container. Dev-only kitchen-sink route for visual parity.
 5. **Site shell.** SiteHeader, SiteFooter with STR licenses, skip link, root metadata, Vercel Analytics, branded 404.
 6. **Hospitable widgets.** HospitableWidget and HospitableSearch with stub and live modes, shared script-injection hook, CSP headers in report-only mode.
-7. **Home page.** Hero with CityMap SVG and search widget, three PropertyBands, hosts strip, area guide, practicals, why-book-direct placeholder.
-8. **Property pages.** `/stays/[slug]` with gallery, specs, amenities, quotes, booking panel (widget + Airbnb link). Static params, 404 on unknown slug.
-9. **Contact API.** `POST /api/contact` with zod validation, honeypot, rate limit, Resend send, dry-run when key absent.
+7. **Contact API.** `POST /api/contact` with zod validation, honeypot, rate limit, Resend send, dry-run when key absent.
+8. **Home page.** Hero with CityMap SVG and search widget, three PropertyBands, hosts strip, area guide, practicals, why-book-direct placeholder.
+9. **Property pages.** `/stays/[slug]` with gallery, specs, amenities, quotes, booking panel (widget + Airbnb link). Static params, 404 on unknown slug.
 10. **Contact form.** ContactForm client component with pending, success, error states mounted in the WhyBookDirect section.
 11. **SEO.** Per-page metadata, generateMetadata for stays, OG image routes, sitemap, robots, JSON-LD VacationRental per property.
 12. **Dark mode and accessibility audit.** Contrast, focus rings, reduced motion, stray hex in SVG and gradients. axe clean in both themes.
@@ -79,7 +79,7 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 9} → {7, 8} → {10, 11} → {12,
 - [ ] Style the widget in the Hospitable dashboard to match the paper palette.
 - [ ] Confirm Stripe or payment setup is complete inside Hospitable Direct.
 
-### Needed before step 9 / 14 (contact and deploy)
+### Needed before step 7 / 14 (contact and deploy)
 - [ ] Domain name and who controls DNS.
 - [ ] Resend account, verified sending domain, `from` address, recipient list (all three or one inbox).
 - [ ] Vercel account and team to deploy under.
@@ -216,13 +216,13 @@ Create `content/` with:
 Done when `pnpm check:content` passes and `getProperty("oak-hill")` returns typed data.
 ```
 
-**Notes from step 3 (read before steps 4, 5, 7, 8, 11):**
+**Notes from step 3 (read before steps 4, 5, 8, 9, 11):**
 
 - Import content only from `@/content` (`content/index.ts`). It parses every data file through zod at module load, so a bad value throws in `next build` and in `pnpm check:content`; the data files themselves are plain typed objects. `getProperty(slug)` returns `undefined` for unknown slugs (call `notFound()`), and `getPropertySlugs()` feeds `generateStaticParams`. `getLicenses()` derives the footer license lines from `properties.ts`; there is no separate license file.
 - Two photo shapes: `Image` (`src`, `alt`, `width`, `height`) for hosts, area picks, and the home hero collage (`site.heroCollage`, 21:9), and `Photo` (`Image` + `role: "hero" | "gallery"`) for properties. Every `src` is root-relative under `/photos/` and `check:content` asserts the file exists in `public/`. Placeholders are real JPEGs with the artifact's diagonal-stripe look (`public/photos/<slug>/hero.jpg`, `gallery-01..03.jpg` at 1800×1200; `area/{eat,outdoors,local}.jpg` at 1200×1200; `home/hero-collage.jpg` at 2100×900), so `next/image` works unchanged and real photos replace them at the same paths.
-- Unconfirmed values: `rateFrom` and `minNights` are `null` (render "t.b.c."); host lines, area picks, FAQ answers, domain, contact email, and Instagram handle are strings starting with `[TBC]` (`isTbc()` from `@/content` detects them; render with the step 4 `Tbc` span and never as a live `mailto:` or link). Every Practicals row and FAQ row carries `tbc: true` until the hosts confirm it. `quotes` are empty arrays because no review quotes have been supplied; step 8 must hide the quotes block when the array is empty rather than seed fake ones.
+- Unconfirmed values: `rateFrom` and `minNights` are `null` (render "t.b.c."); host lines, area picks, FAQ answers, domain, contact email, and Instagram handle are strings starting with `[TBC]` (`isTbc()` from `@/content` detects them; render with the step 4 `Tbc` span and never as a live `mailto:` or link). Every Practicals row and FAQ row carries `tbc: true` until the hosts confirm it. `quotes` are empty arrays because no review quotes have been supplied; step 9 must hide the quotes block when the array is empty rather than seed fake ones.
 - House names stay as the artifact has them (An Oak Hill Home, South Austin Stay, Fire Side Home) until the open item is answered; changing `name` in `properties.ts` is the only edit needed. Slugs are fixed as `oak-hill`, `south-austin`, `fire-side`.
-- Map pins (CityMap 400×400 viewBox): Oak Hill (85, 299), South Austin Stay (258, 292), Fire Side Home (274, 306). The artifact draws one dot at (266, 299) for both South Austin houses; step 7 should draw one per property from `mapPin` instead.
+- Map pins (CityMap 400×400 viewBox): Oak Hill (85, 299), South Austin Stay (258, 292), Fire Side Home (274, 306). The artifact draws one dot at (266, 299) for both South Austin houses; step 8 should draw one per property from `mapPin` instead.
 - Hospitable: `site.hospitable.mode` is `"stub"` and every widget id is `null`. Step 6 reads mode from content (or lets `NEXT_PUBLIC_HOSPITABLE_MODE` override it; decide there) and falls back to the stub whenever an id is null.
 - `site.tiktok` is populated with the artifact's @exploretex clip; set it to `null` to drop the embed. `site.tagline` is the artifact hero line, "Places we look after, properly."
 - Tooling: `zod` 4 (`z.url()`, `z.prettifyError`), `tsx` runs the check script with the `@/` alias. `tsx` pulls in `esbuild`, whose postinstall is denied in `pnpm-workspace.yaml` like the others; it runs fine from the optional platform package.
@@ -253,7 +253,7 @@ Remove the temporary swatches from step 2 on `/`.
 Done when a screenshot of the kitchen sink is visually indistinguishable from the matching artifact elements in light mode, and nothing uses raw hex.
 ```
 
-**Notes from step 4 (read before steps 5, 7, 8, 12):**
+**Notes from step 4 (read before steps 5, 8, 9, 12):**
 
 - Import primitives from `@/components/ui` (barrel in `components/ui/index.ts`): `Container`, `Section`, `SectionHead`, `Eyebrow`, `Button`, `Tag`, `TagList`, `SpecRow`, `Credential`, `PhotoFrame`, `Ledger`, `Prose`, `Tbc`. All are Server Components, styled only with token utilities; `lib/cx.ts` joins class names (no clsx dependency). Class names are always literal strings so Tailwind can see them; never build them with template literals.
 - `Section` wraps its children in a `Container` by default (`bleed` opts out) and takes `hairline` for the artifact's `section + section` top rule, so the home page should pass `hairline` on every section after the hero. `id` lands on the `<section>` for `/#stays`-style anchors; `aria-labelledby` can point at the `SectionHead` `id`, which is set on the h2.
@@ -281,12 +281,12 @@ Step 5 of 14: Site shell.
 Done when every route shows header and footer, the footer lists three license numbers, and `/does-not-exist` renders the branded 404 with status 404.
 ```
 
-**Notes from step 5 (read before steps 7, 8, 11, 12, 13):**
+**Notes from step 5 (read before steps 8, 9, 11, 12, 13):**
 
 - `app/layout.tsx` now composes `SkipLink`, `SiteHeader`, `<main id="main" className="flex flex-1 flex-col">`, and `SiteFooter` inside `ThemeProvider`, with `Analytics` last. Pages must not render their own `<main>` (the holding `/` and the kitchen sink were changed to match). `main` is a flex column so a short page still pushes the footer to the bottom; a page whose only child is a `Section` can pass `className="flex-1"` as `app/not-found.tsx` does.
 - Root metadata is `title: { default: site.name, template: "%s · The Austin Collection" }`, so a page exporting `title: "An Oak Hill Home"` renders "An Oak Hill Home · The Austin Collection". `metadataBase` comes from `getSiteUrl()` in `lib/site-url.ts`, which reads `NEXT_PUBLIC_SITE_URL` (added to `.env.example`) and falls back to `http://localhost:3000`. Step 11 should build canonical URLs, the sitemap, and OG image URLs from the same helper; step 14 sets the variable on Vercel.
-- `app/not-found.tsx` is the branded 404 and exports its own `metadata` (Next 16 supports that on the root `not-found`). `next build` prerenders it as `/_not-found`; `/does-not-exist` returns status 404 with the full shell. `notFound()` from step 8's unknown-slug pages renders the same component. Per the Next docs the status drops to 200 if `notFound()` is thrown after streaming starts, so call it before any `Suspense` boundary.
-- `SiteHeader` nav links are `next/link`s to `/#stays`, `/#area`, `/#practicals`, `/#direct`; step 7 must give those `Section`s matching `id`s. `ThemeToggle` now lives in the header and was removed from `/`; `e2e/theme.spec.ts` still finds it through `[data-theme-toggle]`. At phone widths the nav wraps under the wordmark and the toggle onto its own line; there is no hamburger.
+- `app/not-found.tsx` is the branded 404 and exports its own `metadata` (Next 16 supports that on the root `not-found`). `next build` prerenders it as `/_not-found`; `/does-not-exist` returns status 404 with the full shell. `notFound()` from step 9's unknown-slug pages renders the same component. Per the Next docs the status drops to 200 if `notFound()` is thrown after streaming starts, so call it before any `Suspense` boundary.
+- `SiteHeader` nav links are `next/link`s to `/#stays`, `/#area`, `/#practicals`, `/#direct`; step 8 must give those `Section`s matching `id`s. `ThemeToggle` now lives in the header and was removed from `/`; `e2e/theme.spec.ts` still finds it through `[data-theme-toggle]`. At phone widths the nav wraps under the wordmark and the toggle onto its own line; there is no hamburger.
 - `SiteFooter` reads `getSite()` and `getLicenses()`. `[TBC]` contact values render as `Tbc` gaps with the artifact's wording ("domain to confirm", "email address to confirm", "Instagram handle to confirm"); once real values land in `content/site.ts` they become a `mailto:` link and an `instagram.com/<handle>` link (a leading `@` is stripped). The license line carries `data-testid="str-licenses"` for tests. The artifact's preview notice bar and its "Preview layout" footer line were dropped on purpose.
 - `e2e/shell.spec.ts` covers the header links, the toggle, the three license numbers, the skip link as first tab stop, and the 404 status, title, and shell. Step 13 can fold it into `home.spec.ts` / `stays.spec.ts` or keep it.
 - Computed styles were compared against `design/artifact.html` at 1400px and 375px, light and dark: masthead padding, wordmark size, nav size and gap, footer colophon, domain, contact, and license typography all match the artifact's values.
@@ -321,26 +321,43 @@ Build:
 Done when both modes behave as described, strict mode produces one script and one populated container, and `curl -I` on the production build shows the report-only CSP header.
 ```
 
-**Notes from step 6 (read before steps 7, 8, 12, 13, 14):**
+**Notes from step 6 (read before steps 8, 9, 12, 13, 14):**
 
 - The real snippet is a single `<script>` tag with `data-site-uuid`, `data-property-id`, and `data-theme`; there is no container element and no "widget id". The loader (read from `cdn.hsptb.com`, not guessed) resolves itself via `document.currentScript`, POSTs a ping to `api.hospitable.com/sites/widgets/<uuid>/ping` (it checks that the property's name appears in `document.body.innerText`, so the house name must be on the page), then inserts `<iframe id="booking-iframe" src="https://booking.hospitable.com/widget/<uuid>/<propertyId>?theme=…">` right after the script (or into `#<data-container>` if that attribute is set; `data-height` defaults to 900px and the iframe resizes itself by postMessage). Because the iframe id is fixed, the loader bails out when one already exists, so a mount must clear the previous one first; `useInjectedScript` does that in its cleanup. The iframe is Hospitable's and stays light in dark mode.
 - Content changes: `property.hospitable.propertyId` (was `bookingWidgetId`; it is the numeric `data-property-id`, null until the house is matched) and `site.hospitable = { mode, siteUuid, theme, searchWidgetId }`. `siteUuid` and `theme: "multi"` hold the snippet's values. Fire Side Home carries `propertyId: "2338068"` (the snippet's house, "Dan Jean B" in Hospitable); the other two are null until their snippets are copied (open item). Hospitable's internal names: Parkwood A = An Oak Hill Home, Dan Jean Unit A = South Austin Stay, Dan Jean B = Fire Side Home. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides `site.hospitable.mode` when set to `stub` or `live` (`resolveHospitableMode` in `lib/hospitable.ts`); it is inlined at build time, so set it per Vercel environment.
-- Components, all in `components/hospitable` (barrel `index.ts`): `PropertyWidget({ property })` and `SearchWidget()` are the Server Components steps 7 and 8 should mount; they read `getSite()` and pass props to the client cores `HospitableWidget` / `HospitableSearch`, which decide stub vs. live and `console.warn` once (also in the server log) when live mode has no id. `HospitableStub` (`data-testid="hospitable-stub"`) and `HospitableSearchStub` (`data-testid="hospitable-search-stub"`) are the placeholder panels; the live frame is `data-testid="hospitable-widget"` with a "Loading the booking calendar…" line that hides via `group-has-[iframe]:hidden` once the iframe lands. The live booking widget runs on a hairline `paper-2` surface, no fixed aspect ratio (the iframe sets its own height, roughly 520px for the calendar + guests + Reserve).
-- `HospitableSearch` is stub-only for now: the per-property loader refuses to run without `data-property-id`, so a multi-property search widget needs a different snippet (open item). In live mode it warns once and renders the stub; the `TODO(step 14)` in the file says where to wire the real snippet. Step 7 should still mount `SearchWidget` in the hero so the layout is right.
+- Components, all in `components/hospitable` (barrel `index.ts`): `PropertyWidget({ property })` and `SearchWidget()` are the Server Components steps 8 and 9 should mount; they read `getSite()` and pass props to the client cores `HospitableWidget` / `HospitableSearch`, which decide stub vs. live and `console.warn` once (also in the server log) when live mode has no id. `HospitableStub` (`data-testid="hospitable-stub"`) and `HospitableSearchStub` (`data-testid="hospitable-search-stub"`) are the placeholder panels; the live frame is `data-testid="hospitable-widget"` with a "Loading the booking calendar…" line that hides via `group-has-[iframe]:hidden` once the iframe lands. The live booking widget runs on a hairline `paper-2` surface, no fixed aspect ratio (the iframe sets its own height, roughly 520px for the calendar + guests + Reserve).
+- `HospitableSearch` is stub-only for now: the per-property loader refuses to run without `data-property-id`, so a multi-property search widget needs a different snippet (open item). In live mode it warns once and renders the stub; the `TODO(step 14)` in the file says where to wire the real snippet. Step 8 should still mount `SearchWidget` in the hero so the layout is right.
 - `lib/hooks/useInjectedScript({ src, attributes, target, key, enabled, prepare })` appends the script to the `target` element (a ref to a div React never renders children into) and on cleanup removes the script and calls `replaceChildren()` on it. The insertion is deferred to a microtask so React strict mode's synchronous mount/unmount/remount adds exactly one script (a started script element cannot be cancelled, even after removal). Verified in `next dev`: one loader script, one `booking-iframe`. `prepare(target)` runs just before insertion for scripts that scan for markup (TikTok). Rule for any third-party embed: the element a script mutates must be a React leaf; React throws on unmount if a node it rendered was replaced by someone else.
-- `components/embeds/TikTokEmbed({ clip })` takes `site.tiktok` and renders nothing when it is null. It builds the `blockquote.tiktok-embed` imperatively in the leaf container, injects `https://www.tiktok.com/embed.js`, and shows the artifact's styled fallback (kicker, handle, "Watch on TikTok") until the player iframe appears. Observed: embed.js loads its library script and stylesheet from `lf16-tiktok-web.tiktokcdn-us.com` into `<head>`/`<body>` (deduped by id, left in place) and puts the player iframe *inside* the blockquote at the container's width. Step 7 wraps it in the artifact's `.video-feature` grid (9:16 frame beside the copy).
+- `components/embeds/TikTokEmbed({ clip })` takes `site.tiktok` and renders nothing when it is null. It builds the `blockquote.tiktok-embed` imperatively in the leaf container, injects `https://www.tiktok.com/embed.js`, and shows the artifact's styled fallback (kicker, handle, "Watch on TikTok") until the player iframe appears. Observed: embed.js loads its library script and stylesheet from `lf16-tiktok-web.tiktokcdn-us.com` into `<head>`/`<body>` (deduped by id, left in place) and puts the player iframe *inside* the blockquote at the container's width. Step 8 wraps it in the artifact's `.video-feature` grid (9:16 frame beside the copy).
 - CSP lives in `lib/csp.ts` (`cspDirectives` + `contentSecurityPolicy`) and `next.config.ts` sends it as `Content-Security-Policy-Report-Only` on `/(.*)`. It is the step 6 prompt's policy plus `https://lf16-tiktok-web.tiktokcdn-us.com` in `script-src` and `style-src` (TikTok's library). Because `script-src` carries `'unsafe-inline'`, next-themes' pre-paint script and Next's inline scripts pass without a nonce, which resolves the step 2 note; a nonce would force dynamic rendering of every page. In `next dev` the console logs `'unsafe-eval'` report-only violations from React's dev tooling; production does not use eval. Step 14 flips the header key to `Content-Security-Policy` after watching the live console, and can drop the Google Fonts entries (fonts are self-hosted) if nothing reports them.
-- Temporary lab route `app/(dev)/hospitable-lab` (index: search widget, TikTok, links; `[slug]`: one booking widget with `?propertyId=<id>` overriding content so live mode can be exercised before the ids are known). It is gated by `assertDevRoute()` in `app/(dev)/dev-routes.ts`: available in `next dev` and in production builds that set `NEXT_PUBLIC_DEV_ROUTES=1` (Playwright does), 404 otherwise. The kitchen sink keeps its stricter NODE_ENV-only gate. **Step 8 deletes `app/(dev)/hospitable-lab` and points `e2e/hospitable.spec.ts` and `e2e/hospitable.live.spec.ts` at `/stays/<slug>`** (the lab page is a preview of that booking panel). Step 7 does the same for the search stub and TikTok assertions on `/`.
-- Next 16.4 instant-navigation validation (dev only, `cacheComponents`): awaiting `params` or `searchParams` outside a `<Suspense>` boundary logs "Next.js encountered URL data during prerendering or a navigation". Moving the `await params` into a Suspense child silences it but then `notFound()` for an unknown slug streams with status 200 (verified: `/hospitable-lab/nope` returned 200). The lab page therefore awaits `params` at the top, calls `notFound()` before any boundary, and exports `const instant = false` to declare the blocking read; only `searchParams` is read inside Suspense. **Step 8 should do the same on `/stays/[slug]`** (status 404 matters more than an instant shell for a prerendered page) and step 13 should assert the 404 status.
+- Temporary lab route `app/(dev)/hospitable-lab` (index: search widget, TikTok, links; `[slug]`: one booking widget with `?propertyId=<id>` overriding content so live mode can be exercised before the ids are known). It is gated by `assertDevRoute()` in `app/(dev)/dev-routes.ts`: available in `next dev` and in production builds that set `NEXT_PUBLIC_DEV_ROUTES=1` (Playwright does), 404 otherwise. The kitchen sink keeps its stricter NODE_ENV-only gate. **Step 9 deletes `app/(dev)/hospitable-lab` and points `e2e/hospitable.spec.ts` and `e2e/hospitable.live.spec.ts` at `/stays/<slug>`** (the lab page is a preview of that booking panel). Step 8 does the same for the search stub and TikTok assertions on `/`.
+- Next 16.4 instant-navigation validation (dev only, `cacheComponents`): awaiting `params` or `searchParams` outside a `<Suspense>` boundary logs "Next.js encountered URL data during prerendering or a navigation". Moving the `await params` into a Suspense child silences it but then `notFound()` for an unknown slug streams with status 200 (verified: `/hospitable-lab/nope` returned 200). The lab page therefore awaits `params` at the top, calls `notFound()` before any boundary, and exports `const instant = false` to declare the blocking read; only `searchParams` is read inside Suspense. **Step 9 should do the same on `/stays/[slug]`** (status 404 matters more than an instant shell for a prerendered page) and step 13 should assert the 404 status.
 - Playwright now has two projects and two web servers. `chromium` (port 3000, default build, `NEXT_PUBLIC_DEV_ROUTES=1`) runs every spec except `*.live.spec.ts`; `chromium-live` (port 3001) builds a second copy with `NEXT_PUBLIC_HOSPITABLE_MODE=live` into `.next-live` (`distDir` follows `NEXT_DIST_DIR` in `next.config.ts`) and runs only `*.live.spec.ts`. The live spec intercepts `**/cdn.hsptb.com/**` with a stand-in loader that mimics the real one (reads its `data-*`, inserts a marker after the script) and asserts one marker before and after client-side navigation, the stub fallback plus a single warning when the id is null, and the search stub. `.next-live` is ignored by git, ESLint, and Prettier; the live build adds `.next-live/types` globs to `tsconfig.json` (committed, so the tree stays clean). CI now builds three times; step 13 can drop the explicit `pnpm build` step and let Playwright's servers build. Both web server timeouts are 300s.
 - `e2e/hospitable.spec.ts` also asserts the `Content-Security-Policy-Report-Only` header on `/`, a lab page, and the 404 page, and that no request to `hsptb.com` is made in stub mode. `curl -I http://localhost:3000/` on the production build shows the header.
 - Known edge: if the visitor navigates between two houses while the loader's ping is still in flight, the loader's global in-flight promise makes the second mount a no-op and the new container stays empty until a reload. The ping is cached in `sessionStorage` after the first success, so this only affects the very first navigation and only within the ping's latency. Not worked around.
 - `.env.example` gained `NEXT_PUBLIC_HOSPITABLE_MODE=stub` and `NEXT_PUBLIC_DEV_ROUTES=`. Local dev gotcha: a `.env.local` with `NEXT_PUBLIC_HOSPITABLE_MODE=live` plus `/hospitable-lab/<slug>?propertyId=2338068` loads the real widget against the pasted snippet.
 
-### Step 7 — Home page
+### Step 7 — Contact API
 
 ```
-Step 7 of 14: Home page.
+Step 7 of 14: Contact API route.
+
+Implement `app/api/contact/route.ts` (POST only):
+- `lib/contact/schema.ts`: zod schema { name (2–80), email (valid), message (10–2000), property (optional slug from content), checkIn/checkOut (optional ISO dates, checkOut > checkIn), website (honeypot, must be empty) }.
+- Honeypot filled → return 200 with `{ ok: true }` and do nothing.
+- `lib/contact/rateLimit.ts`: in-memory sliding window, 5 requests per IP per 10 minutes, keyed on `x-forwarded-for`. Document that it is per-instance on Vercel and that Upstash can replace it later.
+- `lib/contact/email.ts`: send via Resend (`resend` package) from `CONTACT_FROM` to `CONTACT_TO` (comma-separated), `replyTo` the guest, subject "Inquiry: <property or General> — <name>", plain-text body plus a simple HTML version. When `RESEND_API_KEY` is absent, log the payload and return success (dry-run) so local and CI work without secrets.
+- Responses: 200 ok, 400 with field errors, 429 on rate limit, 500 on send failure (message logged, generic error returned).
+- `.env.example`: `RESEND_API_KEY=`, `CONTACT_FROM=`, `CONTACT_TO=`.
+- Playwright `e2e/contact-api.spec.ts` using `request` fixture: valid → 200; honeypot → 200 silent; invalid email → 400; sixth request → 429.
+
+Done when all four API tests pass against the production build without a Resend key.
+```
+
+### Step 8 — Home page
+
+```
+Step 8 of 14: Home page.
 
 Rebuild the artifact's landing page in `app/page.tsx` as a Server Component composed from sections, all content from `content/`:
 1. `components/home/Hero.tsx`: eyebrow "Three houses · one small team", h1 "Places we look after, <em>properly.</em>", lede from `site.tagline` (rewrite the artifact lede to name the three hosts), hero collage `PhotoFrame` 21:9 with the three-place figcaption, then the `HospitableSearch` widget directly under the collage with a mono label "Check dates across all three".
@@ -355,10 +372,10 @@ Use `Section` ids `stays`, `area`, `practicals`, `direct` so header anchors work
 Done when Playwright finds all four section headings, three bands link to the right slugs, and the CityMap recolours when toggling the theme.
 ```
 
-### Step 8 — Property pages
+### Step 9 — Property pages
 
 ```
-Step 8 of 14: Property pages at /stays/[slug].
+Step 9 of 14: Property pages at /stays/[slug].
 
 - `app/stays/[slug]/page.tsx`: `generateStaticParams` from `getAllProperties()`; `await params`; `notFound()` on unknown slug.
 - `components/property/PropertyHeader.tsx`: place line, h1 name, Credential, summary.
@@ -373,30 +390,13 @@ Step 8 of 14: Property pages at /stays/[slug].
 Done when `next build` emits three static pages, `/stays/nope` 404s, each page shows the widget stub with the correct property name, and the Airbnb link has target="_blank" rel="noopener noreferrer".
 ```
 
-### Step 9 — Contact API
-
-```
-Step 9 of 14: Contact API route.
-
-Implement `app/api/contact/route.ts` (POST only):
-- `lib/contact/schema.ts`: zod schema { name (2–80), email (valid), message (10–2000), property (optional slug from content), checkIn/checkOut (optional ISO dates, checkOut > checkIn), website (honeypot, must be empty) }.
-- Honeypot filled → return 200 with `{ ok: true }` and do nothing.
-- `lib/contact/rateLimit.ts`: in-memory sliding window, 5 requests per IP per 10 minutes, keyed on `x-forwarded-for`. Document that it is per-instance on Vercel and that Upstash can replace it later.
-- `lib/contact/email.ts`: send via Resend (`resend` package) from `CONTACT_FROM` to `CONTACT_TO` (comma-separated), `replyTo` the guest, subject "Inquiry: <property or General> — <name>", plain-text body plus a simple HTML version. When `RESEND_API_KEY` is absent, log the payload and return success (dry-run) so local and CI work without secrets.
-- Responses: 200 ok, 400 with field errors, 429 on rate limit, 500 on send failure (message logged, generic error returned).
-- `.env.example`: `RESEND_API_KEY=`, `CONTACT_FROM=`, `CONTACT_TO=`.
-- Playwright `e2e/contact-api.spec.ts` using `request` fixture: valid → 200; honeypot → 200 silent; invalid email → 400; sixth request → 429.
-
-Done when all four API tests pass against the production build without a Resend key.
-```
-
 ### Step 10 — Contact form
 
 ```
 Step 10 of 14: Contact form component.
 
 - `components/contact/ContactForm.tsx` ("use client"): fields name, email, property (select populated from `getAllProperties()`, passed in as props from the server parent), check-in and check-out (native date inputs, optional), message, hidden honeypot `website`. Styled like the artifact's signup input and button (hairline borders, mono uppercase button, paper background). States: idle, pending (button disabled, mono "Sending…"), success (replace form with a short display-font thank-you and a mono line "We reply within the hour, usually"), error (inline field errors from the 400 response, general error banner otherwise). No form library; use `fetch` to `/api/contact` and `useState`/`useTransition`.
-- Mount it in `components/home/WhyBookDirect.tsx` in the slot left in step 7, under a mono heading "Ask us anything before you book". Replace the step 7 placeholder.
+- Mount it in `components/home/WhyBookDirect.tsx` in the slot left in step 8, under a mono heading "Ask us anything before you book". Replace the step 8 placeholder.
 - Add a `ContactForm` mount to the kitchen sink.
 - Playwright `e2e/contact-form.spec.ts`: fill and submit, assert success state (API dry-run).
 
