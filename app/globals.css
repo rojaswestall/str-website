@@ -1,11 +1,116 @@
 @import "tailwindcss";
 
 /*
- * Step 2 replaces this file with the design tokens ported from
- * design/artifact.html (light values on :root, dark on [data-theme="dark"])
- * and maps them into Tailwind via @theme inline.
+ * Design tokens, ported from the `:root` block in design/artifact.html.
+ *
+ * Raw values live on :root (light) and [data-theme="dark"] (dark). Components
+ * never read these directly; they use the Tailwind utilities mapped below
+ * (bg-paper, text-ink, border-hairline, font-display, font-mono, ...).
+ * next-themes sets `data-theme` on <html> before first paint.
  */
 
-body {
-  font-family: ui-sans-serif, system-ui, sans-serif;
+/* `dark:` utilities key on the data attribute, not prefers-color-scheme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+
+  --ink: #34312d;
+  --ink-soft: #55524c;
+  --muted: #6e6961;
+  --accent: #8e887f;
+  --hairline: #e5e2dc;
+  --paper: #faf9f7;
+  --paper-2: #f2f0ec;
+  --slot-a: #efede8;
+  --slot-b: #e8e5df;
+
+  /* the map is the one place the page carries real color */
+  --map-ground: #f1efea;
+  --map-road: #d2ccc4;
+  --map-road-major: #bab3a9;
+  --map-water: #7e9aa6;
+  --map-park: #9fb18f;
+
+  --measure: 62ch;
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --maxw: 1180px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ink: #ece8e1;
+  --ink-soft: #cfcac1;
+  --muted: #a19b91;
+  --accent: #8e887f;
+  --hairline: #2e2b27;
+  --paper: #161513;
+  --paper-2: #1e1c19;
+  --slot-a: #22201c;
+  --slot-b: #2a2823;
+
+  --map-ground: #1e1c19;
+  --map-road: #3a3732;
+  --map-road-major: #4a463f;
+  --map-water: #5f7b88;
+  --map-park: #6e8060;
+}
+
+/*
+ * Tailwind theme. `inline` keeps the var() references live so utilities follow
+ * the theme switch without re-generating classes.
+ */
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-hairline: var(--hairline);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-slot-a: var(--slot-a);
+  --color-slot-b: var(--slot-b);
+  --color-map-ground: var(--map-ground);
+  --color-map-road: var(--map-road);
+  --color-map-road-major: var(--map-road-major);
+  --color-map-water: var(--map-water);
+  --color-map-park: var(--map-park);
+
+  /* Font variables are set on <html> by next/font (lib/fonts.ts). */
+  --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --font-body:
+    var(--font-plex-sans), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  --container-maxw: var(--maxw);
+  --spacing-gutter: var(--gutter);
+  --container-measure: var(--measure);
+}
+
+@layer base {
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
 }
