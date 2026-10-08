@@ -45,9 +45,13 @@ build, and e2e on every pull request and on pushes to `main`.
 
 ## Where things live
 
-- `app/` — routes, root layout, global CSS (design tokens from step 2 onward).
-- `components/` — reusable UI, grouped by area (`ui`, `layout`, `property`,
-  `hospitable`, `home`). Added from step 4 onward.
+- `app/` — routes, root layout, and `globals.css` (design tokens: light on
+  `:root`, dark on `[data-theme="dark"]`, mapped to Tailwind utilities).
+- `components/` — reusable UI, grouped by area (`theme`, `ui`, `layout`,
+  `property`, `hospitable`, `home`). `theme/` holds the next-themes provider
+  and toggle; the rest arrive from step 4 onward.
+- `lib/` — shared code that is not a component (`fonts.ts` loads Newsreader
+  and IBM Plex through `next/font`).
 - `content/` — typed site content (`*.ts`). Property copy, hosts, policies,
   and site config live here, never hardcoded in components. Added in step 3.
 - `public/` — static assets and photos.
