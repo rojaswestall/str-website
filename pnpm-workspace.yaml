@@ -1,0 +1,5 @@
+# pnpm 11+ settings (pnpm no longer reads these from .npmrc).
+# Build scripts are denied for packages that work without them.
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
