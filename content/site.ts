@@ -29,11 +29,18 @@ export const site: SiteConfig = {
   tiktok: {
     url: "https://www.tiktok.com/@exploretex/video/7648810803109367053",
     handle: "exploretex",
+    title: "Barton Springs, and the river through the middle of it",
+    body: [
+      "Sixty-eight degrees year round, spring-fed, and busy from the first warm weekend onward. The clip runs the length of the river as it cuts through the city — the stretch of Austin most people come here for, and a short drive from all three houses.",
+      "Video does something a photograph can't: it shows what a place feels like at the hour you'd actually be standing in it.",
+    ],
   },
   heroCollage: {
     src: "/photos/home/hero-collage.jpg",
     alt: "[TBC] Placeholder for the hero collage of the three houses",
     width: 2100,
     height: 900,
+    // The places the artifact's collage shows; update alongside the real photo.
+    caption: ["South Congress", "Zilker Park", "Radio Coffee & Beer"],
   },
 };
