@@ -6,7 +6,7 @@ import type { Photo, Property } from "./types";
  * Still unconfirmed (docs/plan.md, "Needed before step 3"):
  * - final names for South Austin Stay and Fire Side Home
  * - nightly rate and minimum nights (null here; render as "t.b.c.")
- * - guest quotes (empty arrays; step 8 hides the section when empty)
+ * - guest quotes (empty arrays; step 9 hides the section when empty)
  * - Hospitable property ids for Oak Hill and South Austin Stay (`data-property-id`
  *   in each house's dashboard snippet; null renders the stub). Fire Side Home
  *   is "Dan Jean B" in Hospitable, property 2338068, from the snippet in

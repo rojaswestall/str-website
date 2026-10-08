@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 };
 
 /*
- * Temporary home for the step 6 widgets until step 7 (home) and step 8
- * (property pages) mount them for real. Step 8 deletes this folder and points
+ * Temporary home for the step 6 widgets until step 8 (home) and step 9
+ * (property pages) mount them for real. Step 9 deletes this folder and points
  * e2e/hospitable*.spec.ts at /stays/<slug> instead.
  */
 export default function HospitableLabPage() {

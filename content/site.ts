@@ -2,7 +2,7 @@ import type { SiteConfig } from "./types";
 
 /*
  * Site-wide configuration. Domain, contact email, and Instagram handle are
- * open items (docs/plan.md, "Needed before step 9 / 14"); they are `[TBC]`
+ * open items (docs/plan.md, "Needed before step 7 / 14"); they are `[TBC]`
  * placeholders and should render as such, never as a live mailto: or link.
  *
  * Hospitable: `siteUuid` and `theme` come from the real embed snippet. The
