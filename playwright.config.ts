@@ -1,7 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const port = 3000;
+const livePort = 3001;
 const baseURL = `http://localhost:${port}`;
+const liveBaseURL = `http://localhost:${livePort}`;
+
+// Env shared by both production builds: keeps the widget lab routes available.
+const devRoutes = { NEXT_PUBLIC_DEV_ROUTES: "1" };
 
 export default defineConfig({
   testDir: "./e2e",
@@ -15,16 +20,38 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [
+    // Default build: stub-mode widgets (NEXT_PUBLIC_HOSPITABLE_MODE unset).
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      testIgnore: /\.live\.spec\.ts$/,
+    },
+    // Second build with NEXT_PUBLIC_HOSPITABLE_MODE=live, for *.live.spec.ts only.
+    {
+      name: "chromium-live",
+      use: { ...devices["Desktop Chrome"], baseURL: liveBaseURL },
+      testMatch: /\.live\.spec\.ts$/,
     },
   ],
-  // Always test the production build, never the dev server.
-  webServer: {
-    command: `pnpm build && pnpm start --port ${port}`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  // Always test production builds, never the dev server.
+  webServer: [
+    {
+      command: `pnpm build && pnpm start --port ${port}`,
+      url: baseURL,
+      env: devRoutes,
+      reuseExistingServer: !process.env.CI,
+      timeout: 300_000,
+    },
+    {
+      command: `pnpm build && pnpm start --port ${livePort}`,
+      url: liveBaseURL,
+      env: {
+        ...devRoutes,
+        NEXT_PUBLIC_HOSPITABLE_MODE: "live",
+        NEXT_DIST_DIR: ".next-live",
+      },
+      reuseExistingServer: !process.env.CI,
+      timeout: 300_000,
+    },
+  ],
 });

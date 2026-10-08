@@ -45,10 +45,19 @@ export const QuoteSchema = z.object({
 });
 export type Quote = z.infer<typeof QuoteSchema>;
 
-/** Per-property Hospitable settings. Site-wide ones live on SiteConfig. */
+/**
+ * Per-property Hospitable settings. Site-wide ones live on SiteConfig.
+ *
+ * The dashboard snippet (Hospitable → Direct → self-hosted site) is a single
+ * `<script>` tag whose `data-property-id` names the house; there is no
+ * separate "widget id". The real snippet is recorded in docs/plan.md, step 6.
+ */
 export const HospitableConfigSchema = z.object({
-  /** Null until the human pastes the widget id (open item, step 6 / 14). */
-  bookingWidgetId: z.string().min(1).nullable(),
+  /** `data-property-id` from the snippet. Null until the house is matched to one (open item, step 6 / 14). */
+  propertyId: z
+    .string()
+    .regex(/^\d+$/, { message: "propertyId is the numeric data-property-id" })
+    .nullable(),
 });
 export type HospitableConfig = z.infer<typeof HospitableConfigSchema>;
 
@@ -182,9 +191,18 @@ export const SiteConfigSchema = z.object({
   /** Handle without the @. */
   instagram: nonEmpty,
   hospitable: z.object({
-    searchWidgetId: z.string().min(1).nullable(),
-    /** "stub" renders the placeholder panels; "live" injects the loader. */
+    /** "stub" renders the placeholder panels; "live" injects the loader. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
     mode: z.enum(["stub", "live"]),
+    /** `data-site-uuid` from the dashboard snippet; shared by every widget on the site. */
+    siteUuid: z.uuid().nullable(),
+    /** `data-theme` from the dashboard snippet (the widget style configured there). */
+    theme: nonEmpty,
+    /**
+     * Id for the multi-property search widget. Hospitable's per-property loader
+     * requires a property id, so the search widget has a different snippet that
+     * has not been copied yet; until it is, HospitableSearch renders the stub.
+     */
+    searchWidgetId: z.string().min(1).nullable(),
   }),
   /** Null drops the embed entirely (open item: keep the clip?). */
   tiktok: z

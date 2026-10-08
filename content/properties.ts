@@ -7,7 +7,10 @@ import type { Photo, Property } from "./types";
  * - final names for South Austin Stay and Fire Side Home
  * - nightly rate and minimum nights (null here; render as "t.b.c.")
  * - guest quotes (empty arrays; step 8 hides the section when empty)
- * - Hospitable booking widget ids (null; step 6 falls back to the stub)
+ * - Hospitable property ids for Oak Hill and South Austin Stay (`data-property-id`
+ *   in each house's dashboard snippet; null renders the stub). Fire Side Home
+ *   is "Dan Jean B" in Hospitable, property 2338068, from the snippet in
+ *   docs/plan.md.
  * - real photos (the files under public/photos/<slug>/ are striped placeholders)
  */
 
@@ -60,7 +63,7 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598934202273477463",
     strLicense: "OL2026086598",
-    hospitable: { bookingWidgetId: null },
+    hospitable: { propertyId: null },
     photos: placeholderPhotos("oak-hill", "An Oak Hill Home"),
     quotes: [],
     mapPin: { x: 85, y: 299 },
@@ -94,7 +97,7 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1655329029936239948",
     strLicense: "OL2026040319",
-    hospitable: { bookingWidgetId: null },
+    hospitable: { propertyId: null },
     photos: placeholderPhotos("south-austin", "South Austin Stay"),
     quotes: [],
     // Both South Austin houses sit near (266, 299); offset so the dots read apart.
@@ -130,7 +133,7 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598953749522814358",
     strLicense: "OL2026031718",
-    hospitable: { bookingWidgetId: null },
+    hospitable: { propertyId: "2338068" }, // "Dan Jean B" in Hospitable
     photos: placeholderPhotos("fire-side", "Fire Side Home"),
     quotes: [],
     mapPin: { x: 274, y: 306 },
