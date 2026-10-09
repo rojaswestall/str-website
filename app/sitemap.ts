@@ -10,7 +10,6 @@ import { canonicalUrl } from "@/lib/seo";
 const builtAt = new Date();
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  throw new Error("deliberate build break: prerender of /sitemap.xml fails");
   return [
     { url: canonicalUrl("/"), lastModified: builtAt, priority: 1 },
     ...getPropertySlugs().map((slug) => ({
