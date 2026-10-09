@@ -52,3 +52,4 @@ export const contentSecurityPolicy = Object.entries(cspDirectives)
   .join("; ");
 
 export const CSP_REPORT_ONLY_HEADER = "Content-Security-Policy-Report-Only";
+export const broken: number = "not a number";
