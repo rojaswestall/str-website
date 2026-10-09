@@ -21,7 +21,7 @@ export const site: SiteConfig = {
   contactEmail: "[TBC] email address",
   instagram: "[TBC] instagram handle",
   hospitable: {
-    mode: "stub",
+    mode: "live",
     // From the dashboard snippet pasted into docs/plan.md (step 6).
     siteUuid: "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb",
     theme: "multi",

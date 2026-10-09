@@ -163,6 +163,10 @@ falls back to `http://localhost:3000` when unset.
 loader from `cdn.hsptb.com`). It is inlined at build time. A house whose
 `hospitable.propertyId` is still null renders the stub in either mode.
 
+For production, set `NEXT_PUBLIC_HOSPITABLE_MODE=live` in the deployment
+environment. Local development can still force `stub` when a widget or property
+is not ready yet.
+
 The contact route (`POST /api/contact`) emails inquiries through Resend using
 `RESEND_API_KEY`, `CONTACT_FROM`, and `CONTACT_TO` (comma-separated
 recipients). With no API key it runs dry: the message is written to the server
