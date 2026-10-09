@@ -32,6 +32,7 @@ Then open http://localhost:3000.
 | `pnpm lint`          | ESLint                                                   |
 | `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                       |
 | `pnpm check:content` | Parse `content/*.ts` through zod, check slugs and photos |
+| `pnpm check:colors`  | Fail on raw colours outside `app/globals.css`            |
 | `pnpm format`        | Prettier, write mode (`format:check` for CI)             |
 | `pnpm test:e2e`      | Playwright against a fresh production build              |
 
@@ -104,6 +105,24 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   open-items checklist.
 - `design/artifact.html` — the static visual reference. Open it in a browser;
   do not edit it.
+
+## Accessibility and visual checks
+
+`e2e/a11y.spec.ts` runs axe-core (`@axe-core/playwright`) on `/`,
+`/stays/oak-hill`, and `/does-not-exist` in light and dark; `serious` and
+`critical` violations fail, `moderate` and `minor` findings are printed and
+attached to the report. Run it alone with
+`pnpm test:e2e e2e/a11y.spec.ts --project=chromium`. `e2e/visual.spec.ts`
+writes full-page screenshots of `/` and `/stays/oak-hill` in both themes at
+1400px to `e2e/__screenshots__/<route>-<theme>.png`; they are review aids
+regenerated on every run, not a pixel comparison. Both specs block requests to
+`tiktok.com` so the third-party player is never audited. `pnpm check:colors`
+(`scripts/check-colors.ts`) fails on any hex, `rgb(`/`hsl(`/`oklch(`, or bare
+`white`/`black` under `components/` and `app/`; it exempts `app/globals.css`
+(the token blocks) and the four files that render outside the page's CSS and
+copy the light values by hand: `app/opengraph-image.tsx`,
+`app/stays/[slug]/opengraph-image.tsx`, `components/seo/MonogramIcon.tsx`,
+and `app/icon.svg`.
 
 ## Dependency policy
 
