@@ -34,7 +34,8 @@ Then open http://localhost:3000.
 | `pnpm check:content` | Parse `content/*.ts` through zod, check slugs and photos    |
 | `pnpm check:colors`  | Fail on raw colours in `components/` and `app/` (see below) |
 | `pnpm format`        | Prettier, write mode (`format:check` for CI)                |
-| `pnpm test:e2e`      | Playwright against a fresh production build                 |
+| `pnpm test`          | Playwright against fresh production builds (see below)      |
+| `pnpm test:e2e`      | Same as `pnpm test`                                         |
 
 Before the first e2e run, install the browser once:
 
@@ -42,8 +43,19 @@ Before the first e2e run, install the browser once:
 pnpm exec playwright install chromium
 ```
 
-CI (`.github/workflows/ci.yml`) runs install, lint, format check, typecheck,
-content check, build, and e2e on every pull request and on pushes to `main`.
+`pnpm test` builds the site twice (`.next` in stub mode on port 3000,
+`.next-live` in live mode on port 3001), starts both, and runs the specs in
+`e2e/` (about 50 tests, roughly ten seconds once the servers are up).
+Locally it reuses any server already listening on those ports, so stop a
+stale one first (`pkill -f next-server`) or the suite tests an old build. The
+config pins `NEXT_PUBLIC_HOSPITABLE_MODE=stub` and `NEXT_PUBLIC_SITE_URL=""`
+on the default server so a `.env.local` cannot change what the tests see.
+
+CI (`.github/workflows/ci.yml`) runs install, content check, lint, format
+check, typecheck, and `pnpm test` on every pull request and on pushes to
+`main`; the Playwright web servers do the builds, so there is no separate build
+step. A failing run uploads `playwright-report/` (with traces from the one
+retry) as an artifact. The whole job takes about two minutes.
 
 ## Where things live
 
@@ -97,10 +109,13 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   plus `area/` and `home/`. Today every file is a striped placeholder with
   the final aspect ratio (3:2 hero and gallery, 1:1 area picks, 21:9 hero
   collage); drop real photos in at the same paths.
-- `e2e/` — Playwright specs. Two projects: `chromium` runs most specs
-  against the default build on port 3000, and `chromium-live` runs
-  `*.live.spec.ts` against a second build made with
-  `NEXT_PUBLIC_HOSPITABLE_MODE=live` into `.next-live` on port 3001.
+- `e2e/` — Playwright specs. Two projects: `chromium` runs every spec except
+  `*.live.spec.ts` against the default build on port 3000 (`home`, `stays`,
+  `theme`, `contact-api`, `contact-form`, `hospitable`, `seo`,
+  `kitchen-sink`), and `chromium-live` runs `hospitable.live.spec.ts` against
+  a second build made with `NEXT_PUBLIC_HOSPITABLE_MODE=live` into
+  `.next-live` on port 3001. The comment at the top of `playwright.config.ts`
+  says what each file covers.
 - `docs/plan.md` — the full implementation plan with per-step prompts and the
   open-items checklist.
 - `design/artifact.html` — the static visual reference. Open it in a browser;

@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   ci:
-    name: Lint, typecheck, build, e2e
+    name: Content, lint, typecheck, e2e
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -29,26 +29,29 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Content is parsed before anything builds; a bad value fails here with
+      # the zod message rather than inside `next build`.
+      - name: Check content
+        run: pnpm check:content
+
       - name: Lint
         run: pnpm lint
 
       - name: Format check
         run: pnpm format:check
 
+      # Runs `next typegen` first, then `tsc --noEmit`.
       - name: Typecheck
         run: pnpm typecheck
-
-      - name: Check content
-        run: pnpm check:content
-
-      - name: Build
-        run: pnpm build
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: End-to-end tests
-        run: pnpm test:e2e
+      # Playwright's two web servers each run `pnpm build` (stub and live) and
+      # pipe the build log in CI, so there is no separate build step; a build
+      # failure fails this step with the Next error in the log.
+      - name: Build and run end-to-end tests
+        run: pnpm test
 
       - name: Upload Playwright report
         if: failure()
