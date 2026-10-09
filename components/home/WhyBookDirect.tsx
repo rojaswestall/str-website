@@ -1,5 +1,7 @@
-import { Ledger, Section, SectionHead, Tbc } from "@/components/ui";
-import { getSite } from "@/content";
+import { ContactForm } from "@/components/contact";
+import { MonoHeading } from "@/components/property";
+import { Ledger, Section, SectionHead } from "@/components/ui";
+import { getAllProperties, getSite } from "@/content";
 
 /** The four lines from the artifact's "What direct booking changes" ledger. */
 const LEDGER_ITEMS = [
@@ -11,11 +13,16 @@ const LEDGER_ITEMS = [
 
 /*
  * `#direct`: the pitch (`site.directPitch`) on the left, the ledger on the
- * right. The artifact's waitlist signup is gone because booking is live; its
- * place is the slot where step 10 mounts the contact form.
+ * right. The artifact's waitlist signup is gone because booking is live; the
+ * contact form takes its place under the pitch. `ContactForm` is a Client
+ * Component, so it only gets the serialisable slug/name pairs it needs.
  */
 export function WhyBookDirect() {
   const site = getSite();
+  const properties = getAllProperties().map(({ slug, name }) => ({
+    slug,
+    name,
+  }));
   return (
     <Section id="direct" hairline aria-labelledby="direct-heading">
       <div className="grid items-start gap-[clamp(1.75rem,4vw,3.5rem)] min-[760px]:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
@@ -27,16 +34,15 @@ export function WhyBookDirect() {
             ))}
           </div>
 
-          {/*
-           * TODO(step 10): mount `ContactForm` here under the mono heading
-           * "Ask us anything before you book". It posts to POST /api/contact
-           * (response contract in the step 7 notes in docs/plan.md).
-           */}
-          <div
-            data-testid="contact-form-slot"
-            className="mt-6 font-mono text-[0.72rem] text-muted"
-          >
-            <Tbc>Contact form to come</Tbc>
+          <div data-testid="contact-form-slot" className="mt-8">
+            <MonoHeading as="h3" id="contact-heading">
+              Ask us anything before you book
+            </MonoHeading>
+            <ContactForm
+              properties={properties}
+              aria-labelledby="contact-heading"
+              className="mt-4"
+            />
           </div>
         </div>
 
