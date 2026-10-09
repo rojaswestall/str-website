@@ -9,9 +9,16 @@ import { expect, type Page, type Route, test } from "@playwright/test";
  * not set it, so without this header every browser post in the whole suite
  * would share one bucket. Each real submission below is made from this file's
  * own address; the 429, 500, and offline paths are intercepted and never reach
- * the route, so one run costs the limiter a single valid inquiry.
+ * the route, so one run costs the limiter a single valid inquiry. The address
+ * varies per worker process (203.0.113.50–249, clear of contact-api.spec.ts's
+ * .10–.17) so repeated local runs against a reused server do not hit the
+ * five-per-ten-minutes limit.
  */
-test.use({ extraHTTPHeaders: { "x-forwarded-for": "203.0.113.50" } });
+test.use({
+  extraHTTPHeaders: {
+    "x-forwarded-for": `203.0.113.${50 + (process.pid % 200)}`,
+  },
+});
 
 const inquiry = {
   name: "Taylor Guest",
@@ -35,17 +42,11 @@ async function fillForm(page: Page, values = inquiry) {
   await f.getByLabel("Message").fill(values.message);
 }
 
-const json = (route: Route, status: number, body: unknown, delayMs = 0) =>
-  new Promise<void>((resolve) => {
-    setTimeout(() => {
-      route
-        .fulfill({
-          status,
-          contentType: "application/json",
-          body: JSON.stringify(body),
-        })
-        .then(resolve);
-    }, delayMs);
+const json = (route: Route, status: number, body: unknown) =>
+  route.fulfill({
+    status,
+    contentType: "application/json",
+    body: JSON.stringify(body),
   });
 
 test.describe("contact form", () => {
@@ -109,6 +110,7 @@ test.describe("contact form", () => {
     await expect(success).toBeVisible();
     await expect(success).toHaveAttribute("role", "status");
     await expect(success).toContainText("Thank you");
+    await expect(success).toBeFocused();
     await expect(success).toContainText("We reply within the hour, usually");
     await expect(form(page)).toHaveCount(0);
   });
@@ -154,9 +156,16 @@ test.describe("contact form", () => {
   }) => {
     const message =
       "Too many messages in a short time. Please try again later.";
-    await page.route("**/api/contact", (route) =>
-      json(route, 429, { ok: false, message }, 600),
-    );
+    // Hold the response until the pending state has been asserted, so the
+    // test never races a timer.
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route("**/api/contact", async (route) => {
+      await gate;
+      await json(route, 429, { ok: false, message });
+    });
     await fillForm(page);
     const f = form(page);
     const button = f.getByRole("button", { name: /Send/ });
@@ -164,6 +173,7 @@ test.describe("contact form", () => {
 
     await expect(button).toHaveText("Sending…");
     await expect(button).toBeDisabled();
+    release();
 
     const error = page.getByTestId("contact-form-error");
     await expect(error).toHaveText(message);

@@ -33,6 +33,16 @@ type FieldName = keyof ContactFieldErrors;
 type ContactResponse =
   { ok: true } | { ok: false; message?: string; errors?: ContactFieldErrors };
 
+/* DOM order, so the first invalid control focused is the first on screen. */
+const FIELD_ORDER = [
+  "name",
+  "email",
+  "property",
+  "checkIn",
+  "checkOut",
+  "message",
+] as const satisfies readonly FieldName[];
+
 const NETWORK_ERROR =
   "We couldn't reach the server. Check your connection and try again.";
 const UNEXPECTED_ERROR =
@@ -64,6 +74,7 @@ export function ContactForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (status === "pending") return;
     const form = event.currentTarget;
     const body = Object.fromEntries(new FormData(form));
 
@@ -109,7 +120,7 @@ export function ContactForm({
       return;
     }
     // Field errors stand on their own; move focus to the first one.
-    const first = Object.keys(errors).find((name) => name !== "website");
+    const first = FIELD_ORDER.find((name) => name in errors);
     if (first) {
       const control = form.elements.namedItem(first);
       if (control instanceof HTMLElement) control.focus();
@@ -134,6 +145,10 @@ export function ContactForm({
     return (
       <div
         role="status"
+        tabIndex={-1}
+        // The form (and the focused submit) unmounts, so take focus here;
+        // a ref callback avoids an effect and runs once on mount.
+        ref={(el) => el?.focus()}
         className={cx("flex flex-col gap-[0.6rem]", className)}
         data-testid="contact-form-success"
       >
@@ -153,6 +168,7 @@ export function ContactForm({
     <form
       {...formProps}
       className={cx("relative grid gap-[0.9rem]", className)}
+      method="post"
       noValidate
       onSubmit={handleSubmit}
       onChange={handleChange}
@@ -183,7 +199,6 @@ export function ContactForm({
               type="email"
               name="email"
               autoComplete="email"
-              inputMode="email"
               placeholder="you@example.com"
               className={inputClasses}
             />
@@ -265,7 +280,7 @@ export function ContactForm({
        */}
       <div
         aria-hidden="true"
-        className="absolute top-auto -left-[9999px] h-px w-px overflow-hidden"
+        className="absolute -left-[9999px] h-px w-px overflow-hidden"
       >
         <label>
           Website
@@ -283,8 +298,7 @@ export function ContactForm({
         <Button
           type="submit"
           disabled={pending}
-          aria-disabled={pending}
-          className="disabled:cursor-not-allowed disabled:opacity-70"
+          className="disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:border-ink disabled:hover:bg-ink"
         >
           {pending ? "Sending…" : "Send message"}
         </Button>
