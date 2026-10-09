@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getAllProperties, getSite } from "@/content";
-import { loadOgFonts } from "@/lib/og-font";
-import { siteDescription } from "@/lib/seo";
+import { ogFonts } from "@/lib/og-font";
 
 /*
  * Default Open Graph image: the site name, the tagline, the house count, and
@@ -28,7 +27,6 @@ export const contentType = "image/png";
 export default async function Image() {
   const site = getSite();
   const houses = getAllProperties().length;
-  const fonts = await loadOgFonts();
 
   // The hero sets the tagline's last word in italics; the card does the same.
   const words = site.tagline.split(" ");
@@ -91,9 +89,9 @@ export default async function Image() {
           maxWidth: 900,
         }}
       >
-        <span>{siteDescription}</span>
+        <span>{site.description}</span>
       </div>
     </div>,
-    { ...size, fonts },
+    { ...size, fonts: ogFonts },
   );
 }

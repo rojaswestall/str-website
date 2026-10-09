@@ -185,6 +185,8 @@ export type License = z.infer<typeof LicenseSchema>;
 export const SiteConfigSchema = z.object({
   name: z.literal("The Austin Collection"),
   tagline: nonEmpty,
+  /** One sentence for the root `<meta name="description">`, Open Graph, and the Organization JSON-LD. */
+  description: nonEmpty,
   /** Bare host name, no scheme. Placeholder until the domain is chosen. */
   domain: nonEmpty,
   contactEmail: nonEmpty,

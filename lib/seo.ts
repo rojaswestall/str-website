@@ -30,10 +30,6 @@ export const openGraphDefaults = {
   type: "website",
 } as const satisfies NonNullable<Metadata["openGraph"]>;
 
-/** Site description reused by the home page and the Organization block. */
-export const siteDescription =
-  "Three short-term rental houses in Austin, Texas, booked directly with the hosts who look after them.";
-
 /** The OG image route for a property page. */
 export function propertyOgImageUrl(property: Pick<Property, "slug">): string {
   return canonicalUrl(`/stays/${property.slug}/opengraph-image`);
@@ -108,7 +104,7 @@ export function organizationJsonLd() {
     name: site.name,
     url: canonicalUrl("/"),
     logo: canonicalUrl("/icon.svg"),
-    description: siteDescription,
+    description: site.description,
     ...(isTbc(site.contactEmail) ? {} : { email: site.contactEmail }),
     ...(sameAs.length > 0 ? { sameAs } : {}),
   };

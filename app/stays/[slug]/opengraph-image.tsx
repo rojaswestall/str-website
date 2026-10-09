@@ -1,8 +1,9 @@
 import { ImageResponse } from "next/og";
 import { notFound } from "next/navigation";
+import { propertySpecItems } from "@/components/property";
 import { formatRating } from "@/components/ui";
 import { getProperty, getPropertySlugs, getSite } from "@/content";
-import { loadOgFonts } from "@/lib/og-font";
+import { ogFonts } from "@/lib/og-font";
 
 /*
  * Per-house Open Graph image: site name, house name, the ★ rating line, and
@@ -27,7 +28,9 @@ export function generateStaticParams() {
   return getPropertySlugs().map((slug) => ({ slug }));
 }
 
-export const alt = "The Austin Collection";
+// Inert today: the page's explicit `openGraph.images` entry carries the house
+// name as alt. Kept because the file convention expects it for the fallback.
+export const alt = "A house in The Austin Collection";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -41,7 +44,6 @@ export default async function Image({
   if (!property) notFound();
 
   const site = getSite();
-  const fonts = await loadOgFonts();
   const reviews = `${property.reviewCount} ${property.reviewCount === 1 ? "review" : "reviews"}`;
 
   return new ImageResponse(
@@ -146,12 +148,15 @@ export default async function Image({
           color: MUTED,
         }}
       >
+        {/* Same wording as the page's spec strip; unconfirmed items are left out. */}
         <span>
-          Sleeps {property.sleeps} · {property.bedrooms} bedrooms ·{" "}
-          {property.bathrooms} bath · book direct
+          {propertySpecItems(property)
+            .filter((item) => !item.tbc)
+            .map((item) => item.label)
+            .join(" · ")}
         </span>
       </div>
     </div>,
-    { ...size, fonts },
+    { ...size, fonts: ogFonts },
   );
 }

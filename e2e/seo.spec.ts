@@ -51,7 +51,12 @@ test.describe("seo", () => {
     expect(body).toContain(`Sitemap: ${origin(baseURL)}/sitemap.xml`);
   });
 
-  for (const path of ["/opengraph-image", "/stays/oak-hill/opengraph-image"]) {
+  for (const path of [
+    "/opengraph-image",
+    "/stays/oak-hill/opengraph-image",
+    "/apple-icon",
+    "/icon1",
+  ]) {
     test(`${path} returns a PNG`, async ({ request }) => {
       const response = await request.get(path);
       expect(response.status()).toBe(200);
@@ -61,7 +66,7 @@ test.describe("seo", () => {
       expect([...bytes.subarray(0, 8)]).toEqual([
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
       ]);
-      expect(bytes.length).toBeGreaterThan(1000);
+      expect(bytes.length).toBeGreaterThan(100); // the 32px icon is ~660 bytes
     });
   }
 

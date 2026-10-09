@@ -77,9 +77,10 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   `metadata` in `app/page.tsx`. `app/sitemap.ts` and `app/robots.ts` generate
   `/sitemap.xml` and `/robots.txt`; `app/opengraph-image.tsx` and
   `app/stays/[slug]/opengraph-image.tsx` render the share cards with
-  `ImageResponse` (Newsreader is fetched once at build by `lib/og-font.ts`);
-  `app/icon.svg` and `app/apple-icon.tsx` are the placeholder "AC" monogram
-  icons until real brand assets exist. Set `NEXT_PUBLIC_SITE_URL` to the real
+  `ImageResponse` (`lib/og-font.ts` reads the Newsreader TTFs vendored under
+  `assets/fonts/`); `app/icon.svg`, `app/icon1.tsx`, and `app/apple-icon.tsx`
+  are the placeholder "AC" monogram icons (`components/seo/MonogramIcon.tsx`)
+  until real brand assets exist. Set `NEXT_PUBLIC_SITE_URL` to the real
   origin on Vercel, or every canonical, sitemap, and OG URL points at
   localhost.
 - `content/` — typed site content. `types.ts` holds the zod schemas; the

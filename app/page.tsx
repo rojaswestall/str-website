@@ -7,37 +7,24 @@ import { Stays } from "@/components/home/Stays";
 import { WhyBookDirect } from "@/components/home/WhyBookDirect";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getSite } from "@/content";
-import {
-  canonicalUrl,
-  openGraphDefaults,
-  organizationJsonLd,
-  siteDescription,
-} from "@/lib/seo";
+import { canonicalUrl, openGraphDefaults, organizationJsonLd } from "@/lib/seo";
 
 const site = getSite();
 
 /*
- * Title stays the root default (the bare site name, no template). The OG
- * image is the generated card at /opengraph-image; listing it explicitly
- * replaces the file-convention tag with the same route, so the URL is built
- * through canonicalUrl like every other absolute URL.
+ * Title stays the root default (the bare site name, no template). No
+ * `openGraph.images` here on purpose: the `app/opengraph-image.tsx` file
+ * convention supplies the tag, absolute through `metadataBase` and with the
+ * cache-busting hash scrapers need when the artwork changes.
  */
 export const metadata: Metadata = {
-  description: siteDescription,
+  description: site.description,
   alternates: { canonical: canonicalUrl("/") },
   openGraph: {
     ...openGraphDefaults,
     title: site.name,
-    description: siteDescription,
+    description: site.description,
     url: canonicalUrl("/"),
-    images: [
-      {
-        url: canonicalUrl("/opengraph-image"),
-        width: 1200,
-        height: 630,
-        alt: site.name,
-      },
-    ],
   },
   twitter: { card: "summary_large_image" },
 };

@@ -6,7 +6,6 @@ import { SkipLink } from "@/components/layout/SkipLink";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { getSite } from "@/content";
 import { fontVariables } from "@/lib/fonts";
-import { siteDescription } from "@/lib/seo";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -18,7 +17,7 @@ export const metadata: Metadata = {
     default: site.name,
     template: `%s · ${site.name}`,
   },
-  description: siteDescription,
+  description: site.description,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

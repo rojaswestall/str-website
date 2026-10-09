@@ -1,7 +1,8 @@
 /*
- * Canonical origin for absolute URLs (metadataBase today; canonical links,
- * sitemap, and OG images in step 11). Comes from NEXT_PUBLIC_SITE_URL, set per
- * environment on Vercel; falls back to localhost so local and CI builds work.
+ * Canonical origin for absolute URLs: metadataBase in app/layout.tsx and
+ * every canonical link, sitemap entry, OG image, and JSON-LD URL built by
+ * lib/seo.ts. Comes from NEXT_PUBLIC_SITE_URL, set per environment on
+ * Vercel; falls back to localhost so local and CI builds work.
  */
 const FALLBACK = "http://localhost:3000";
 
