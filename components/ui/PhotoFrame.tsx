@@ -59,7 +59,9 @@ export function PhotoFrame({
             fill
             sizes={sizes}
             preload={preload}
-            className="object-cover"
+            // Dark paper: pull the photo back a step so it does not glow.
+            // Real photos inherit this at the same paths as the placeholders.
+            className="object-cover dark:brightness-90"
           />
         ) : (
           <span className="border border-hairline bg-paper px-[0.7rem] py-[0.4rem] font-mono text-[0.72rem] tracking-[0.08em] text-muted uppercase">
