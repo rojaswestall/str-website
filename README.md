@@ -112,4 +112,7 @@ loader from `cdn.hsptb.com`). It is inlined at build time. A house whose
 The contact route (`POST /api/contact`) emails inquiries through Resend using
 `RESEND_API_KEY`, `CONTACT_FROM`, and `CONTACT_TO` (comma-separated
 recipients). With no API key it runs dry: the message is written to the server
-log and the request still succeeds, so local dev and CI need no secrets.
+log and the request still succeeds, so local dev and CI need no secrets. The home
+page's form (`components/contact/ContactForm.tsx`, mounted in "Why book
+direct") posts to that route and shows the same success state in dry run as
+after a real send.

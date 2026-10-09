@@ -1,4 +1,6 @@
-import { getPolicies, getProperty } from "@/content";
+import { ContactForm } from "@/components/contact";
+import { MonoHeading } from "@/components/property";
+import { getAllProperties, getPolicies, getProperty } from "@/content";
 import {
   Button,
   Credential,
@@ -22,6 +24,10 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
   if (!house) throw new Error("kitchen sink expects the oak-hill seed");
   const hero = house.photos.find((photo) => photo.role === "hero") ?? null;
   const policies = getPolicies().slice(0, 3);
+  const properties = getAllProperties().map(({ slug, name }) => ({
+    slug,
+    name,
+  }));
 
   return (
     <>
@@ -168,6 +174,24 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
                 ),
               },
             ]}
+          />
+        </div>
+      </Section>
+
+      <Section hairline>
+        <SectionHead
+          title="ContactForm"
+          meta="idle · posts to /api/contact"
+          lede="The step 10 form as mounted in Why book direct. Submitting here hits the real route (dry run without a Resend key), so the success and error states can be checked in both themes."
+        />
+        <div className="max-w-[46ch]">
+          <MonoHeading as="h3" id={`${theme}-contact-heading`}>
+            Ask us anything before you book
+          </MonoHeading>
+          <ContactForm
+            properties={properties}
+            aria-labelledby={`${theme}-contact-heading`}
+            className="mt-4"
           />
         </div>
       </Section>
