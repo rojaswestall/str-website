@@ -69,6 +69,19 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   `hospitable.ts` holds the loader URL and the stub/live mode switch;
   `csp.ts` is the Content Security Policy that `next.config.ts` sends as
   report-only; `hooks/useInjectedScript.ts` mounts third-party scripts).
+- SEO — `lib/seo.ts` builds every absolute URL from `getSiteUrl()`
+  (`canonicalUrl`), holds the shared Open Graph defaults and site
+  description, and builds the `VacationRental` and `Organization` JSON-LD that
+  `components/seo/JsonLd.tsx` renders on each house page and the home page.
+  Per-page metadata is `generateMetadata` in `app/stays/[slug]/page.tsx` and
+  `metadata` in `app/page.tsx`. `app/sitemap.ts` and `app/robots.ts` generate
+  `/sitemap.xml` and `/robots.txt`; `app/opengraph-image.tsx` and
+  `app/stays/[slug]/opengraph-image.tsx` render the share cards with
+  `ImageResponse` (Newsreader is fetched once at build by `lib/og-font.ts`);
+  `app/icon.svg` and `app/apple-icon.tsx` are the placeholder "AC" monogram
+  icons until real brand assets exist. Set `NEXT_PUBLIC_SITE_URL` to the real
+  origin on Vercel, or every canonical, sitemap, and OG URL points at
+  localhost.
 - `content/` — typed site content. `types.ts` holds the zod schemas; the
   data files (`properties.ts`, `hosts.ts`, `area.ts`, `policies.ts`,
   `site.ts`) are plain objects; `index.ts` parses them at import and exposes
