@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const SLUGS = ["oak-hill", "south-austin", "fire-side"] as const;
+const LICENSES = ["OL2026086598", "OL2026040319", "OL2026031718"];
 
 // Raw --map-ground values from app/globals.css, as the browser reports them.
 const MAP_GROUND_LIGHT = "rgb(241, 239, 234)";
@@ -166,5 +167,54 @@ test.describe("home page", () => {
     await expect(direct).toContainText("What direct booking changes");
     await expect(direct.locator("li")).toHaveCount(4);
     await expect(direct.getByTestId("contact-form-slot")).toBeVisible();
+  });
+});
+
+// The shell (header, footer, skip link) is the same on every route; it is
+// asserted once here, on the home page. The 404 shell is in stays.spec.ts.
+test.describe("site shell", () => {
+  test("header, nav, and footer render on the home page", async ({ page }) => {
+    await page.goto("/");
+
+    const header = page.getByRole("banner");
+    await expect(
+      header.getByRole("link", { name: "The Austin Collection" }),
+    ).toHaveAttribute("href", "/");
+
+    const nav = header.getByRole("navigation", { name: "Primary" });
+    for (const [label, href] of [
+      ["Stays", "/#stays"],
+      ["The area", "/#area"],
+      ["Practicals", "/#practicals"],
+      ["Book direct", "/#direct"],
+    ]) {
+      await expect(nav.getByRole("link", { name: label })).toHaveAttribute(
+        "href",
+        href!,
+      );
+    }
+    await expect(header.locator("[data-theme-toggle]")).toBeVisible();
+
+    await expect(page.getByRole("main")).toHaveAttribute("id", "main");
+    await expect(page.getByRole("contentinfo")).toContainText(
+      "Phone shared with guests after booking",
+    );
+  });
+
+  test("footer lists the three STR licenses", async ({ page }) => {
+    await page.goto("/");
+    const licenses = page.getByTestId("str-licenses");
+    await expect(licenses).toContainText("City of Austin STR licenses");
+    for (const number of LICENSES) {
+      await expect(licenses).toContainText(number);
+    }
+  });
+
+  test("skip link is the first tab stop and targets main", async ({ page }) => {
+    await page.goto("/");
+    await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", { name: "Skip to content" });
+    await expect(skip).toBeFocused();
+    await expect(skip).toHaveAttribute("href", "#main");
   });
 });
