@@ -15,7 +15,9 @@ import { defineConfig, devices } from "@playwright/test";
  *   hospitable.spec.ts    stub mode makes no loader request; the CSP header
  *   seo.spec.ts           sitemap, robots, OG images, JSON-LD, canonical tags
  *   kitchen-sink.spec.ts  /kitchen-sink is a 404 in production
- *   (a11y.spec.ts joins this project when step 12 merges.)
+ *   a11y.spec.ts          axe on /, one stay, and the 404 in both themes
+ *   visual.spec.ts        full-page screenshots into e2e/__screenshots__/
+ *                         (gitignored; CI uploads them as an artifact)
  *
  * `chromium-live` (port 3001, a second build with
  * NEXT_PUBLIC_HOSPITABLE_MODE=live into .next-live) runs only

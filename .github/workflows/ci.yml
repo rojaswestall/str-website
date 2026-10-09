@@ -34,6 +34,9 @@ jobs:
       - name: Check content
         run: pnpm check:content
 
+      - name: Check colors
+        run: pnpm check:colors
+
       - name: Lint
         run: pnpm lint
 
@@ -52,6 +55,17 @@ jobs:
       # failure fails this step with the Next error in the log.
       - name: Build and run end-to-end tests
         run: pnpm test
+
+      # e2e/visual.spec.ts writes these on every run; they are review aids,
+      # not committed, so they are published here instead.
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: e2e/__screenshots__/
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Upload Playwright report
         if: failure()

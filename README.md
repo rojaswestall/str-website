@@ -45,17 +45,19 @@ pnpm exec playwright install chromium
 
 `pnpm test` builds the site twice (`.next` in stub mode on port 3000,
 `.next-live` in live mode on port 3001), starts both, and runs the specs in
-`e2e/` (about 50 tests, roughly ten seconds once the servers are up).
+`e2e/` (65 tests, roughly 15 seconds once the servers are up).
 Locally it reuses any server already listening on those ports, so stop a
 stale one first (`pkill -f next-server`) or the suite tests an old build. The
 config pins `NEXT_PUBLIC_HOSPITABLE_MODE=stub` and `NEXT_PUBLIC_SITE_URL=""`
 on the default server so a `.env.local` cannot change what the tests see.
 
-CI (`.github/workflows/ci.yml`) runs install, content check, lint, format
-check, typecheck, and `pnpm test` on every pull request and on pushes to
-`main`; the Playwright web servers do the builds, so there is no separate build
-step. A failing run uploads `playwright-report/` (with traces from the one
-retry) as an artifact. The whole job takes about two minutes.
+CI (`.github/workflows/ci.yml`) runs install, content check, colour check,
+lint, format check, typecheck, and `pnpm test` on every pull request and on
+pushes to `main`; the Playwright web servers do the builds, so there is no
+separate build step. Every run uploads the `screenshots` artifact (the
+`e2e/__screenshots__/` review aids, which are gitignored); a failing run also
+uploads `playwright-report/` (with traces from the one retry). The whole job
+takes about two minutes.
 
 ## Where things live
 
@@ -112,7 +114,8 @@ retry) as an artifact. The whole job takes about two minutes.
 - `e2e/` — Playwright specs. Two projects: `chromium` runs every spec except
   `*.live.spec.ts` against the default build on port 3000 (`home`, `stays`,
   `theme`, `contact-api`, `contact-form`, `hospitable`, `seo`,
-  `kitchen-sink`), and `chromium-live` runs `hospitable.live.spec.ts` against
+  `kitchen-sink`, `a11y`, `visual`), and `chromium-live` runs
+  `hospitable.live.spec.ts` against
   a second build made with `NEXT_PUBLIC_HOSPITABLE_MODE=live` into
   `.next-live` on port 3001. The comment at the top of `playwright.config.ts`
   says what each file covers.
@@ -130,7 +133,8 @@ attached to the report. Run it alone with
 `pnpm test:e2e e2e/a11y.spec.ts --project=chromium`. `e2e/visual.spec.ts`
 writes full-page screenshots of `/` and `/stays/oak-hill` in both themes at
 1400px to `e2e/__screenshots__/<route>-<theme>.png`; they are review aids
-regenerated on every run, not a pixel comparison. Both specs block requests to
+regenerated on every run, not a pixel comparison, so the folder is gitignored
+and CI publishes it as the `screenshots` artifact on every run. Both specs block requests to
 `tiktok.com` so the third-party player is never audited. `pnpm check:colors`
 (`scripts/check-colors.ts`) fails on any hex, `rgb(`/`hsl(`/`oklch(`, or bare
 `white`/`black` under `components/` and `app/`; it exempts `app/globals.css`
