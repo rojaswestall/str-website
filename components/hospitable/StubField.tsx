@@ -23,7 +23,7 @@ export function StubField({
         value={value}
         disabled
         aria-disabled="true"
-        className="w-full border border-hairline bg-paper px-[0.75rem] py-[0.6rem] font-mono text-[0.8rem] tracking-[0.04em] text-muted normal-case disabled:cursor-not-allowed disabled:opacity-80"
+        className="w-full border border-hairline bg-paper px-[0.75rem] py-[0.6rem] font-mono text-[0.8rem] tracking-[0.04em] text-muted normal-case disabled:cursor-not-allowed"
         readOnly
       />
     </label>

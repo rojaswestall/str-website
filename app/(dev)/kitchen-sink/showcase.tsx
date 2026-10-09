@@ -149,6 +149,7 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
         <div className="flex flex-col gap-6">
           <Ledger
             title="What direct booking changes"
+            headingAs="h3"
             items={[
               "No platform service fee on the guest's side",
               "Returning guests get first refusal on holiday weeks",
@@ -159,6 +160,7 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
           <Ledger
             as="div"
             title="Practicals"
+            headingAs="h3"
             rows={[
               ...policies.map((row) => ({
                 term: row.term,
@@ -187,6 +189,8 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
         <div className="max-w-[46ch]">
           <MonoHeading as="h3" id={`${theme}-contact-heading`}>
             Ask us anything before you book
+            {/* Two copies of the form share a page; keep their landmark names distinct. */}
+            <span className="sr-only"> ({theme})</span>
           </MonoHeading>
           <ContactForm
             properties={properties}
