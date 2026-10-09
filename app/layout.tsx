@@ -17,8 +17,7 @@ export const metadata: Metadata = {
     default: site.name,
     template: `%s · ${site.name}`,
   },
-  description:
-    "Three short-term rental houses in Austin, Texas, booked directly with the hosts who look after them.",
+  description: site.description,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

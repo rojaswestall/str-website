@@ -15,6 +15,8 @@ import type { SiteConfig } from "./types";
 export const site: SiteConfig = {
   name: "The Austin Collection",
   tagline: "Places we look after, properly.",
+  description:
+    "Three short-term rental houses in Austin, Texas, booked directly with the hosts who look after them.",
   domain: "[TBC] domain",
   contactEmail: "[TBC] email address",
   instagram: "[TBC] instagram handle",

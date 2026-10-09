@@ -44,7 +44,9 @@ export default defineConfig({
     {
       command: `pnpm build && pnpm start --port ${port}`,
       url: baseURL,
-      env: { NEXT_PUBLIC_HOSPITABLE_MODE: "stub" },
+      // NEXT_PUBLIC_SITE_URL is pinned empty so a .env.local value cannot change
+      // the origin e2e/seo.spec.ts expects (an explicit env value wins over .env files).
+      env: { NEXT_PUBLIC_HOSPITABLE_MODE: "stub", NEXT_PUBLIC_SITE_URL: "" },
       reuseExistingServer: !process.env.CI,
       timeout: 300_000,
     },
@@ -53,6 +55,7 @@ export default defineConfig({
       url: liveBaseURL,
       env: {
         NEXT_PUBLIC_HOSPITABLE_MODE: "live",
+        NEXT_PUBLIC_SITE_URL: "",
         NEXT_DIST_DIR: ".next-live",
       },
       reuseExistingServer: !process.env.CI,
