@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="The Austin Collection">
+  <!--
+    Placeholder favicon: the "AC" monogram in ink on paper, until the brand
+    assets open item in docs/plan.md is answered. A standalone SVG cannot read
+    the CSS variables in app/globals.css, so paper (#faf9f7) and ink (#34312d)
+    are literal here; step 12's raw-hex grep must exempt this file.
+  -->
+  <rect width="64" height="64" rx="8" fill="#faf9f7"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="7.5" fill="none" stroke="#34312d" stroke-opacity="0.18"/>
+  <text x="32" y="44" text-anchor="middle" font-family="'Iowan Old Style', Georgia, 'Times New Roman', serif" font-size="34" font-weight="300" letter-spacing="-1.5" fill="#34312d">AC</text>
+</svg>
