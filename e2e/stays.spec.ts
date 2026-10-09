@@ -128,15 +128,26 @@ test.describe("property pages", () => {
     ).toHaveAttribute("href", "#book");
   });
 
-  test("an unknown slug returns the branded 404 with status 404", async ({
-    page,
-  }) => {
-    const response = await page.goto("/stays/nope");
-    expect(response?.status()).toBe(404);
-    await expect(
-      page.getByRole("heading", { level: 1, name: /isn.t one of ours/ }),
-    ).toBeVisible();
-    await expect(page.getByRole("banner")).toBeVisible();
-    await expect(page.getByRole("contentinfo")).toBeVisible();
-  });
+  // `/stays/nope` gets its 404 status from the slug check in proxy.ts (the
+  // route's fallback shell would otherwise answer 200); `/does-not-exist` is
+  // Next's own not-found path. Both must render the full branded shell.
+  for (const path of ["/stays/nope", "/does-not-exist"]) {
+    test(`${path} renders the branded 404 with status 404`, async ({
+      page,
+    }) => {
+      const response = await page.goto(path);
+      expect(response?.status()).toBe(404);
+      await expect(page).toHaveTitle("Page not found · The Austin Collection");
+      await expect(
+        page.getByRole("heading", { level: 1, name: /isn.t one of ours/ }),
+      ).toBeVisible();
+      await expect(page.getByRole("banner")).toBeVisible();
+      await expect(page.getByRole("contentinfo")).toBeVisible();
+      await expect(
+        page
+          .getByRole("main")
+          .getByRole("link", { name: "Back to the houses" }),
+      ).toHaveAttribute("href", "/");
+    });
+  }
 });

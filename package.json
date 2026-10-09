@@ -16,6 +16,7 @@
     "check:colors": "tsx scripts/check-colors.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test": "playwright test",
     "test:e2e": "playwright test"
   },
   "dependencies": {

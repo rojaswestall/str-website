@@ -34,7 +34,8 @@ Then open http://localhost:3000.
 | `pnpm check:content` | Parse `content/*.ts` through zod, check slugs and photos    |
 | `pnpm check:colors`  | Fail on raw colours in `components/` and `app/` (see below) |
 | `pnpm format`        | Prettier, write mode (`format:check` for CI)                |
-| `pnpm test:e2e`      | Playwright against a fresh production build                 |
+| `pnpm test`          | Playwright against fresh production builds (see below)      |
+| `pnpm test:e2e`      | Same as `pnpm test`                                         |
 
 Before the first e2e run, install the browser once:
 
@@ -42,8 +43,21 @@ Before the first e2e run, install the browser once:
 pnpm exec playwright install chromium
 ```
 
-CI (`.github/workflows/ci.yml`) runs install, lint, format check, typecheck,
-content check, build, and e2e on every pull request and on pushes to `main`.
+`pnpm test` builds the site twice (`.next` in stub mode on port 3000,
+`.next-live` in live mode on port 3001), starts both, and runs the specs in
+`e2e/` (65 tests, roughly 15 seconds once the servers are up).
+Locally it reuses any server already listening on those ports, so stop a
+stale one first (`pkill -f next-server`) or the suite tests an old build. The
+config pins `NEXT_PUBLIC_HOSPITABLE_MODE=stub` and `NEXT_PUBLIC_SITE_URL=""`
+on the default server so a `.env.local` cannot change what the tests see.
+
+CI (`.github/workflows/ci.yml`) runs install, content check, colour check,
+lint, format check, typecheck, and `pnpm test` on every pull request and on
+pushes to `main`; the Playwright web servers do the builds, so there is no
+separate build step. Every run uploads two artifacts: `screenshots` (the
+`e2e/__screenshots__/` review aids, which are gitignored) and
+`playwright-report` (the HTML report, with a trace for any test that needed
+its one retry). The whole job takes about two minutes.
 
 ## Where things live
 
@@ -91,16 +105,21 @@ content check, build, and e2e on every pull request and on pushes to `main`.
   from `@/content`, never from a data file. Unconfirmed values are `null` or
   strings starting with `[TBC]`. Property copy is never hardcoded in
   components.
-- `scripts/` — `check-content.ts`, run by `pnpm check:content` and CI before
-  the build.
+- `scripts/` — `check-content.ts` (`pnpm check:content`) and
+  `check-colors.ts` (`pnpm check:colors`); CI runs both first, before
+  anything builds.
 - `public/photos/` — photos referenced from `content/`, one folder per house
   plus `area/` and `home/`. Today every file is a striped placeholder with
   the final aspect ratio (3:2 hero and gallery, 1:1 area picks, 21:9 hero
   collage); drop real photos in at the same paths.
-- `e2e/` — Playwright specs. Two projects: `chromium` runs most specs
-  against the default build on port 3000, and `chromium-live` runs
-  `*.live.spec.ts` against a second build made with
-  `NEXT_PUBLIC_HOSPITABLE_MODE=live` into `.next-live` on port 3001.
+- `e2e/` — Playwright specs. Two projects: `chromium` runs every spec except
+  `*.live.spec.ts` against the default build on port 3000 (`home`, `stays`,
+  `theme`, `contact-api`, `contact-form`, `hospitable`, `seo`,
+  `kitchen-sink`, `a11y`, `visual`), and `chromium-live` runs
+  `hospitable.live.spec.ts` against
+  a second build made with `NEXT_PUBLIC_HOSPITABLE_MODE=live` into
+  `.next-live` on port 3001. The comment at the top of `playwright.config.ts`
+  says what each file covers.
 - `docs/plan.md` — the full implementation plan with per-step prompts and the
   open-items checklist.
 - `design/artifact.html` — the static visual reference. Open it in a browser;
@@ -115,8 +134,10 @@ attached to the report. Run it alone with
 `pnpm test:e2e e2e/a11y.spec.ts --project=chromium`. `e2e/visual.spec.ts`
 writes full-page screenshots of `/` and `/stays/oak-hill` in both themes at
 1400px to `e2e/__screenshots__/<route>-<theme>.png`; they are review aids
-regenerated on every run, not a pixel comparison. Both specs block requests to
-`tiktok.com` so the third-party player is never audited. `pnpm check:colors`
+regenerated on every run, not a pixel comparison, so the folder is gitignored
+and CI publishes it as the `screenshots` artifact on every run. Both specs
+block requests to `tiktok.com` so the third-party player is never audited.
+`pnpm check:colors`
 (`scripts/check-colors.ts`) fails on any hex, `rgb(`/`hsl(`/`oklch(`, or bare
 `white`/`black` under `components/` and `app/`; it exempts `app/globals.css`
 (the token blocks) and the four files that render outside the page's CSS and

@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   ci:
-    name: Lint, typecheck, build, e2e
+    name: Content, lint, typecheck, e2e
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -29,31 +29,51 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Content is parsed before anything builds; a bad value fails here with
+      # the zod message rather than inside `next build`.
+      - name: Check content
+        run: pnpm check:content
+
+      - name: Check colors
+        run: pnpm check:colors
+
       - name: Lint
         run: pnpm lint
 
       - name: Format check
         run: pnpm format:check
 
+      # Runs `next typegen` first, then `tsc --noEmit`.
       - name: Typecheck
         run: pnpm typecheck
-
-      - name: Check content
-        run: pnpm check:content
-
-      - name: Build
-        run: pnpm build
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: End-to-end tests
-        run: pnpm test:e2e
+      # Playwright's two web servers each run `pnpm build` (stub and live) and
+      # pipe the build log in CI, so there is no separate build step; a build
+      # failure fails this step with the Next error in the log.
+      - name: Build and run end-to-end tests
+        run: pnpm test
 
+      # e2e/visual.spec.ts writes these on every run; they are review aids,
+      # not committed, so they are published here instead.
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: e2e/__screenshots__/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      # Always, not only on failure: a test that fails once and passes on its
+      # retry leaves the job green, and the retry's trace is the only record.
       - name: Upload Playwright report
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
+          if-no-files-found: ignore
           retention-days: 7
