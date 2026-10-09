@@ -1,5 +1,5 @@
 /*
- * Raw-colour check, run by `pnpm check:colors` (and CI).
+ * Raw-colour check, run by `pnpm check:colors` (step 13 adds it to CI).
  *
  * Components must use the token utilities mapped in app/globals.css
  * (bg-paper, text-ink, border-hairline, fill-map-water, ...) so that every
@@ -27,9 +27,14 @@ const EXEMPT = new Set([
   "app/icon.svg",
 ]);
 
-/* Same pattern as the manual grep from the step 12 prompt, plus hsl/oklch. */
+/*
+ * Same pattern as the manual grep from the step 12 prompt, plus hsl/oklch.
+ * `-` is a word boundary on purpose so `bg-white` and `text-black` (Tailwind's
+ * raw colours) are caught; the one CSS property that would collide,
+ * `white-space`, is excluded explicitly.
+ */
 const RAW_COLOR =
-  /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(|\bwhite\b|\bblack\b/;
+  /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(|\bwhite\b(?!-space)|\bblack\b/;
 
 function walk(dir: string, out: string[]) {
   for (const entry of readdirSync(dir)) {

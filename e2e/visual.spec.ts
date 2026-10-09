@@ -21,9 +21,15 @@ const THEMES = ["light", "dark"] as const;
 
 test.use({ viewport: { width: 1400, height: 900 } });
 
-/** Scroll through the page so lazy images load, then wait for them and the fonts. */
+/*
+ * Scroll through the page so lazy images load, then wait for them and the
+ * fonts. The image wait is capped: a still-loading image only costs the
+ * review aid a blank frame, which beats a 30s timeout on a slow runner.
+ */
+const IMAGE_WAIT_MS = 5_000;
+
 async function settle(page: Page) {
-  await page.evaluate(async () => {
+  await page.evaluate(async (timeoutMs) => {
     const step = window.innerHeight;
     for (let y = 0; y < document.body.scrollHeight; y += step) {
       window.scrollTo(0, y);
@@ -31,18 +37,20 @@ async function settle(page: Page) {
     }
     window.scrollTo(0, 0);
     await document.fonts.ready;
-    await Promise.all(
-      Array.from(document.images)
-        .filter((img) => !img.complete)
-        .map(
-          (img) =>
-            new Promise((resolve) => {
-              img.addEventListener("load", resolve, { once: true });
-              img.addEventListener("error", resolve, { once: true });
-            }),
-        ),
-    );
-  });
+    const pending = Array.from(document.images)
+      .filter((img) => !img.complete)
+      .map(
+        (img) =>
+          new Promise((resolve) => {
+            img.addEventListener("load", resolve, { once: true });
+            img.addEventListener("error", resolve, { once: true });
+          }),
+      );
+    await Promise.race([
+      Promise.all(pending),
+      new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+    ]);
+  }, IMAGE_WAIT_MS);
 }
 
 for (const route of ROUTES) {

@@ -26,7 +26,7 @@ type Violation = Awaited<
   ReturnType<AxeBuilder["analyze"]>
 >["violations"][number];
 
-function describe(violation: Violation) {
+function formatViolation(violation: Violation) {
   const nodes = violation.nodes
     .map(
       (node) =>
@@ -70,7 +70,7 @@ for (const route of ROUTES) {
       );
 
       if (advisory.length > 0) {
-        const report = advisory.map(describe).join("\n");
+        const report = advisory.map(formatViolation).join("\n");
         console.log(
           `axe advisory findings on ${route.path} (${theme}), not failing:\n${report}`,
         );
@@ -84,7 +84,7 @@ for (const route of ROUTES) {
 
       expect(
         blocking,
-        `serious/critical axe violations on ${route.path} (${theme}):\n${blocking.map(describe).join("\n")}`,
+        `serious/critical axe violations on ${route.path} (${theme}):\n${blocking.map(formatViolation).join("\n")}`,
       ).toEqual([]);
     });
   }

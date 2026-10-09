@@ -24,17 +24,17 @@ pnpm dev
 
 Then open http://localhost:3000.
 
-| Script               | What it does                                             |
-| -------------------- | -------------------------------------------------------- |
-| `pnpm dev`           | Development server                                       |
-| `pnpm build`         | Production build                                         |
-| `pnpm start`         | Serve the production build                               |
-| `pnpm lint`          | ESLint                                                   |
-| `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                       |
-| `pnpm check:content` | Parse `content/*.ts` through zod, check slugs and photos |
-| `pnpm check:colors`  | Fail on raw colours outside `app/globals.css`            |
-| `pnpm format`        | Prettier, write mode (`format:check` for CI)             |
-| `pnpm test:e2e`      | Playwright against a fresh production build              |
+| Script               | What it does                                                |
+| -------------------- | ----------------------------------------------------------- |
+| `pnpm dev`           | Development server                                          |
+| `pnpm build`         | Production build                                            |
+| `pnpm start`         | Serve the production build                                  |
+| `pnpm lint`          | ESLint                                                      |
+| `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                          |
+| `pnpm check:content` | Parse `content/*.ts` through zod, check slugs and photos    |
+| `pnpm check:colors`  | Fail on raw colours in `components/` and `app/` (see below) |
+| `pnpm format`        | Prettier, write mode (`format:check` for CI)                |
+| `pnpm test:e2e`      | Playwright against a fresh production build                 |
 
 Before the first e2e run, install the browser once:
 
