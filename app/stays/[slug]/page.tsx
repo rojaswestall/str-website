@@ -13,21 +13,65 @@ import {
 } from "@/components/property";
 import { CityMap } from "@/components/map/CityMap";
 import { PracticalsList } from "@/components/practicals/PracticalsList";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Button, Prose, Section, SpecRow } from "@/components/ui";
 import { getAllProperties, getProperty, getPropertySlugs } from "@/content";
+import {
+  canonicalUrl,
+  openGraphDefaults,
+  propertyOgImageUrl,
+  vacationRentalJsonLd,
+} from "@/lib/seo";
 
 export function generateStaticParams() {
   return getPropertySlugs().map((slug) => ({ slug }));
 }
 
-/* Title and description only; step 11 adds Open Graph, canonical, and JSON-LD. */
+/*
+ * The root template appends the site name to `title`. The OG image is the
+ * generated card at /stays/<slug>/opengraph-image with the hero photo as a
+ * second choice; setting `images` here replaces the file-convention tag, so
+ * both URLs are listed explicitly. Only `params` is awaited: the page stays
+ * static under Cache Components.
+ */
 export async function generateMetadata({
   params,
 }: PageProps<"/stays/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const property = getProperty(slug);
   if (!property) notFound();
-  return { title: property.name, description: property.summary };
+  const url = canonicalUrl(`/stays/${slug}`);
+  const hero = property.photos.find((photo) => photo.role === "hero");
+  return {
+    title: property.name,
+    description: property.summary,
+    alternates: { canonical: url },
+    openGraph: {
+      ...openGraphDefaults,
+      title: property.name,
+      description: property.summary,
+      url,
+      images: [
+        {
+          url: propertyOgImageUrl(property),
+          width: 1200,
+          height: 630,
+          alt: property.name,
+        },
+        ...(hero
+          ? [
+              {
+                url: canonicalUrl(hero.src),
+                width: hero.width,
+                height: hero.height,
+                alt: property.name,
+              },
+            ]
+          : []),
+      ],
+    },
+    twitter: { card: "summary_large_image" },
+  };
 }
 
 /*
@@ -50,6 +94,7 @@ export default async function StayPage({ params }: PageProps<"/stays/[slug]">) {
 
   return (
     <>
+      <JsonLd data={vacationRentalJsonLd(property)} />
       <Section>
         <Link
           href="/#stays"

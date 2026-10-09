@@ -6,6 +6,7 @@ import { SkipLink } from "@/components/layout/SkipLink";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { getSite } from "@/content";
 import { fontVariables } from "@/lib/fonts";
+import { siteDescription } from "@/lib/seo";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -17,8 +18,7 @@ export const metadata: Metadata = {
     default: site.name,
     template: `%s · ${site.name}`,
   },
-  description:
-    "Three short-term rental houses in Austin, Texas, booked directly with the hosts who look after them.",
+  description: siteDescription,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
