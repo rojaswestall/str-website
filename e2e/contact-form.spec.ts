@@ -10,9 +10,9 @@ import { expect, type Page, type Route, test } from "@playwright/test";
  * would share one bucket. Each real submission below is made from this file's
  * own address; the 429, 500, and offline paths are intercepted and never reach
  * the route, so one run costs the limiter a single valid inquiry. The address
- * varies per worker process (203.0.113.50–249, clear of contact-api.spec.ts's
- * .10–.17) so repeated local runs against a reused server do not hit the
- * five-per-ten-minutes limit.
+ * varies per worker process (203.0.113.50–249; contact-api.spec.ts uses
+ * 2001:db8::/32 addresses) so repeated local runs against a reused server do
+ * not hit the five-per-ten-minutes limit.
  */
 test.use({
   extraHTTPHeaders: {

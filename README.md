@@ -54,10 +54,10 @@ on the default server so a `.env.local` cannot change what the tests see.
 CI (`.github/workflows/ci.yml`) runs install, content check, colour check,
 lint, format check, typecheck, and `pnpm test` on every pull request and on
 pushes to `main`; the Playwright web servers do the builds, so there is no
-separate build step. Every run uploads the `screenshots` artifact (the
-`e2e/__screenshots__/` review aids, which are gitignored); a failing run also
-uploads `playwright-report/` (with traces from the one retry). The whole job
-takes about two minutes.
+separate build step. Every run uploads two artifacts: `screenshots` (the
+`e2e/__screenshots__/` review aids, which are gitignored) and
+`playwright-report` (the HTML report, with a trace for any test that needed
+its one retry). The whole job takes about two minutes.
 
 ## Where things live
 
@@ -105,8 +105,9 @@ takes about two minutes.
   from `@/content`, never from a data file. Unconfirmed values are `null` or
   strings starting with `[TBC]`. Property copy is never hardcoded in
   components.
-- `scripts/` — `check-content.ts`, run by `pnpm check:content` and CI before
-  the build.
+- `scripts/` — `check-content.ts` (`pnpm check:content`) and
+  `check-colors.ts` (`pnpm check:colors`); CI runs both first, before
+  anything builds.
 - `public/photos/` — photos referenced from `content/`, one folder per house
   plus `area/` and `home/`. Today every file is a striped placeholder with
   the final aspect ratio (3:2 hero and gallery, 1:1 area picks, 21:9 hero
@@ -134,8 +135,9 @@ attached to the report. Run it alone with
 writes full-page screenshots of `/` and `/stays/oak-hill` in both themes at
 1400px to `e2e/__screenshots__/<route>-<theme>.png`; they are review aids
 regenerated on every run, not a pixel comparison, so the folder is gitignored
-and CI publishes it as the `screenshots` artifact on every run. Both specs block requests to
-`tiktok.com` so the third-party player is never audited. `pnpm check:colors`
+and CI publishes it as the `screenshots` artifact on every run. Both specs
+block requests to `tiktok.com` so the third-party player is never audited.
+`pnpm check:colors`
 (`scripts/check-colors.ts`) fails on any hex, `rgb(`/`hsl(`/`oklch(`, or bare
 `white`/`black` under `components/` and `app/`; it exempts `app/globals.css`
 (the token blocks) and the four files that render outside the page's CSS and

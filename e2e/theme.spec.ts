@@ -52,6 +52,17 @@ test.describe("theme", () => {
     expect(await storedTheme(page)).toBe("light");
     await page.emulateMedia({ colorScheme: "light" });
     await page.emulateMedia({ colorScheme: "dark" });
+    // Wait until the page can see the new preference and has had a frame to
+    // react, so the assertion below cannot pass just by running first.
+    await page.waitForFunction(
+      () => matchMedia("(prefers-color-scheme: dark)").matches,
+    );
+    await page.evaluate(
+      () =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        ),
+    );
     await expect(html).toHaveAttribute("data-theme", "light");
     expect(await bodyBackground(page)).toBe(PAPER_LIGHT);
   });

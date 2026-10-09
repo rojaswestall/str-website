@@ -127,7 +127,9 @@ test.describe("home page", () => {
     const toggle = page.locator("[data-theme-toggle]");
     await expect(toggle).toHaveAttribute("data-mode", "system");
     await toggle.click();
+    await expect(toggle).toHaveAttribute("data-mode", "light");
     await toggle.click();
+    await expect(toggle).toHaveAttribute("data-mode", "dark");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
     expect(await mapGroundFill(page)).toBe(MAP_GROUND_DARK);
   });
