@@ -182,6 +182,17 @@ export const LicenseSchema = z.object({
 });
 export type License = z.infer<typeof LicenseSchema>;
 
+export const TikTokClipSchema = z.object({
+  url: z.url({ hostname: /(^|\.)tiktok\.com$/ }),
+  /** Handle without the @. */
+  handle: nonEmpty,
+  /** Heading shown with the player in the area guide. */
+  title: nonEmpty,
+  /** One or two short paragraphs under the heading; keep them brief, the column is narrow. */
+  body: z.array(nonEmpty).min(1),
+});
+export type TikTokClip = z.infer<typeof TikTokClipSchema>;
+
 export const SiteConfigSchema = z.object({
   name: z.literal("The Austin Collection"),
   tagline: nonEmpty,
@@ -206,18 +217,11 @@ export const SiteConfigSchema = z.object({
      */
     searchWidgetId: z.string().min(1).nullable(),
   }),
-  /** Null drops the embed entirely (open item: keep the clip?). */
-  tiktok: z
-    .object({
-      url: z.url({ hostname: /(^|\.)tiktok\.com$/ }),
-      /** Handle without the @. */
-      handle: nonEmpty,
-      /** Display heading beside the player on the home page. */
-      title: nonEmpty,
-      /** One or two short paragraphs beside the player. */
-      body: z.array(nonEmpty).min(1),
-    })
-    .nullable(),
+  /**
+   * TikTok clips at the top of the area guide, in display order. An empty
+   * list drops the feature row entirely.
+   */
+  tiktoks: z.array(TikTokClipSchema),
   /** Lede under "The stays" on the home page: how the houses differ. One paragraph. */
   staysLede: nonEmpty,
   /** The "Why book direct" pitch paragraphs beside the ledger, in order. */

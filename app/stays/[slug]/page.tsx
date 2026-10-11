@@ -136,14 +136,12 @@ export default async function StayPage({ params }: PageProps<"/stays/[slug]">) {
             <Quotes quotes={property.quotes} />
 
             <section
+              id="practicals"
               aria-labelledby="practicals-heading"
               className="flex flex-col gap-4"
             >
-              <MonoHeading id="practicals-heading">Good to know</MonoHeading>
-              <PracticalsList
-                terms={["Check-in", "Check-out", "Pets", "Cancellation"]}
-                faq={false}
-              />
+              <MonoHeading id="practicals-heading">Practicals</MonoHeading>
+              <PracticalsList />
             </section>
 
             <section

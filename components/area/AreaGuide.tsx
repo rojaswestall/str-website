@@ -13,8 +13,9 @@ function pickIsTbc(pick: AreaPick) {
 }
 
 /*
- * `#area`: the optional TikTok feature row (hidden when `site.tiktok` is
- * null) above the three area picks. Picks still awaiting the hosts' answers
+ * `#area`: the TikTok feature row (one clip per entry in `site.tiktoks`,
+ * hidden when the list is empty; layouts described below) above the three
+ * area picks. Picks still awaiting the hosts' answers
  * render their brief with the dashed Tbc treatment, never invented places.
  */
 export function AreaGuide() {
@@ -32,24 +33,45 @@ export function AreaGuide() {
         }
       />
 
-      {site.tiktok ? (
+      {site.tiktoks.length > 0 ? (
+        /*
+         * Three layouts:
+         * - from 860px: the clips side by side, spaced evenly so the gap
+         *   between them matches the gap out to each edge;
+         * - 600-859px: stacked, each player with its text to the right;
+         * - under 600px: stacked, each player centred with its text under it
+         *   in a block of the same width, also centred and left-aligned inside
+         *   (TikTok's player needs ~325px, which leaves no room beside it on a
+         *   phone).
+         */
         <div
           data-testid="video-feature"
-          className="mb-[clamp(2.5rem,5vw,3.5rem)] grid items-start gap-[clamp(1.5rem,4vw,3rem)] border-b border-hairline pb-[clamp(2.5rem,5vw,3.5rem)] min-[760px]:grid-cols-[minmax(0,320px)_minmax(0,1fr)]"
+          className="mb-[clamp(2.5rem,5vw,3.5rem)] grid gap-y-[clamp(2.5rem,5vw,3.5rem)] border-b border-hairline pb-[clamp(2.5rem,5vw,3.5rem)] min-[860px]:grid-cols-[repeat(2,340px)] min-[860px]:justify-evenly"
         >
-          <div className="max-w-[320px]">
-            <TikTokEmbed clip={site.tiktok} />
-          </div>
-          <div className="flex flex-col items-start gap-[0.85rem]">
-            <h3 className="font-display text-[clamp(1.35rem,2.6vw,1.7rem)] font-normal">
-              {site.tiktok.title}
-            </h3>
-            {site.tiktok.body.map((paragraph) => (
-              <p key={paragraph} className="max-w-[48ch] text-ink-soft">
-                {paragraph}
-              </p>
-            ))}
-          </div>
+          {site.tiktoks.map((clip) => (
+            <article
+              key={clip.url}
+              data-testid="video-clip"
+              className="grid min-w-0 items-start gap-x-[clamp(1.5rem,4vw,2.5rem)] gap-y-[1.1rem] min-[600px]:grid-cols-[325px_minmax(0,1fr)] min-[860px]:grid-cols-1"
+            >
+              <div className="w-full max-w-[340px] min-w-0 justify-self-center min-[600px]:justify-self-start">
+                <TikTokEmbed clip={clip} />
+              </div>
+              <div className="flex w-full max-w-[340px] min-w-0 flex-col items-start gap-[0.85rem] justify-self-center min-[600px]:max-w-none min-[600px]:justify-self-stretch min-[600px]:max-[859px]:self-center">
+                <h3 className="font-display text-[clamp(1.25rem,2.4vw,1.5rem)] font-normal">
+                  {clip.title}
+                </h3>
+                {clip.body.map((paragraph) => (
+                  <p
+                    key={paragraph}
+                    className="max-w-[48ch] text-[0.95rem] text-ink-soft"
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </article>
+          ))}
         </div>
       ) : null}
 

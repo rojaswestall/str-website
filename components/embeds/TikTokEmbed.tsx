@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Button } from "@/components/ui";
-import type { SiteConfig } from "@/content";
+import type { TikTokClip } from "@/content";
 import { useInjectedScript } from "@/lib/hooks/useInjectedScript";
 
 export const TIKTOK_EMBED_SRC = "https://www.tiktok.com/embed.js";
@@ -21,11 +21,11 @@ export function tikTokVideoId(url: string): string | null {
  * the player iframe appears; without JavaScript, or until the player loads,
  * it is what the visitor sees.
  *
- * Renders nothing when `site.tiktok` is null.
+ * Renders nothing when the URL has no video id.
  */
-export function TikTokEmbed({ clip }: { clip: SiteConfig["tiktok"] }) {
-  const videoId = clip ? tikTokVideoId(clip.url) : null;
-  if (!clip || !videoId) return null;
+export function TikTokEmbed({ clip }: { clip: TikTokClip }) {
+  const videoId = tikTokVideoId(clip.url);
+  if (!videoId) return null;
   return <TikTokPlayer url={clip.url} handle={clip.handle} videoId={videoId} />;
 }
 
@@ -63,7 +63,10 @@ function TikTokPlayer({
   });
 
   return (
-    <div data-testid="tiktok-embed" className="group m-0 max-w-full min-w-0">
+    <div
+      data-testid="tiktok-embed"
+      className="group m-0 w-full max-w-full min-w-0"
+    >
       <section className="flex aspect-[9/16] flex-col items-start justify-center gap-[0.85rem] border border-hairline bg-[repeating-linear-gradient(135deg,var(--color-slot-a)_0_14px,var(--color-slot-b)_14px_28px)] p-[clamp(1.25rem,3vw,1.75rem)] group-has-[iframe]:hidden">
         <p className="font-mono text-[0.72rem] tracking-[0.13em] text-muted uppercase">
           TikTok

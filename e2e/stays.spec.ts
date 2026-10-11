@@ -67,8 +67,8 @@ test.describe("property pages", () => {
   }) => {
     await page.goto("/stays/fire-side");
 
-    // Hero plus three gallery placeholders from content.
-    await expect(page.getByTestId("gallery").getByRole("img")).toHaveCount(4);
+    // Hero plus the 30 gallery photos listed for fire-side in content/photos.ts.
+    await expect(page.getByTestId("gallery").getByRole("img")).toHaveCount(31);
 
     const specs = page.getByRole("list", { name: "Key facts" });
     await expect(specs).toContainText("Sleeps 8");
@@ -88,20 +88,36 @@ test.describe("property pages", () => {
     await expect(page.getByText("What guests say")).toHaveCount(0);
   });
 
-  test("shows the four relevant practicals rows and the map with this house highlighted", async ({
+  test("shows every practicals row with the booking FAQ, and the map with this house highlighted", async ({
     page,
   }) => {
     await page.goto("/stays/south-austin");
 
-    const practicals = page.getByTestId("practicals");
-    const terms = practicals.locator("dt");
-    await expect(terms).toHaveText([
+    const section = page.locator("section#practicals");
+    await expect(
+      section.getByRole("heading", { level: 2, name: "Practicals" }),
+    ).toBeVisible();
+    const practicals = section.getByTestId("practicals");
+    for (const term of [
       "Check-in",
       "Check-out",
+      "Cleaning",
       "Pets",
       "Cancellation",
-    ]);
-    await expect(page.getByTestId("practicals-faq")).toHaveCount(0);
+      "Questions",
+    ]) {
+      await expect(
+        practicals.locator("dt", { hasText: new RegExp(`^${term}$`) }),
+      ).toHaveCount(1);
+    }
+    const faq = practicals.getByTestId("practicals-faq");
+    await expect(
+      faq.getByRole("heading", { level: 3, name: "Booking direct" }),
+    ).toBeVisible();
+    await expect(faq.locator("dt")).toHaveCount(3);
+    await expect(faq).toContainText(
+      "How does payment work when I book direct?",
+    );
 
     const map = page.getByTestId("city-map");
     await expect(map.locator("[data-map-pin]")).toHaveCount(3);
