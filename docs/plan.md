@@ -83,7 +83,7 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 7} → {8, 9} → {10, 11} → {12,
 - [ ] Domain name and who controls DNS.
 - [ ] Resend account, verified sending domain, `from` address, recipient list (all three or one inbox). Step 7 built the route; the values go in `RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO` (see `.env.example`), set on Vercel in step 14.
 - [ ] Vercel account and team to deploy under.
-- [ ] Public contact email and Instagram handle for the footer (artifact: t.b.c.).
+- [x] Public contact email and Instagram handle for the footer (artifact: t.b.c.). Dropped: guests reach the hosts only through the contact form, so the footer links to it (`/#direct`) instead.
 - [ ] Approve or adjust the proposed dark palette in step 2.
 - [ ] Decide whether a privacy policy page is required (contact form collects name and email; analytics is cookieless).
 

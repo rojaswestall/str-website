@@ -1,9 +1,9 @@
 import type { SiteConfig } from "./types";
 
 /*
- * Site-wide configuration. Domain, contact email, and Instagram handle are
- * open items (docs/plan.md, "Needed before step 7 / 14"); they are `[TBC]`
- * placeholders and should render as such, never as a live mailto: or link.
+ * Site-wide configuration. The domain is an open item (docs/plan.md, "Needed
+ * before step 7 / 14"); it is a `[TBC]` placeholder and should render as
+ * such, never as a live link.
  *
  * Hospitable: `siteUuid` and `theme` come from the real embed snippet. The
  * per-house `propertyId` lives on each property. `mode` is the default for
@@ -18,8 +18,6 @@ export const site: SiteConfig = {
   description:
     "Three short-term rental houses in Austin, Texas, booked directly with the hosts who look after them.",
   domain: "[TBC] domain",
-  contactEmail: "[TBC] email address",
-  instagram: "[TBC] instagram handle",
   hospitable: {
     mode: "stub",
     // From the dashboard snippet pasted into docs/plan.md (step 6).
