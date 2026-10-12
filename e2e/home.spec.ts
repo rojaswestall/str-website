@@ -65,10 +65,13 @@ test.describe("home page", () => {
       await expect(band.getByRole("heading", { level: 3 })).toBeVisible();
     }
 
-    // Rates and minimum nights are still unconfirmed: shown as gaps, never numbers.
-    await expect(bands.first()).toContainText("min nights t.b.c.");
-    await expect(bands.first()).toContainText("rate t.b.c.");
+    // Bands are brief: rooms only. Rate, minimum nights, and amenities are on
+    // the house page.
+    await expect(bands.first()).toContainText("Sleeps 8");
+    await expect(bands.first()).not.toContainText("min nights");
+    await expect(bands.first()).not.toContainText("rate");
     await expect(bands.first()).not.toContainText("$");
+    await expect(page.getByRole("list", { name: "Amenities" })).toHaveCount(0);
   });
 
   test("hero mounts the search stub and the area guide mounts both TikTok embeds", async ({
@@ -115,9 +118,13 @@ test.describe("home page", () => {
       ).toHaveCount(1);
     }
 
-    await expect(page.getByTestId("area-picks").locator("article")).toHaveCount(
-      3,
-    );
+    // The picks themselves live on /area (e2e/area.spec.ts); home links there.
+    await expect(page.getByTestId("area-picks")).toHaveCount(0);
+    await expect(
+      page
+        .locator("section#area")
+        .getByRole("link", { name: "Open the area guide" }),
+    ).toHaveAttribute("href", "/area");
   });
 
   test("city map draws one pin per house and recolours with the theme", async ({
@@ -148,6 +155,57 @@ test.describe("home page", () => {
     await expect(toggle).toHaveAttribute("data-mode", "dark");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
     expect(await mapGroundFill(page)).toBe(MAP_GROUND_DARK);
+  });
+
+  test("guest reviews sit above the hosts with each house's record", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const reviews = page.locator("section#reviews");
+    await expect(
+      reviews.getByRole("heading", { level: 2, name: "What guests say" }),
+    ).toBeVisible();
+    // Average weighted by review count across the three listings.
+    await expect(reviews).toContainText("4.99 average · 75 reviews");
+
+    const records = reviews.getByTestId("review-records").locator("li");
+    await expect(records).toHaveCount(3);
+    for (const [index, [slug, name, airbnb]] of (
+      [
+        ["oak-hill", "An Oak Hill Home", /rooms\/1598934202273477463/],
+        ["south-austin", "South Austin Stay", /rooms\/1655329029936239948/],
+        ["fire-side", "Fire Side Home", /rooms\/1598953749522814358/],
+      ] as const
+    ).entries()) {
+      const record = records.nth(index);
+      await expect(
+        record.getByRole("link", { name, exact: true }),
+      ).toHaveAttribute("href", `/stays/${slug}`);
+      await expect(
+        record.getByRole("link", { name: /Read the reviews on Airbnb/ }),
+      ).toHaveAttribute("href", airbnb);
+    }
+    // Two quotes per house, interleaved, each naming its house.
+    const quotes = reviews.getByTestId("review-quotes").locator("figcaption");
+    await expect(quotes).toHaveCount(6);
+    await expect(quotes.first()).toContainText("Melanie");
+    await expect(quotes).toContainText([
+      "An Oak Hill Home",
+      "South Austin Stay",
+      "Fire Side Home",
+      "An Oak Hill Home",
+      "South Austin Stay",
+      "Fire Side Home",
+    ]);
+    await expect(reviews.getByTestId("review-quotes-tbc")).toHaveCount(0);
+
+    // Order on the page: Why book direct, then reviews, then hosts.
+    const ids = await page
+      .locator("main section[id], main section[aria-labelledby=hosts-heading]")
+      .evaluateAll((sections) =>
+        sections.map((s) => s.id || s.getAttribute("aria-labelledby")),
+      );
+    expect(ids.slice(-3)).toEqual(["direct", "reviews", "hosts-heading"]);
   });
 
   test("hosts and the direct-booking section render from content", async ({
@@ -181,7 +239,7 @@ test.describe("site shell", () => {
     await expect(nav.getByRole("link")).toHaveCount(3);
     for (const [label, href] of [
       ["Stays", "/#stays"],
-      ["The area", "/#area"],
+      ["The area", "/area"],
       ["Book direct", "/#direct"],
     ]) {
       await expect(nav.getByRole("link", { name: label })).toHaveAttribute(

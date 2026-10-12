@@ -63,10 +63,10 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 7} → {8, 9} → {10, 11} → {12,
 - [ ] Nightly rate range and minimum nights per house (artifact shows t.b.c.).
 - [ ] Pet fee per stay.
 - [ ] Confirm the placeholder policies: 4 pm check-in, 11 am checkout, late checkout to 1 pm, 14-day / 7-day cancellation.
-- [ ] Three area-guide picks (eat, outdoors, locals-only): name, one or two sentences, distance from houses, a photo.
+- [ ] Area-guide picks (eat, outdoors, locals-only to start; more can be added): name, one or two sentences, a photo, and the drive time in minutes from **each** house (`driveMinutes` in `content/area.ts`, keyed by slug). The picks live on `/area`, each lists its time from every house, and each property page shows its three closest under "Near this house". The home page keeps the TikTok row and links to `/area`; "Your hosts" now sits after "Why book direct".
 - [x] TikTok clips: keep the @exploretex Barton Springs clip and add @gabynjohnny's Austin BBQ comparison (`site.tiktoks` in `content/site.ts`, rendered side by side with the text under each player; an empty list drops the row).
 - [ ] Host bios: one line each for Alexis, Gabe, Aaron, and whether to show photos.
-- [ ] Two or three guest review quotes per house with first name and month.
+- [x] Two or three guest review quotes per house with first name and month. Three per house from the Airbnb reviews, in `content/properties.ts` (month = when the review was posted). They show on each house page and, two per house, in the home page's "What guests say" section above "Your hosts". Ratings and review counts were refreshed from the listings on 2026-10-12.
 - [ ] Photos per house (hero 3:2, gallery set), plus hero collage and area pick photos. Confirm you own the rights. House photos and the hero collage are in (`content/photos.ts`, `public/photos/<slug>/`, `public/photos/home/`); area pick photos are still placeholders.
 - [ ] Brand assets: wordmark treatment (text-only is fine), favicon, default OG image. Step 11 shipped placeholders: an "AC" monogram (`app/icon.svg`, `components/seo/MonogramIcon.tsx` behind `/icon1` and `/apple-icon`) and generated paper-and-Newsreader share cards (`app/opengraph-image.tsx`, `app/stays/[slug]/opengraph-image.tsx`).
 

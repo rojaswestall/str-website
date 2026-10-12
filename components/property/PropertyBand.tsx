@@ -4,18 +4,27 @@ import {
   PhotoFrame,
   SpecRow,
   type SpecItem,
-  TagList,
 } from "@/components/ui";
 import type { Property } from "@/content";
 import { cx } from "@/lib/cx";
 
-/** The mono spec strip items for a house; unconfirmed rate and nights render as Tbc. */
-export function propertySpecItems(property: Property): SpecItem[] {
+/** The house itself: sleeps, bedrooms, beds, baths. */
+export function propertyRoomItems(property: Property): SpecItem[] {
   return [
     { label: `Sleeps ${property.sleeps}` },
     { label: `${property.bedrooms} bed` },
     { label: `${property.beds} ${property.beds === 1 ? "bed" : "beds"}` },
     { label: `${property.bathrooms} bath` },
+  ];
+}
+
+/**
+ * The full mono spec strip for a house page: the rooms plus minimum nights and
+ * rate, which render as Tbc until confirmed.
+ */
+export function propertySpecItems(property: Property): SpecItem[] {
+  return [
+    ...propertyRoomItems(property),
     property.minNights === null
       ? { label: "min nights t.b.c.", tbc: true }
       : {
@@ -31,6 +40,8 @@ export function propertySpecItems(property: Property): SpecItem[] {
  * One house on the home page: the artifact's two-column `.property` band.
  * Photo left, body right; `flip` puts the photo on the right at ≥760px (the
  * artifact's `nth-child(even)` rule) and stacks photo-first below that.
+ * Deliberately brief: rooms only. Rate, minimum nights, and amenities are on
+ * the house page ("See the whole house").
  */
 export function PropertyBand({
   property,
@@ -78,9 +89,8 @@ export function PropertyBand({
         <p className="max-w-[46ch] text-ink-soft">{property.description}</p>
         <SpecRow
           aria-label={`${property.name} at a glance`}
-          items={propertySpecItems(property)}
+          items={propertyRoomItems(property)}
         />
-        <TagList aria-label="Amenities" items={property.amenities} />
         <div className="mt-[0.35rem] flex flex-wrap gap-[0.6rem]">
           <Button href={`/stays/${property.slug}#book`}>Book direct</Button>
           <Button href={`/stays/${property.slug}`} variant="ghost">
