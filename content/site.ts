@@ -22,7 +22,7 @@ export const site: SiteConfig = {
     mode: "stub",
     // From the dashboard snippet pasted into docs/plan.md (step 6).
     siteUuid: "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb",
-    theme: "multi",
+    theme: "boutique",
     // The search widget snippet has not been copied yet (open item, step 6 / 14).
     searchWidgetId: null,
   },
