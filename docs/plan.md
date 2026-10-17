@@ -74,7 +74,7 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 7} → {8, 9} → {10, 11} → {12,
 - [ ] Confirm Hospitable plan includes Direct with self-hosted widgets.
 - [x] From Hospitable → Direct → self-hosted site: copy the raw widget embed snippet for one property and paste it into the step 6 prompt so the component matches the real loader shape (docs do not publish it; the August 2026 loader replaced the old iframe). Pasted in step 6; the site uuid is in `content/site.ts`.
 - [x] Which house is Hospitable property id `2338068` (the id in the pasted snippet)? Confirmed after step 6: "Dan Jean B", which is Fire Side Home (`fire-side`, Airbnb room 1598953749522814358). Set in `content/properties.ts`.
-- [ ] `data-property-id` for An Oak Hill Home ("Parkwood A" in Hospitable) and South Austin Stay ("Dan Jean Unit A"); copy each house's snippet, only the property id differs. Goes in `content/properties.ts`.
+- [x] `data-property-id` for An Oak Hill Home ("Parkwood A" in Hospitable) and South Austin Stay ("Dan Jean Unit A"). Set in step 14: Parkwood A is `2338067`, Dan Jean Unit A is `2338069`; the dashboard snippet now uses `data-theme="boutique"`.
 - [ ] The search widget snippet, if Hospitable Direct offers a multi-property one. The per-property loader refuses to run without `data-property-id`, so the search widget has a different embed; until it is pasted here and wired in `HospitableSearch.tsx`, the home hero shows the search stub even in live mode.
 - [ ] Style the widget in the Hospitable dashboard to match the paper palette.
 - [ ] Confirm Stripe or payment setup is complete inside Hospitable Direct.

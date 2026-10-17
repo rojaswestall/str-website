@@ -63,7 +63,7 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598934202273477463",
     strLicense: "OL2026086598",
-    hospitable: { propertyId: null },
+    hospitable: { propertyId: "2338067" }, // "Parkwood A" in Hospitable
     photos: placeholderPhotos("oak-hill", "An Oak Hill Home"),
     quotes: [],
     mapPin: { x: 85, y: 299 },
