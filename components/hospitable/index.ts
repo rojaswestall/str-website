@@ -1,6 +1,7 @@
 export {
   HospitableSearch,
   type HospitableSearchProps,
+  type HospitableSearchVariant,
 } from "./HospitableSearch";
 export { HospitableSearchStub } from "./HospitableSearchStub";
 export { HospitableStub } from "./HospitableStub";

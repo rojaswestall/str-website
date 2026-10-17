@@ -25,8 +25,8 @@ export const site: SiteConfig = {
     // From the dashboard snippet pasted into docs/plan.md (step 6).
     siteUuid: "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb",
     theme: "multi",
-    // The search widget snippet has not been copied yet (open item, step 6 / 14).
-    searchWidgetId: null,
+    // `identifier` from Direct → Property Search (step 14).
+    searchWidgetId: "178e46fc-3dbb-4433-ac2d-3ebe9d9cca07",
   },
   tiktok: {
     url: "https://www.tiktok.com/@exploretex/video/7648810803109367053",

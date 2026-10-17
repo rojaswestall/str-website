@@ -1,40 +1,90 @@
 "use client";
 
-import { type HospitableMode, resolveHospitableMode } from "@/lib/hospitable";
+import Script from "next/script";
+import {
+  HOSPITABLE_SEARCH_SCRIPT_SRC,
+  type HospitableMode,
+  resolveHospitableMode,
+  SEARCH_RESULTS_PATH,
+  searchWidgetAttributes,
+} from "@/lib/hospitable";
 import { HospitableSearchStub } from "./HospitableSearchStub";
 import { warnOnce } from "./warn-once";
+
+// Hospitable's custom element, so it can be rendered as JSX. Module
+// augmentation is the only way to extend JSX.IntrinsicElements.
+declare module "react" {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      "hospitable-direct-mps": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+      > & {
+        identifier: string;
+        type: "custom";
+        "results-url"?: string;
+      };
+    }
+  }
+}
+
+export type HospitableSearchVariant =
+  /** The home hero: only the search bar, which navigates to /search on submit. */
+  | "bar"
+  /** The /search page: the bar plus the list of available houses. */
+  | "results";
 
 export type HospitableSearchProps = {
   /** `site.hospitable.searchWidgetId`; null renders the stub. */
   searchWidgetId: string | null;
   propertyCount: number;
   mode: HospitableMode;
+  variant: HospitableSearchVariant;
 };
 
 /*
- * Multi-property search widget for the home hero.
- *
- * TODO(step 14): Hospitable's per-property loader refuses to run without a
- * data-property-id, so the search widget has its own snippet that has not been
- * copied from the dashboard yet (docs/plan.md, open items). Until it is, live
- * mode warns once and renders the stub. When the snippet lands, mount it the
- * way LiveBookingWidget in HospitableWidget.tsx does, with useInjectedScript.
+ * Property search widget. In live mode it renders Hospitable's
+ * <hospitable-direct-mps> element inside the hairline frame and loads the
+ * library that defines it. Unlike the booking loader (HospitableWidget.tsx),
+ * that script registers a custom element once and must not run twice, so
+ * next/script's dedupe by src is exactly right here: the element upgrades
+ * whenever the script lands, on first paint or after client-side navigation.
  */
 export function HospitableSearch({
   searchWidgetId,
   propertyCount,
   mode,
+  variant,
 }: HospitableSearchProps) {
   const resolvedMode = resolveHospitableMode(mode);
 
-  if (resolvedMode === "live") {
+  if (resolvedMode === "live" && searchWidgetId === null) {
     warnOnce(
       "search",
-      searchWidgetId === null
-        ? "[Hospitable] live mode, but site.hospitable.searchWidgetId is null; rendering the search stub."
-        : "[Hospitable] live mode, but the search widget snippet is not implemented yet; rendering the search stub.",
+      "[Hospitable] live mode, but site.hospitable.searchWidgetId is null; rendering the search stub.",
     );
   }
 
-  return <HospitableSearchStub propertyCount={propertyCount} />;
+  if (resolvedMode !== "live" || searchWidgetId === null) {
+    return (
+      <HospitableSearchStub propertyCount={propertyCount} variant={variant} />
+    );
+  }
+
+  const attributes = searchWidgetAttributes({
+    identifier: searchWidgetId,
+    resultsUrl: variant === "bar" ? SEARCH_RESULTS_PATH : undefined,
+  });
+
+  return (
+    <div
+      data-testid="hospitable-search"
+      data-variant={variant}
+      className="border border-hairline bg-paper-2 p-[clamp(1rem,2.5vw,1.5rem)]"
+    >
+      <Script src={HOSPITABLE_SEARCH_SCRIPT_SRC} strategy="afterInteractive" />
+      <hospitable-direct-mps {...attributes} />
+    </div>
+  );
 }

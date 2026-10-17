@@ -4,6 +4,9 @@
  *
  * Why each third party is here:
  * - cdn.hsptb.com: the Hospitable widget loader script.
+ * - hospitable.b-cdn.net: the property search widget library (step 14). It
+ *   is listed for styles and fonts too in case it loads its own; the
+ *   report-only pass on production trims whatever it never uses.
  * - booking.hospitable.com / *.hospitable.com: the booking iframe and the
  *   loader's ping to api.hospitable.com.
  * - va.vercel-scripts.com / vitals.vercel-insights.com: Vercel Web Analytics.
@@ -21,6 +24,7 @@ export const cspDirectives: Readonly<Record<string, readonly string[]>> = {
     "'self'",
     "'unsafe-inline'",
     "https://cdn.hsptb.com",
+    "https://hospitable.b-cdn.net",
     "https://va.vercel-scripts.com",
     "https://www.tiktok.com",
     "https://lf16-tiktok-web.tiktokcdn-us.com",
@@ -33,16 +37,23 @@ export const cspDirectives: Readonly<Record<string, readonly string[]>> = {
   "connect-src": [
     "'self'",
     "https://*.hospitable.com",
+    "https://hospitable.b-cdn.net",
     "https://vitals.vercel-insights.com",
   ],
   "img-src": ["'self'", "data:", "https:"],
   "style-src": [
     "'self'",
     "'unsafe-inline'",
+    "https://hospitable.b-cdn.net",
     "https://fonts.googleapis.com",
     "https://lf16-tiktok-web.tiktokcdn-us.com",
   ],
-  "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
+  "font-src": [
+    "'self'",
+    "https://hospitable.b-cdn.net",
+    "https://fonts.gstatic.com",
+    "data:",
+  ],
   "frame-ancestors": ["'none'"],
 };
 

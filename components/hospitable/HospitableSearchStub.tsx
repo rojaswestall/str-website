@@ -1,15 +1,19 @@
 import { Button, Eyebrow } from "@/components/ui";
+import type { HospitableSearchVariant } from "./HospitableSearch";
 import { StubField } from "./StubField";
 
-/** Placeholder for the multi-property search widget on the home hero. */
+/** Placeholder for the property search widget, on the home hero and on /search. */
 export function HospitableSearchStub({
   propertyCount,
+  variant,
 }: {
   propertyCount: number;
+  variant: HospitableSearchVariant;
 }) {
   return (
     <div
       data-testid="hospitable-search-stub"
+      data-variant={variant}
       className="flex flex-col gap-[1.1rem] border border-hairline bg-paper-2 p-[clamp(1.25rem,3vw,1.75rem)]"
     >
       <div className="flex flex-col gap-[0.35rem]">

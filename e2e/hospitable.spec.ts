@@ -33,13 +33,58 @@ test.describe("hospitable widgets (stub mode)", () => {
     expect(loaderRequests).toEqual([]);
   });
 
+  test("/search renders the search stub and never loads the search script", async ({
+    page,
+  }) => {
+    const searchRequests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("hospitable.b-cdn.net"))
+        searchRequests.push(request.url());
+    });
+
+    const response = await page.goto("/search");
+    expect(response?.status()).toBe(200);
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Which house is free?" }),
+    ).toBeVisible();
+    const stub = page.getByTestId("hospitable-search-stub");
+    await expect(stub).toBeVisible();
+    await expect(stub).toHaveAttribute("data-variant", "results");
+    await expect(stub).toContainText("Search all 3 houses");
+    await expect(page.locator("hospitable-direct-mps")).toHaveCount(0);
+
+    // Client-rendered results: kept out of the index, links still followed.
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      /noindex/,
+    );
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      /follow/,
+    );
+
+    const houses = page.getByRole("navigation", { name: "The houses" });
+    for (const [name, slug] of [
+      ["An Oak Hill Home", "oak-hill"],
+      ["South Austin Stay", "south-austin"],
+      ["Fire Side Home", "fire-side"],
+    ]) {
+      await expect(houses.getByRole("link", { name })).toHaveAttribute(
+        "href",
+        `/stays/${slug}`,
+      );
+    }
+    expect(searchRequests).toEqual([]);
+  });
+
   test("every page carries the report-only CSP header", async ({ page }) => {
-    for (const path of ["/", "/stays/oak-hill", "/does-not-exist"]) {
+    for (const path of ["/", "/stays/oak-hill", "/search", "/does-not-exist"]) {
       const response = await page.goto(path);
       const csp = response?.headers()["content-security-policy-report-only"];
       expect(csp, path).toBeTruthy();
       expect(csp).toContain(
-        "script-src 'self' 'unsafe-inline' https://cdn.hsptb.com",
+        "script-src 'self' 'unsafe-inline' https://cdn.hsptb.com https://hospitable.b-cdn.net",
       );
       expect(csp).toContain("frame-src https://booking.hospitable.com");
       expect(csp).toContain("frame-ancestors 'none'");
