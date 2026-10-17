@@ -34,8 +34,8 @@ export default function SearchPage() {
       <Prose className="mt-[1.4rem] text-[clamp(1.02rem,1.6vw,1.18rem)]">
         <p>
           Pick your dates and the houses with those nights open are listed
-          below, with the same calendar the listings use. Choose one to book
-          it direct.
+          below, with the same calendar the listings use. Choose one to book it
+          direct.
         </p>
       </Prose>
       <div className="mt-[clamp(2rem,4vw,3rem)]">

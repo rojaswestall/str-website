@@ -33,13 +33,17 @@ const FAKE_SEARCH_SCRIPT = `
   if (!customElements.get("hospitable-direct-mps")) {
     customElements.define("hospitable-direct-mps", class extends HTMLElement {
       connectedCallback() {
-        const marker = document.createElement("div");
-        marker.dataset.testid = "hospitable-search-marker";
-        marker.dataset.identifier = this.getAttribute("identifier") ?? "";
-        marker.dataset.type = this.getAttribute("type") ?? "";
-        marker.dataset.resultsUrl = this.getAttribute("results-url") ?? "";
-        marker.textContent = "fake hospitable search";
-        this.replaceChildren(marker);
+        // Like the real widget: an open shadow root, attached a frame later.
+        requestAnimationFrame(() => {
+          const root = this.shadowRoot ?? this.attachShadow({ mode: "open" });
+          const marker = document.createElement("div");
+          marker.dataset.testid = "hospitable-search-marker";
+          marker.dataset.identifier = this.getAttribute("identifier") ?? "";
+          marker.dataset.type = this.getAttribute("type") ?? "";
+          marker.dataset.resultsUrl = this.getAttribute("results-url") ?? "";
+          marker.textContent = "fake hospitable search";
+          root.replaceChildren(marker);
+        });
       }
     });
   }
@@ -176,6 +180,17 @@ test.describe("hospitable widgets (live mode)", () => {
     const marker = page.getByTestId("hospitable-search-marker");
     await expect(marker).toHaveAttribute("data-identifier", SEARCH_WIDGET_ID);
     await expect(marker).toHaveAttribute("data-results-url", "/search");
+    // The layout adjustments were appended into the shadow root, once.
+    await expect
+      .poll(() =>
+        bar.evaluate(
+          (element) =>
+            element.shadowRoot?.querySelectorAll(
+              "style[data-austin-collection]",
+            ).length,
+        ),
+      )
+      .toBe(1);
     await expect(
       page.locator(`script[src="${SEARCH_SCRIPT_SRC}"]`),
     ).toHaveCount(1);

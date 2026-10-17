@@ -1,5 +1,8 @@
 import { getAllProperties, getSite } from "@/content";
-import { HospitableSearch, type HospitableSearchVariant } from "./HospitableSearch";
+import {
+  HospitableSearch,
+  type HospitableSearchVariant,
+} from "./HospitableSearch";
 
 /** Server wrapper: the property search widget, wired to site config. */
 export function SearchWidget({
