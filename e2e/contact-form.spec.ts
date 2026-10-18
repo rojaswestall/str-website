@@ -187,7 +187,7 @@ test.describe("contact form", () => {
 
   test("shows the API's generic message on 500", async ({ page }) => {
     const message =
-      "We couldn't send your message just now. Please try again or email us directly.";
+      "We couldn't send your message just now. Please try again in a moment.";
     await page.route("**/api/contact", (route) =>
       json(route, 500, { ok: false, message }),
     );

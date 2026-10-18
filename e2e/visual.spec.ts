@@ -3,7 +3,7 @@ import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 /*
- * Full-page screenshots of the home page and one stay in both themes at
+ * Full-page screenshots of the home page, one stay, and /search in both themes at
  * 1400px, written to e2e/__screenshots__/<route>-<theme>.png as review aids.
  * This is `page.screenshot`, not `toHaveScreenshot`: there is no pixel
  * comparison yet because font rasterisation differs across operating systems.
@@ -15,6 +15,7 @@ const DIR = path.join(__dirname, "__screenshots__");
 const ROUTES = [
   { name: "home", path: "/" },
   { name: "stays-oak-hill", path: "/stays/oak-hill" },
+  { name: "search", path: "/search" },
 ] as const;
 
 const THEMES = ["light", "dark"] as const;
