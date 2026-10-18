@@ -74,7 +74,7 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 7} → {8, 9} → {10, 11} → {12,
 - [ ] Confirm Hospitable plan includes Direct with self-hosted widgets.
 - [x] From Hospitable → Direct → self-hosted site: copy the raw widget embed snippet for one property and paste it into the step 6 prompt so the component matches the real loader shape (docs do not publish it; the August 2026 loader replaced the old iframe). Pasted in step 6; the site uuid is in `content/site.ts`.
 - [x] Which house is Hospitable property id `2338068` (the id in the pasted snippet)? Confirmed after step 6: "Dan Jean B", which is Fire Side Home (`fire-side`, Airbnb room 1598953749522814358). Set in `content/properties.ts`.
-- [ ] `data-property-id` for An Oak Hill Home ("Parkwood A" in Hospitable) and South Austin Stay ("Dan Jean Unit A"); copy each house's snippet, only the property id differs. Goes in `content/properties.ts`.
+- [x] `data-property-id` for An Oak Hill Home ("Parkwood A" in Hospitable) and South Austin Stay ("Dan Jean Unit A"). Set in step 14: Parkwood A is `2338067`, Dan Jean Unit A is `2338069`; the dashboard snippet now uses `data-theme="boutique"`.
 - [x] The search widget snippet. Pasted in step 14 from Direct → Property Search: a library script from `hospitable.b-cdn.net` plus `<hospitable-direct-mps identifier="178e46fc-3dbb-4433-ac2d-3ebe9d9cca07" type="custom">`. The home hero carries it with `results-url="/search"`; `/search` hosts the results widget. The dashboard's step 3 (forwarding search terms into the booking iframe) is not needed: the current loader reads checkin, checkout, guest counts, locale, and utm_* from the page URL itself (verified against the live loader). Map view is disabled in the dashboard.
 - [ ] In Hospitable, set each house's property URL (the address a search result links to) to `https://<domain>/stays/oak-hill`, `/stays/south-austin`, and `/stays/fire-side`, once the domain is live.
 - [ ] Style the widget in the Hospitable dashboard to match the paper palette.
@@ -84,7 +84,7 @@ Dependencies: 1 → 2 → 3 → 4 → {5, 6, 7} → {8, 9} → {10, 11} → {12,
 - [ ] Domain name and who controls DNS.
 - [ ] Resend account, verified sending domain, `from` address, recipient list (all three or one inbox). Step 7 built the route; the values go in `RESEND_API_KEY`, `CONTACT_FROM`, `CONTACT_TO` (see `.env.example`), set on Vercel in step 14.
 - [ ] Vercel account and team to deploy under.
-- [ ] Public contact email and Instagram handle for the footer (artifact: t.b.c.).
+- [x] Public contact email and Instagram handle for the footer (artifact: t.b.c.). Dropped: guests reach the hosts only through the contact form, so the footer links to it (`/#direct`) instead.
 - [ ] Approve or adjust the proposed dark palette in step 2.
 - [ ] Decide whether a privacy policy page is required (contact form collects name and email; analytics is cookieless).
 
