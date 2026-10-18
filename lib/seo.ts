@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getSite, isTbc, type Property } from "@/content";
+import { getSite, type Property } from "@/content";
 import { getSiteUrl } from "@/lib/site-url";
 
 /*
@@ -11,9 +11,9 @@ import { getSiteUrl } from "@/lib/site-url";
  * here hardcodes a host, and nothing here hardcodes copy: names, summaries,
  * amenities, ratings, and photos all come from `@/content`.
  *
- * Contact email, phone, and Instagram are still `[TBC]` open items, so the
- * JSON-LD leaves them out entirely rather than emitting placeholders; the
- * content carries no street address, so the PostalAddress stops at the city.
+ * The site publishes no contact email, phone, or social handle (guests use
+ * the contact form), so the JSON-LD carries none; the content carries no
+ * street address, so the PostalAddress stops at the city.
  */
 
 const site = getSite();
@@ -93,11 +93,8 @@ export function vacationRentalJsonLd(property: Property) {
   };
 }
 
-/** schema.org `Organization` for the site. Contact fields appear only once confirmed. */
+/** schema.org `Organization` for the site. No public contact fields; guests use the contact form. */
 export function organizationJsonLd() {
-  const sameAs = isTbc(site.instagram)
-    ? []
-    : [`https://www.instagram.com/${site.instagram.replace(/^@/, "")}`];
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -105,7 +102,5 @@ export function organizationJsonLd() {
     url: canonicalUrl("/"),
     logo: canonicalUrl("/icon.svg"),
     description: site.description,
-    ...(isTbc(site.contactEmail) ? {} : { email: site.contactEmail }),
-    ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 }

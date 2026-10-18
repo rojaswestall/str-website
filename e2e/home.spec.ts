@@ -250,9 +250,15 @@ test.describe("site shell", () => {
     await expect(header.locator("[data-theme-toggle]")).toBeVisible();
 
     await expect(page.getByRole("main")).toHaveAttribute("id", "main");
-    await expect(page.getByRole("contentinfo")).toContainText(
+    const footer = page.getByRole("contentinfo");
+    await expect(footer).toContainText(
       "Phone shared with guests after booking",
     );
+    // No public email or Instagram; the footer points at the contact form.
+    await expect(
+      footer.getByRole("link", { name: "Send us a message" }),
+    ).toHaveAttribute("href", "/#direct");
+    await expect(footer.locator('a[href^="mailto:"]')).toHaveCount(0);
   });
 
   test("footer lists the three STR licenses", async ({ page }) => {

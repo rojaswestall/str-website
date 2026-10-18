@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container, Tbc } from "@/components/ui";
 import { getLicenses, getSite, isTbc } from "@/content";
 
@@ -7,13 +8,13 @@ const link =
 /**
  * The artifact's footer: display-font colophon with the domain under it, a
  * mono contact column, and the City of Austin STR license line, one entry per
- * house, read from the content layer. Unconfirmed contact details render as
- * dashed `Tbc` gaps, never as live links.
+ * house, read from the content layer. There is no public email or Instagram:
+ * the contact column links to the contact form in the home page's `#direct`
+ * section. An unconfirmed domain renders as a dashed `Tbc` gap.
  */
 export function SiteFooter() {
   const site = getSite();
   const licenses = getLicenses();
-  const instagram = site.instagram.replace(/^@/, "");
 
   return (
     <footer className="border-t border-hairline py-[clamp(2.5rem,5vw,3.5rem)]">
@@ -26,25 +27,9 @@ export function SiteFooter() {
         </p>
 
         <address className="flex flex-col items-start gap-[0.35rem] font-mono text-[0.8rem] text-ink-soft not-italic">
-          {isTbc(site.contactEmail) ? (
-            <Tbc>email address to confirm</Tbc>
-          ) : (
-            <a href={`mailto:${site.contactEmail}`} className={link}>
-              {site.contactEmail}
-            </a>
-          )}
-          {isTbc(site.instagram) ? (
-            <Tbc>Instagram handle to confirm</Tbc>
-          ) : (
-            <a
-              href={`https://www.instagram.com/${instagram}`}
-              className={link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              @{instagram}
-            </a>
-          )}
+          <Link href="/#direct" className={link}>
+            Send us a message
+          </Link>
           <span>Phone shared with guests after booking</span>
         </address>
 

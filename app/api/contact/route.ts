@@ -21,7 +21,7 @@ import {
  */
 
 const GENERIC_ERROR =
-  "We couldn't send your message just now. Please try again or email us directly.";
+  "We couldn't send your message just now. Please try again in a moment.";
 
 export async function POST(request: Request) {
   let body: unknown;

@@ -48,7 +48,7 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598934202273477463",
     strLicense: "OL2026086598",
-    hospitable: { propertyId: null },
+    hospitable: { propertyId: "2338067" }, // "Parkwood A" in Hospitable
     photos: photos["oak-hill"],
     quotes: [
       {
@@ -98,7 +98,7 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1655329029936239948",
     strLicense: "OL2026040319",
-    hospitable: { propertyId: null },
+    hospitable: { propertyId: "2338069" }, // "Dan Jean Unit A" in Hospitable
     photos: photos["south-austin"],
     quotes: [
       {

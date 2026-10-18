@@ -209,9 +209,6 @@ export const SiteConfigSchema = z.object({
   description: nonEmpty,
   /** Bare host name, no scheme. Placeholder until the domain is chosen. */
   domain: nonEmpty,
-  contactEmail: nonEmpty,
-  /** Handle without the @. */
-  instagram: nonEmpty,
   hospitable: z.object({
     /** "stub" renders the placeholder panels; "live" injects the loader. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
     mode: z.enum(["stub", "live"]),
@@ -220,11 +217,11 @@ export const SiteConfigSchema = z.object({
     /** `data-theme` from the dashboard snippet (the widget style configured there). */
     theme: nonEmpty,
     /**
-     * Id for the multi-property search widget. Hospitable's per-property loader
-     * requires a property id, so the search widget has a different snippet that
-     * has not been copied yet; until it is, HospitableSearch renders the stub.
+     * `identifier` of the property search widget (Direct → Property Search),
+     * a different script from the per-property loader. Null renders the
+     * search stub on the home hero and on /search.
      */
-    searchWidgetId: z.string().min(1).nullable(),
+    searchWidgetId: z.uuid().nullable(),
   }),
   /**
    * TikTok clips at the top of the area guide, in display order. An empty
