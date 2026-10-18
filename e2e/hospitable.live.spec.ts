@@ -7,9 +7,11 @@ import { expect, test, type Page } from "@playwright/test";
  * the real one (reads its own data-* attributes, inserts its output right
  * after the script element).
  *
- * Fire Side Home is the only house with a Hospitable property id in content
- * (docs/plan.md, open items), so it is the live mount; the other two exercise
- * the stub fallback.
+ * All three houses have a Hospitable property id in content (step 14), so
+ * every house page is a live mount; client-side navigation between two of
+ * them covers the tear-down and fresh injection. The stub fallback for a
+ * house without an id (HospitableWidget.tsx) has no house left to exercise
+ * it and is not covered here.
  */
 const FAKE_LOADER = `
   (() => {
@@ -39,6 +41,8 @@ async function interceptLoader(page: Page) {
 
 const SITE_UUID = "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb";
 const FIRE_SIDE_PROPERTY_ID = "2338068";
+const OAK_HILL_PROPERTY_ID = "2338067";
+const THEME = "boutique";
 
 test.describe("hospitable widgets (live mode)", () => {
   test("mounts the loader once and re-mounts after client-side navigation away and back", async ({
@@ -54,7 +58,7 @@ test.describe("hospitable widgets (live mode)", () => {
       "data-property-id",
       FIRE_SIDE_PROPERTY_ID,
     );
-    await expect(marker).toHaveAttribute("data-theme", "multi");
+    await expect(marker).toHaveAttribute("data-theme", THEME);
     await expect(page.getByTestId("hospitable-stub")).toHaveCount(0);
 
     const script = page.locator(
@@ -66,7 +70,7 @@ test.describe("hospitable widgets (live mode)", () => {
       "data-property-id",
       FIRE_SIDE_PROPERTY_ID,
     );
-    await expect(script).toHaveAttribute("data-theme", "multi");
+    await expect(script).toHaveAttribute("data-theme", THEME);
     // The loader's output lands inside the container React hands over to it.
     await expect(
       page
@@ -74,18 +78,24 @@ test.describe("hospitable widgets (live mode)", () => {
         .locator("[data-hospitable-container] > *"),
     ).toHaveCount(2);
 
-    // Client-side navigation to a house without an id: the live mount is torn
-    // down and the stub takes its place.
+    // Client-side navigation to another house: the first mount is torn down
+    // and exactly one fresh marker and one fresh script carry the new id.
     const others = page.getByRole("navigation", { name: "Other houses" });
     await others.getByRole("link", { name: "An Oak Hill Home" }).click();
     await expect(page).toHaveURL(/\/stays\/oak-hill$/);
-    await expect(page.getByTestId("hospitable-stub")).toContainText(
-      "An Oak Hill Home",
+    await expect(marker).toHaveCount(1);
+    await expect(marker).toHaveAttribute(
+      "data-property-id",
+      OAK_HILL_PROPERTY_ID,
     );
-    await expect(marker).toHaveCount(0);
-    await expect(script).toHaveCount(0);
+    await expect(script).toHaveCount(1);
+    await expect(script).toHaveAttribute(
+      "data-property-id",
+      OAK_HILL_PROPERTY_ID,
+    );
+    await expect(page.getByTestId("hospitable-stub")).toHaveCount(0);
 
-    // Back to the live house: exactly one fresh marker and one fresh script.
+    // And back again.
     await others.getByRole("link", { name: "Fire Side Home" }).click();
     await expect(page).toHaveURL(/\/stays\/fire-side$/);
     await expect(marker).toHaveCount(1);
@@ -94,29 +104,24 @@ test.describe("hospitable widgets (live mode)", () => {
       FIRE_SIDE_PROPERTY_ID,
     );
     await expect(script).toHaveCount(1);
-    expect(loads).toHaveLength(2);
+    expect(loads).toHaveLength(3);
   });
 
-  test("falls back to the stub and warns once when the house has no property id", async ({
+  test("no house warns about missing Hospitable config in live mode", async ({
     page,
   }) => {
-    const loads = await interceptLoader(page);
+    await interceptLoader(page);
     const warnings: string[] = [];
     page.on("console", (message) => {
       if (message.type() === "warning") warnings.push(message.text());
     });
-
-    await page.goto("/stays/oak-hill");
-
-    await expect(page.getByTestId("hospitable-stub")).toBeVisible();
-    await expect(page.getByTestId("hospitable-stub")).toContainText(
-      "An Oak Hill Home",
-    );
-    await expect(page.getByTestId("hospitable-live-marker")).toHaveCount(0);
-    expect(loads).toEqual([]);
+    for (const slug of ["oak-hill", "south-austin", "fire-side"]) {
+      await page.goto(`/stays/${slug}`);
+      await expect(page.getByTestId("hospitable-live-marker")).toHaveCount(1);
+    }
     expect(
       warnings.filter((text) => text.includes("[Hospitable] live mode")),
-    ).toHaveLength(1);
+    ).toEqual([]);
   });
 
   test("the home search widget stays a stub until its snippet exists", async ({
