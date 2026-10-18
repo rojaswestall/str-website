@@ -12,6 +12,11 @@ import { expect, test, type Page } from "@playwright/test";
  * them covers the tear-down and fresh injection. The stub fallback for a
  * house without an id (HospitableWidget.tsx) has no house left to exercise
  * it and is not covered here.
+ *
+ * The property search script (hospitable.b-cdn.net) is replaced the same way,
+ * with a stand-in that defines the <hospitable-direct-mps> custom element and
+ * echoes its attributes, so the hero bar and the results page are covered
+ * without the real one.
  */
 const FAKE_LOADER = `
   (() => {
@@ -24,6 +29,26 @@ const FAKE_LOADER = `
     marker.textContent = "fake hospitable widget";
     script.insertAdjacentElement("afterend", marker);
   })();
+`;
+
+const FAKE_SEARCH_SCRIPT = `
+  if (!customElements.get("hospitable-direct-mps")) {
+    customElements.define("hospitable-direct-mps", class extends HTMLElement {
+      connectedCallback() {
+        // Like the real widget: an open shadow root, attached a frame later.
+        requestAnimationFrame(() => {
+          const root = this.shadowRoot ?? this.attachShadow({ mode: "open" });
+          const marker = document.createElement("div");
+          marker.dataset.testid = "hospitable-search-marker";
+          marker.dataset.identifier = this.getAttribute("identifier") ?? "";
+          marker.dataset.type = this.getAttribute("type") ?? "";
+          marker.dataset.resultsUrl = this.getAttribute("results-url") ?? "";
+          marker.textContent = "fake hospitable search";
+          root.replaceChildren(marker);
+        });
+      }
+    });
+  }
 `;
 
 async function interceptLoader(page: Page) {
@@ -39,10 +64,26 @@ async function interceptLoader(page: Page) {
   return loads;
 }
 
+async function interceptSearchScript(page: Page) {
+  const loads: string[] = [];
+  await page.route("**/hospitable.b-cdn.net/**", async (route) => {
+    loads.push(route.request().url());
+    await route.fulfill({
+      status: 200,
+      contentType: "application/javascript",
+      body: FAKE_SEARCH_SCRIPT,
+    });
+  });
+  return loads;
+}
+
 const SITE_UUID = "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb";
 const FIRE_SIDE_PROPERTY_ID = "2338068";
 const OAK_HILL_PROPERTY_ID = "2338067";
 const THEME = "boutique";
+const SEARCH_WIDGET_ID = "178e46fc-3dbb-4433-ac2d-3ebe9d9cca07";
+const SEARCH_SCRIPT_SRC =
+  "https://hospitable.b-cdn.net/direct-property-search-widget/hospitable-search-widget.prod.js";
 
 test.describe("hospitable widgets (live mode)", () => {
   test("mounts the loader once and re-mounts after client-side navigation away and back", async ({
@@ -124,12 +165,56 @@ test.describe("hospitable widgets (live mode)", () => {
     ).toEqual([]);
   });
 
-  test("the home search widget stays a stub until its snippet exists", async ({
+  test("the home hero mounts the search bar pointing at /search, and /search mounts the results widget", async ({
     page,
   }) => {
-    const loads = await interceptLoader(page);
+    const loaderLoads = await interceptLoader(page);
+    const searchLoads = await interceptSearchScript(page);
+
     await page.goto("/");
-    await expect(page.getByTestId("hospitable-search-stub")).toBeVisible();
-    expect(loads).toEqual([]);
+    const frame = page.getByTestId("hospitable-search");
+    await expect(frame).toHaveAttribute("data-variant", "bar");
+    await expect(page.getByTestId("hospitable-search-stub")).toHaveCount(0);
+
+    const bar = frame.locator("hospitable-direct-mps");
+    await expect(bar).toHaveAttribute("identifier", SEARCH_WIDGET_ID);
+    await expect(bar).toHaveAttribute("type", "custom");
+    await expect(bar).toHaveAttribute("results-url", "/search");
+
+    // The stand-in upgraded the element once the script landed.
+    const marker = page.getByTestId("hospitable-search-marker");
+    await expect(marker).toHaveAttribute("data-identifier", SEARCH_WIDGET_ID);
+    await expect(marker).toHaveAttribute("data-results-url", "/search");
+    // The layout adjustments were appended into the shadow root, once.
+    await expect
+      .poll(() =>
+        bar.evaluate(
+          (element) =>
+            element.shadowRoot?.querySelectorAll(
+              "style[data-austin-collection]",
+            ).length,
+        ),
+      )
+      .toBe(1);
+    await expect(
+      page.locator(`script[src="${SEARCH_SCRIPT_SRC}"]`),
+    ).toHaveCount(1);
+
+    // The results page: the same element without results-url.
+    await page.goto("/search");
+    const results = page.getByTestId("hospitable-search");
+    await expect(results).toHaveAttribute("data-variant", "results");
+    const widget = results.locator("hospitable-direct-mps");
+    await expect(widget).toHaveAttribute("identifier", SEARCH_WIDGET_ID);
+    await expect(widget).toHaveAttribute("type", "custom");
+    await expect(widget).not.toHaveAttribute("results-url");
+    await expect(page.getByTestId("hospitable-search-marker")).toHaveAttribute(
+      "data-results-url",
+      "",
+    );
+
+    expect(searchLoads).toHaveLength(2);
+    // The booking loader has no business on either page.
+    expect(loaderLoads).toEqual([]);
   });
 });

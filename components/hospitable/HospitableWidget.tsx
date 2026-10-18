@@ -31,6 +31,11 @@ export type HospitableWidgetProps = {
  * owned by the loader; React only renders the frame around it.
  *
  * The iframe is Hospitable's and stays light in dark mode; that is accepted.
+ *
+ * When the guest arrives from the search results page, the loader itself
+ * copies checkin, checkout, and the guest counts from the page URL into the
+ * iframe's src (verified against the live loader in step 14), so the
+ * dashboard's "step 3" script is not needed here.
  */
 export function HospitableWidget({
   propertyId,

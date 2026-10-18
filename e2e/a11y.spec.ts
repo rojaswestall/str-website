@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 /*
- * axe-core on the three page shapes (home, a stay, the 404) in both themes.
+ * axe-core on the four page shapes (home, a stay, search, the 404) in both themes.
  * Theme is set the way e2e/theme.spec.ts does for a first visit: emulate the
  * OS colour scheme and let next-themes resolve `system` to it, then assert
  * html[data-theme] before auditing so a failure is never a race.
@@ -15,6 +15,7 @@ import { expect, test, type Page } from "@playwright/test";
 const ROUTES = [
   { name: "home", path: "/" },
   { name: "stay", path: "/stays/oak-hill" },
+  { name: "search", path: "/search" },
   { name: "not-found", path: "/does-not-exist" },
 ] as const;
 
