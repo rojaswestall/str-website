@@ -189,9 +189,6 @@ export const SiteConfigSchema = z.object({
   description: nonEmpty,
   /** Bare host name, no scheme. Placeholder until the domain is chosen. */
   domain: nonEmpty,
-  contactEmail: nonEmpty,
-  /** Handle without the @. */
-  instagram: nonEmpty,
   hospitable: z.object({
     /** "stub" renders the placeholder panels; "live" injects the loader. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
     mode: z.enum(["stub", "live"]),
