@@ -3,7 +3,7 @@ import { getPropertySlugs } from "@/content";
 import { canonicalUrl } from "@/lib/seo";
 
 /*
- * The home page plus one entry per house. Absolute URLs come from
+ * The home page, one entry per house, and the area guide. Absolute URLs come from
  * `canonicalUrl` (NEXT_PUBLIC_SITE_URL); `lastModified` is fixed once when
  * the route builds, since the content is static until the next deploy.
  */
@@ -17,5 +17,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: builtAt,
       priority: 0.8,
     })),
+    { url: canonicalUrl("/area"), lastModified: builtAt, priority: 0.6 },
   ];
 }

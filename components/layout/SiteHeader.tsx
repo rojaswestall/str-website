@@ -3,10 +3,10 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Container } from "@/components/ui";
 import { getSite } from "@/content";
 
-/** Section anchors on the home page, in the artifact's order. */
+/** Home-page section anchors, plus the area guide page. */
 const NAV = [
   { label: "Stays", href: "/#stays" },
-  { label: "The area", href: "/#area" },
+  { label: "The area", href: "/area" },
   { label: "Book direct", href: "/#direct" },
 ] as const;
 

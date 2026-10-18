@@ -36,12 +36,13 @@ export const PhotoSchema = ImageSchema.extend({
 });
 export type Photo = z.infer<typeof PhotoSchema>;
 
+/** A guest review quote, copied from Airbnb. Never invented. */
 export const QuoteSchema = z.object({
   text: nonEmpty,
-  /** First name only, as shown on Airbnb. */
-  author: nonEmpty,
-  /** Month of the stay as a display string, e.g. "March 2026". */
-  month: nonEmpty,
+  /** First name only, as shown on Airbnb. Omit to attribute to "Airbnb guest". */
+  author: nonEmpty.optional(),
+  /** Month of the stay as a display string, e.g. "March 2026". Optional. */
+  month: nonEmpty.optional(),
 });
 export type Quote = z.infer<typeof QuoteSchema>;
 
@@ -143,11 +144,19 @@ export type Host = z.infer<typeof HostSchema>;
 export const HostsSchema = z.array(HostSchema).min(1);
 
 export const AreaPickSchema = z.object({
+  /** Anchor on /area (`/area#<id>`); lowercase, unique across picks. */
+  id: z.string().regex(/^[a-z0-9-]+$/, {
+    message: "id is lowercase letters, digits, and hyphens",
+  }),
   title: nonEmpty,
   kind: z.enum(["eat", "outdoors", "local"]),
   blurb: nonEmpty,
-  /** e.g. "10 min from all three houses". */
-  distanceLine: nonEmpty,
+  /**
+   * Drive time in minutes from each house, keyed by property slug. Every
+   * property needs an entry (checked in content/index.ts); null renders as
+   * "t.b.c." until the hosts confirm it.
+   */
+  driveMinutes: z.record(z.string(), z.number().int().positive().nullable()),
   link: z.url().optional(),
   photo: ImageSchema.optional(),
 });

@@ -61,7 +61,8 @@ its one retry). The whole job takes about two minutes.
 
 ## Where things live
 
-- `app/` — routes (`/`, `/stays/[slug]` for each house, `/api/contact`),
+- `app/` — routes (`/`, `/stays/[slug]` for each house, `/area` for the
+  area guide, `/api/contact`),
   root layout, and `globals.css` (design tokens: light on `:root`, dark on
   `[data-theme="dark"]`, mapped to Tailwind utilities).
 - `components/` — reusable UI, grouped by area (`theme`, `ui`, `layout`,
@@ -72,7 +73,9 @@ its one retry). The whole job takes about two minutes.
   holds the booking and search widgets (`PropertyWidget`, `SearchWidget`,
   their client cores, and the stubs); `embeds/` holds `TikTokEmbed`;
   `home/` holds the landing-page sections composed by `app/page.tsx`;
-  `map/` holds the `CityMap` SVG; `area/` the area guide; `practicals/`
+  `map/` holds the `CityMap` SVG; `area/` the area guide (the home-page
+  TikTok row, the `/area` pick cards with per-house `DriveTimes`, and the
+  property page's `NearbyPicks`); `practicals/`
   the policies list; `property/` the home-page `PropertyBand` and the pieces
   of a house page (`PropertyHeader`, `Gallery`, `AmenityList`, `Quotes`,
   `BookingPanel`, `PropertyCard`, `OtherHouses`). `/kitchen-sink` renders

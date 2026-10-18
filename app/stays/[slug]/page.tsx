@@ -11,6 +11,7 @@ import {
   propertySpecItems,
   Quotes,
 } from "@/components/property";
+import { NearbyPicks } from "@/components/area/NearbyPicks";
 import { CityMap } from "@/components/map/CityMap";
 import { PracticalsList } from "@/components/practicals/PracticalsList";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -151,6 +152,8 @@ export default async function StayPage({ params }: PageProps<"/stays/[slug]">) {
               <MonoHeading id="map-heading">Where it is</MonoHeading>
               <CityMap highlightSlug={property.slug} />
             </section>
+
+            <NearbyPicks property={property} />
           </div>
 
           <BookingPanel property={property} className="lg:sticky lg:top-8" />

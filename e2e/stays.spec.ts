@@ -62,7 +62,7 @@ test.describe("property pages", () => {
     });
   }
 
-  test("shows the gallery, the spec strip with unconfirmed values, and no quotes", async ({
+  test("shows the gallery, the spec strip with unconfirmed values, and the guest quotes", async ({
     page,
   }) => {
     await page.goto("/stays/fire-side");
@@ -83,9 +83,15 @@ test.describe("property pages", () => {
     ).toBeVisible();
     await expect(page.getByText("fire pit", { exact: true })).toBeVisible();
 
-    // Review quotes are an open item: nothing is rendered until they exist.
-    await expect(page.getByTestId("guest-quotes")).toHaveCount(0);
-    await expect(page.getByText("What guests say")).toHaveCount(0);
+    // This house's three Airbnb quotes, each with the guest's name and month.
+    const quotes = page.getByTestId("guest-quotes");
+    await expect(
+      quotes.getByRole("heading", { level: 2, name: "What guests say" }),
+    ).toBeVisible();
+    await expect(quotes.locator("blockquote")).toHaveCount(3);
+    await expect(quotes.locator("figcaption").first()).toContainText(
+      "Alexander",
+    );
   });
 
   test("shows every practicals row with the booking FAQ, and the map with this house highlighted", async ({
@@ -166,4 +172,25 @@ test.describe("property pages", () => {
       ).toHaveAttribute("href", "/");
     });
   }
+
+  test("lists the closest area picks with this house's drive time and links to /area", async ({
+    page,
+  }) => {
+    await page.goto("/stays/oak-hill");
+    const nearby = page.getByTestId("nearby-picks");
+    await expect(
+      nearby.getByRole("heading", { level: 2, name: "Near this house" }),
+    ).toBeVisible();
+    const items = nearby.locator("li");
+    await expect(items).toHaveCount(3);
+    // Each pick links to its entry on the guide page.
+    for (const id of ["eat", "outdoors", "local"]) {
+      await expect(nearby.locator(`a[href="/area#${id}"]`)).toHaveCount(1);
+    }
+    // Drive times are open items: one t.b.c. gap per pick, never a number.
+    await expect(items.filter({ hasText: "drive time t.b.c." })).toHaveCount(3);
+    await expect(
+      nearby.getByRole("link", { name: /full area guide/ }),
+    ).toHaveAttribute("href", "/area");
+  });
 });

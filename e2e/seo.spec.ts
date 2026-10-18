@@ -17,7 +17,7 @@ function origin(baseURL: string | undefined) {
 }
 
 test.describe("seo", () => {
-  test("/sitemap.xml lists the home page and the three stays on this origin", async ({
+  test("/sitemap.xml lists the home page, the three stays, and the area guide on this origin", async ({
     request,
     baseURL,
   }) => {
@@ -31,9 +31,10 @@ test.describe("seo", () => {
     expect(locs).toEqual([
       `${site}/`,
       ...SLUGS.map((slug) => `${site}/stays/${slug}`),
+      `${site}/area`,
     ]);
     // lastModified is set once at build time, in ISO form.
-    expect(body.match(/<lastmod>/g)).toHaveLength(4);
+    expect(body.match(/<lastmod>/g)).toHaveLength(5);
   });
 
   test("/robots.txt allows crawling, hides the dev and 404 routes, and names the sitemap", async ({

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AreaGuide } from "@/components/area/AreaGuide";
 import { Hero } from "@/components/home/Hero";
+import { GuestReviews } from "@/components/home/GuestReviews";
 import { HostsStrip } from "@/components/home/HostsStrip";
 import { Stays } from "@/components/home/Stays";
 import { WhyBookDirect } from "@/components/home/WhyBookDirect";
@@ -39,9 +40,10 @@ export default function Home() {
       <JsonLd data={organizationJsonLd()} />
       <Hero />
       <Stays />
-      <HostsStrip />
       <AreaGuide />
       <WhyBookDirect />
+      <GuestReviews />
+      <HostsStrip />
     </>
   );
 }
