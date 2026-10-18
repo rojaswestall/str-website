@@ -109,9 +109,13 @@ its one retry). The whole job takes about two minutes.
   `check-colors.ts` (`pnpm check:colors`); CI runs both first, before
   anything builds.
 - `public/photos/` — photos referenced from `content/`, one folder per house
-  plus `area/` and `home/`. Today every file is a striped placeholder with
-  the final aspect ratio (3:2 hero and gallery, 1:1 area picks, 21:9 hero
-  collage); drop real photos in at the same paths.
+  plus `area/` and `home/`. Each house folder holds `hero.jpg` (the
+  listing's cover photo) and `gallery-NN.jpg` in walk-through order, listed
+  with alt text and real pixel sizes in `content/photos.ts`. They are resized
+  from the hosts' originals (2400px long edge for heroes, 1600px for the
+  gallery, JPEG quality 80, metadata stripped); frames crop to 3:2 with
+  `object-cover`. `home/hero-collage.jpg` is the real 21:9 collage. The 1:1
+  area-pick photos under `area/` are still striped placeholders.
 - `e2e/` — Playwright specs. Two projects: `chromium` runs every spec except
   `*.live.spec.ts` against the default build on port 3000 (`home`, `stays`,
   `theme`, `contact-api`, `contact-form`, `hospitable`, `seo`,

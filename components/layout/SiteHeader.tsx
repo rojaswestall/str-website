@@ -7,7 +7,6 @@ import { getSite } from "@/content";
 const NAV = [
   { label: "Stays", href: "/#stays" },
   { label: "The area", href: "/#area" },
-  { label: "Practicals", href: "/#practicals" },
   { label: "Book direct", href: "/#direct" },
 ] as const;
 

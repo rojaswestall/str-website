@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { AreaGuide } from "@/components/area/AreaGuide";
 import { Hero } from "@/components/home/Hero";
 import { HostsStrip } from "@/components/home/HostsStrip";
-import { Practicals } from "@/components/home/Practicals";
 import { Stays } from "@/components/home/Stays";
 import { WhyBookDirect } from "@/components/home/WhyBookDirect";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -42,7 +41,6 @@ export default function Home() {
       <Stays />
       <HostsStrip />
       <AreaGuide />
-      <Practicals />
       <WhyBookDirect />
     </>
   );

@@ -25,14 +25,13 @@ test.describe("home page", () => {
     }
   });
 
-  test("renders the four anchored sections with their headings", async ({
+  test("renders the three anchored sections with their headings", async ({
     page,
   }) => {
     await page.goto("/");
     for (const [id, heading] of [
       ["stays", "The stays"],
       ["area", "What's worth doing"],
-      ["practicals", "Practicals"],
       ["direct", "Why book direct"],
     ] as const) {
       const section = page.locator(`section#${id}`);
@@ -44,6 +43,9 @@ test.describe("home page", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: "Your hosts" }),
     ).toBeVisible();
+    // Practicals moved to the property pages.
+    await expect(page.locator("section#practicals")).toHaveCount(0);
+    await expect(page.getByTestId("practicals")).toHaveCount(0);
   });
 
   test("three property bands link to the right slugs", async ({ page }) => {
@@ -69,7 +71,7 @@ test.describe("home page", () => {
     await expect(bands.first()).not.toContainText("$");
   });
 
-  test("hero mounts the search stub and the area guide mounts the TikTok embed", async ({
+  test("hero mounts the search stub and the area guide mounts both TikTok embeds", async ({
     page,
   }) => {
     // Keep TikTok off the network: the fallback must stay visible for the
@@ -85,19 +87,33 @@ test.describe("home page", () => {
     ).toHaveAttribute("href", "/#stays");
 
     const feature = page.getByTestId("video-feature");
-    await expect(
-      feature.getByRole("heading", { level: 3, name: /Barton Springs/ }),
-    ).toBeVisible();
-    const tiktok = feature.getByTestId("tiktok-embed");
-    await expect(
-      tiktok.getByRole("link", { name: "Watch on TikTok" }),
-    ).toHaveAttribute("href", /tiktok\.com\/@exploretex\/video\/\d+/);
-    // embed.js is injected into the leaf container and scans for the blockquote it finds there
-    // (blocked above, so the fallback stays and the blockquote is never swapped).
-    await expect(tiktok.locator("blockquote.tiktok-embed")).toHaveCount(1);
-    await expect(
-      tiktok.locator('script[src="https://www.tiktok.com/embed.js"]'),
-    ).toHaveCount(1);
+    const clips = feature.getByTestId("video-clip");
+    await expect(clips).toHaveCount(2);
+    for (const [index, [handle, heading]] of (
+      [
+        ["exploretex", /Barton Springs/],
+        ["gabynjohnny", /BBQ/],
+      ] as const
+    ).entries()) {
+      const clip = clips.nth(index);
+      const tiktok = clip.getByTestId("tiktok-embed");
+      await expect(
+        tiktok.getByRole("link", { name: "Watch on TikTok" }),
+      ).toHaveAttribute(
+        "href",
+        new RegExp(`tiktok\\.com/@${handle}/video/\\d+`),
+      );
+      // The heading and text sit in the same column as the player.
+      await expect(
+        clip.getByRole("heading", { level: 3, name: heading }),
+      ).toBeVisible();
+      // embed.js is injected into the leaf container and scans for the blockquote it finds there
+      // (blocked above, so the fallback stays and the blockquote is never swapped).
+      await expect(tiktok.locator("blockquote.tiktok-embed")).toHaveCount(1);
+      await expect(
+        tiktok.locator('script[src="https://www.tiktok.com/embed.js"]'),
+      ).toHaveCount(1);
+    }
 
     await expect(page.getByTestId("area-picks").locator("article")).toHaveCount(
       3,
@@ -134,7 +150,7 @@ test.describe("home page", () => {
     expect(await mapGroundFill(page)).toBe(MAP_GROUND_DARK);
   });
 
-  test("hosts, practicals, and the direct-booking section render from content", async ({
+  test("hosts and the direct-booking section render from content", async ({
     page,
   }) => {
     await page.goto("/");
@@ -142,28 +158,6 @@ test.describe("home page", () => {
     const hosts = page.getByTestId("hosts-strip").locator("li");
     await expect(hosts).toHaveCount(3);
     await expect(hosts).toContainText(["Alexis", "Gabe", "Aaron"]);
-
-    const practicals = page.getByTestId("practicals");
-    for (const term of [
-      "Check-in",
-      "Check-out",
-      "Cleaning",
-      "Pets",
-      "Cancellation",
-      "Questions",
-    ]) {
-      await expect(
-        practicals.locator("dt", { hasText: new RegExp(`^${term}$`) }),
-      ).toHaveCount(1);
-    }
-    const faq = page.getByTestId("practicals-faq");
-    await expect(
-      faq.getByRole("heading", { level: 3, name: "Booking direct" }),
-    ).toBeVisible();
-    await expect(faq.locator("dt")).toHaveCount(3);
-    await expect(faq).toContainText(
-      "How does payment work when I book direct?",
-    );
 
     const direct = page.locator("section#direct");
     await expect(direct).toContainText("What direct booking changes");
@@ -184,10 +178,10 @@ test.describe("site shell", () => {
     ).toHaveAttribute("href", "/");
 
     const nav = header.getByRole("navigation", { name: "Primary" });
+    await expect(nav.getByRole("link")).toHaveCount(3);
     for (const [label, href] of [
       ["Stays", "/#stays"],
       ["The area", "/#area"],
-      ["Practicals", "/#practicals"],
       ["Book direct", "/#direct"],
     ]) {
       await expect(nav.getByRole("link", { name: label })).toHaveAttribute(

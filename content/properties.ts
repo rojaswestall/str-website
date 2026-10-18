@@ -1,4 +1,5 @@
-import type { Photo, Property } from "./types";
+import { photos } from "./photos";
+import type { Property } from "./types";
 
 /*
  * The three houses, seeded from design/artifact.html.
@@ -11,27 +12,9 @@ import type { Photo, Property } from "./types";
  *   in each house's dashboard snippet; null renders the stub). Fire Side Home
  *   is "Dan Jean B" in Hospitable, property 2338068, from the snippet in
  *   docs/plan.md.
- * - real photos (the files under public/photos/<slug>/ are striped placeholders)
+ *
+ * Photos live in content/photos.ts.
  */
-
-function placeholderPhotos(slug: string, name: string): Photo[] {
-  return [
-    {
-      src: `/photos/${slug}/hero.jpg`,
-      alt: `[TBC] Placeholder for the hero photo of ${name}`,
-      width: 1800,
-      height: 1200,
-      role: "hero",
-    },
-    ...([1, 2, 3] as const).map<Photo>((n) => ({
-      src: `/photos/${slug}/gallery-0${n}.jpg`,
-      alt: `[TBC] Placeholder for gallery photo ${n} of ${name}`,
-      width: 1800,
-      height: 1200,
-      role: "gallery",
-    })),
-  ];
-}
 
 export const properties: Property[] = [
   {
@@ -64,7 +47,7 @@ export const properties: Property[] = [
     airbnbUrl: "https://www.airbnb.com/rooms/1598934202273477463",
     strLicense: "OL2026086598",
     hospitable: { propertyId: "2338067" }, // "Parkwood A" in Hospitable
-    photos: placeholderPhotos("oak-hill", "An Oak Hill Home"),
+    photos: photos["oak-hill"],
     quotes: [],
     mapPin: { x: 85, y: 299 },
   },
@@ -98,7 +81,7 @@ export const properties: Property[] = [
     airbnbUrl: "https://www.airbnb.com/rooms/1655329029936239948",
     strLicense: "OL2026040319",
     hospitable: { propertyId: "2338069" }, // "Dan Jean Unit A" in Hospitable
-    photos: placeholderPhotos("south-austin", "South Austin Stay"),
+    photos: photos["south-austin"],
     quotes: [],
     // Both South Austin houses sit near (266, 299); offset so the dots read apart.
     mapPin: { x: 258, y: 292 },
@@ -134,7 +117,7 @@ export const properties: Property[] = [
     airbnbUrl: "https://www.airbnb.com/rooms/1598953749522814358",
     strLicense: "OL2026031718",
     hospitable: { propertyId: "2338068" }, // "Dan Jean B" in Hospitable
-    photos: placeholderPhotos("fire-side", "Fire Side Home"),
+    photos: photos["fire-side"],
     quotes: [],
     mapPin: { x: 274, y: 306 },
   },
