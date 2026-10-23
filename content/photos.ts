@@ -4,9 +4,11 @@ import type { Photo } from "./types";
  * Property photos, generated from the hosts' originals (Images/<house>/ next
  * to the repo): resized to 2400px (hero) or 1600px (gallery) on the long edge,
  * re-encoded as JPEG with metadata stripped. The `cover` original is each
- * house's hero; the rest follow a walk through the house (outside, entry,
- * living, kitchen, bedrooms, baths, patio, garage and laundry), with the
- * backyard photos last. Width and height are the real pixel sizes; frames
+ * house's hero; the rest follow a walk through the house (entry, living,
+ * kitchen, bedrooms, baths, garage and laundry), with every outdoor photo
+ * (front and side of the house, front door, patio, backyard) last. Entries
+ * are listed in display order, so the gallery-NN file numbers no longer
+ * match their position. Width and height are the real pixel sizes; frames
  * crop to 3:2 with object-cover.
  */
 
@@ -18,20 +20,6 @@ export const photos = {
       width: 2400,
       height: 1600,
       role: "hero",
-    },
-    {
-      src: "/photos/oak-hill/gallery-01.jpg",
-      alt: "Side of house",
-      width: 1600,
-      height: 1067,
-      role: "gallery",
-    },
-    {
-      src: "/photos/oak-hill/gallery-02.jpg",
-      alt: "Front door",
-      width: 1067,
-      height: 1600,
-      role: "gallery",
     },
     {
       src: "/photos/oak-hill/gallery-03.jpg",
@@ -111,13 +99,6 @@ export const photos = {
       role: "gallery",
     },
     {
-      src: "/photos/oak-hill/gallery-14.jpg",
-      alt: "Outdoor patio",
-      width: 1067,
-      height: 1600,
-      role: "gallery",
-    },
-    {
       src: "/photos/oak-hill/gallery-15.jpg",
       alt: "Garage",
       width: 1067,
@@ -128,6 +109,27 @@ export const photos = {
       src: "/photos/oak-hill/gallery-16.jpg",
       alt: "Washer and dryer",
       width: 1600,
+      height: 1600,
+      role: "gallery",
+    },
+    {
+      src: "/photos/oak-hill/gallery-01.jpg",
+      alt: "Side of house",
+      width: 1600,
+      height: 1067,
+      role: "gallery",
+    },
+    {
+      src: "/photos/oak-hill/gallery-02.jpg",
+      alt: "Front door",
+      width: 1067,
+      height: 1600,
+      role: "gallery",
+    },
+    {
+      src: "/photos/oak-hill/gallery-14.jpg",
+      alt: "Outdoor patio",
+      width: 1067,
       height: 1600,
       role: "gallery",
     },
@@ -146,27 +148,6 @@ export const photos = {
       width: 2400,
       height: 1600,
       role: "hero",
-    },
-    {
-      src: "/photos/south-austin/gallery-01.jpg",
-      alt: "Front of house",
-      width: 1600,
-      height: 1067,
-      role: "gallery",
-    },
-    {
-      src: "/photos/south-austin/gallery-02.jpg",
-      alt: "Side of house",
-      width: 1600,
-      height: 1067,
-      role: "gallery",
-    },
-    {
-      src: "/photos/south-austin/gallery-03.jpg",
-      alt: "Front door",
-      width: 1600,
-      height: 1067,
-      role: "gallery",
     },
     {
       src: "/photos/south-austin/gallery-04.jpg",
@@ -372,20 +353,6 @@ export const photos = {
       role: "gallery",
     },
     {
-      src: "/photos/south-austin/gallery-33.jpg",
-      alt: "Outdoor patio",
-      width: 1600,
-      height: 1067,
-      role: "gallery",
-    },
-    {
-      src: "/photos/south-austin/gallery-34.jpg",
-      alt: "Outdoor patio, second view",
-      width: 1600,
-      height: 1067,
-      role: "gallery",
-    },
-    {
       src: "/photos/south-austin/gallery-35.jpg",
       alt: "Washer",
       width: 1067,
@@ -397,6 +364,41 @@ export const photos = {
       alt: "Dryer",
       width: 1067,
       height: 1600,
+      role: "gallery",
+    },
+    {
+      src: "/photos/south-austin/gallery-01.jpg",
+      alt: "Front of house",
+      width: 1600,
+      height: 1067,
+      role: "gallery",
+    },
+    {
+      src: "/photos/south-austin/gallery-02.jpg",
+      alt: "Side of house",
+      width: 1600,
+      height: 1067,
+      role: "gallery",
+    },
+    {
+      src: "/photos/south-austin/gallery-03.jpg",
+      alt: "Front door",
+      width: 1600,
+      height: 1067,
+      role: "gallery",
+    },
+    {
+      src: "/photos/south-austin/gallery-33.jpg",
+      alt: "Outdoor patio",
+      width: 1600,
+      height: 1067,
+      role: "gallery",
+    },
+    {
+      src: "/photos/south-austin/gallery-34.jpg",
+      alt: "Outdoor patio, second view",
+      width: 1600,
+      height: 1067,
       role: "gallery",
     },
     {
@@ -421,20 +423,6 @@ export const photos = {
       width: 2400,
       height: 1600,
       role: "hero",
-    },
-    {
-      src: "/photos/fire-side/gallery-01.jpg",
-      alt: "Front of house",
-      width: 1600,
-      height: 1067,
-      role: "gallery",
-    },
-    {
-      src: "/photos/fire-side/gallery-02.jpg",
-      alt: "Front door",
-      width: 1600,
-      height: 1067,
-      role: "gallery",
     },
     {
       src: "/photos/fire-side/gallery-03.jpg",
@@ -614,6 +602,20 @@ export const photos = {
     {
       src: "/photos/fire-side/gallery-28.jpg",
       alt: "Washer and dryer",
+      width: 1600,
+      height: 1067,
+      role: "gallery",
+    },
+    {
+      src: "/photos/fire-side/gallery-01.jpg",
+      alt: "Front of house",
+      width: 1600,
+      height: 1067,
+      role: "gallery",
+    },
+    {
+      src: "/photos/fire-side/gallery-02.jpg",
+      alt: "Front door",
       width: 1600,
       height: 1067,
       role: "gallery",
