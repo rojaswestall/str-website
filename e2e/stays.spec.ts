@@ -62,6 +62,63 @@ test.describe("property pages", () => {
     });
   }
 
+  test("the gallery is a carousel that opens every photo in a pop-up", async ({
+    page,
+  }) => {
+    await page.goto("/stays/fire-side");
+    const gallery = page.getByTestId("gallery");
+    const counter = gallery.getByTestId("gallery-counter");
+
+    // Chevrons step through the carousel and wrap at the ends.
+    await expect(counter).toContainText("01 / 31");
+    await gallery.getByRole("button", { name: "Next photo" }).click();
+    await expect(counter).toContainText("02 / 31");
+    await gallery.getByRole("button", { name: "Previous photo" }).click();
+    await gallery.getByRole("button", { name: "Previous photo" }).click();
+    await expect(counter).toContainText("31 / 31");
+    await gallery.getByRole("button", { name: "Next photo" }).click();
+    await expect(counter).toContainText("01 / 31");
+
+    // "Show all" opens the pop-up with every photo; the exit button closes it.
+    const popup = page.getByTestId("all-photos");
+    await gallery.getByRole("button", { name: "Show all 31 photos" }).click();
+    await expect(popup).toBeVisible();
+    await expect(popup.getByRole("img")).toHaveCount(31);
+    await popup.getByRole("button", { name: "Close" }).click();
+    await expect(popup).toHaveCount(0);
+
+    // Clicking the grey area around the photos closes it too, and so does Escape.
+    await gallery.getByRole("button", { name: "Show all 31 photos" }).click();
+    await expect(popup).toBeVisible();
+    await popup.click({ position: { x: 5, y: 300 } });
+    await expect(popup).toHaveCount(0);
+    await gallery.getByRole("button", { name: "Show all 31 photos" }).click();
+    await page.keyboard.press("Escape");
+    await expect(popup).toHaveCount(0);
+
+    // The pop-up opens at the photo the carousel was on, and closing it hands
+    // focus back to the button that opened it (by button and by Escape).
+    await gallery.getByRole("button", { name: "Next photo" }).click();
+    await gallery.getByRole("button", { name: "Next photo" }).click();
+    await expect(counter).toContainText("03 / 31");
+    const showAll = gallery.getByRole("button", { name: "Show all 31 photos" });
+    await showAll.click();
+    await expect(popup.locator('[data-photo-index="2"]')).toBeInViewport();
+    await expect(popup.locator('[data-photo-index="0"]')).not.toBeInViewport();
+    await popup.getByRole("button", { name: "Close" }).click();
+    await expect(showAll).toBeFocused();
+    await showAll.click();
+    await page.keyboard.press("Escape");
+    await expect(showAll).toBeFocused();
+
+    // Clicking the photo itself opens the pop-up too.
+    await gallery
+      .getByRole("button", { name: "Open all photos" })
+      .first()
+      .click();
+    await expect(popup).toBeVisible();
+  });
+
   test("shows the gallery, the spec strip with unconfirmed values, and the guest quotes", async ({
     page,
   }) => {
@@ -89,9 +146,14 @@ test.describe("property pages", () => {
       quotes.getByRole("heading", { level: 2, name: "What guests say" }),
     ).toBeVisible();
     await expect(quotes.locator("blockquote")).toHaveCount(3);
-    await expect(quotes.locator("figcaption").first()).toContainText(
-      "Alexander",
-    );
+    // The same slideshow as the home page: one review showing, chevrons step.
+    const current = quotes.locator("li[data-current]");
+    await expect(current).toHaveCount(1);
+    await expect(current.locator("figcaption")).toContainText("Alexander");
+    await expect(quotes.getByTestId("review-counter")).toHaveText("01 / 03");
+    await quotes.getByRole("button", { name: "Next review" }).click();
+    await expect(quotes.getByTestId("review-counter")).toHaveText("02 / 03");
+    await expect(current.locator("figcaption")).not.toContainText("Alexander");
   });
 
   test("shows every practicals row with the booking FAQ, and the map with this house highlighted", async ({

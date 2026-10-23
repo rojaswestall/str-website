@@ -25,6 +25,8 @@
   --paper-2: #f2f0ec;
   --slot-a: #efede8;
   --slot-b: #e8e5df;
+  /* the grey behind the all-photos pop-up */
+  --scrim: #3a3733;
 
   /* the map is the one place the page carries real color */
   --map-ground: #f1efea;
@@ -50,6 +52,7 @@
   --paper-2: #1e1c19;
   --slot-a: #22201c;
   --slot-b: #2a2823;
+  --scrim: #0d0c0b;
 
   --map-ground: #1e1c19;
   --map-road: #3a3732;
@@ -72,6 +75,7 @@
   --color-paper-2: var(--paper-2);
   --color-slot-a: var(--slot-a);
   --color-slot-b: var(--slot-b);
+  --color-scrim: var(--scrim);
   --color-map-ground: var(--map-ground);
   --color-map-road: var(--map-road);
   --color-map-road-major: var(--map-road-major);
@@ -113,5 +117,15 @@
       transition: none !important;
       animation: none !important;
     }
+  }
+}
+
+/* The review slideshow's timer bar (components/home/ReviewCarousel.tsx). */
+@keyframes review-timer {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
