@@ -177,3 +177,120 @@ log and the request still succeeds, so local dev and CI need no secrets. The hom
 page's form (`components/contact/ContactForm.tsx`, mounted in "Why book
 direct") posts to that route and shows the same success state in dry run as
 after a real send.
+
+## Deploying on Vercel
+
+The site runs in two Vercel environments, and the difference between them is
+mostly one variable, `NEXT_PUBLIC_HOSPITABLE_MODE`:
+
+| Environment           | Built from                      | Hospitable widgets              | Contact form                     |
+| --------------------- | ------------------------------- | ------------------------------- | -------------------------------- |
+| **Production** (live) | `main`                          | `live`: real calendar, checkout | Sends through Resend             |
+| **Preview** (sandbox) | every other branch and every PR | `stub`: placeholder panels      | Dry run, or a test inbox (below) |
+| Local (`pnpm dev`)    | your working tree               | `stub` unless `.env.local` says | Dry run                          |
+
+A preview is the safe place to look at a change on a real URL: guests cannot
+book from it, and no inquiry reaches the hosts unless you point it at them.
+
+### One-time setup
+
+1. Install the CLI and sign in: `npm i -g vercel`, then `vercel login`.
+2. From the repo root, run `vercel link` and create (or pick) the project
+   under the right team. The framework preset is Next.js; leave the build and
+   output settings at their defaults.
+3. In Project → Settings → Git, connect `rojaswestall/str-website` and set the
+   production branch to `main`. From then on every push to `main` deploys to
+   Production and every other push or PR gets its own Preview URL.
+4. In Project → Settings → General, set the Node.js version to 24.x (matches
+   `.nvmrc`).
+5. Add `ENABLE_EXPERIMENTAL_COREPACK=1` for all environments so Vercel
+   installs the exact pnpm pinned in `package.json` rather than its default.
+6. Enable Web Analytics in the project's Analytics tab (`app/layout.tsx`
+   already renders `<Analytics />`).
+7. Add the custom domain under Settings → Domains and set the DNS records
+   Vercel shows.
+
+### Environment variables
+
+`NEXT_PUBLIC_*` values are inlined at build time, so changing one only takes
+effect on the next deployment (use Redeploy in the dashboard, or push).
+
+| Variable                       | Production                    | Preview                              |
+| ------------------------------ | ----------------------------- | ------------------------------------ |
+| `NEXT_PUBLIC_HOSPITABLE_MODE`  | `live`                        | `stub`                               |
+| `NEXT_PUBLIC_SITE_URL`         | `https://<domain>` (required) | leave unset                          |
+| `RESEND_API_KEY`               | the Resend key                | unset for dry run, or the same key   |
+| `CONTACT_FROM`                 | sender on the verified domain | same as Production if the key is set |
+| `CONTACT_TO`                   | the hosts' inbox(es)          | a test inbox if the key is set       |
+| `ENABLE_EXPERIMENTAL_COREPACK` | `1`                           | `1`                                  |
+
+Set them in Project → Settings → Environment Variables, or from the CLI, which
+prompts for the value:
+
+```bash
+vercel env add NEXT_PUBLIC_HOSPITABLE_MODE production   # enter: live
+vercel env add NEXT_PUBLIC_HOSPITABLE_MODE preview      # enter: stub
+vercel env ls                                           # check what is set where
+```
+
+Notes:
+
+- Without `NEXT_PUBLIC_SITE_URL`, canonical links, the sitemap, and Open Graph
+  URLs point at `http://localhost:3000`. That is acceptable on previews (Vercel
+  sends `noindex` for preview URLs) but would break SEO and share cards in
+  Production.
+- If `RESEND_API_KEY` is set, `CONTACT_FROM` and `CONTACT_TO` must be set too,
+  or `/api/contact` returns 500. With no key, inquiries are written to the
+  function log (Deployment → Logs) instead of sent.
+
+### Run it live (Production)
+
+Merge to `main`. Vercel builds and promotes the deployment to the production
+domain. To deploy the current working tree straight to Production instead
+(rarely needed):
+
+```bash
+vercel --prod
+```
+
+After a production deploy, open each `/stays/<slug>` page and check that the
+booking calendar loads, and send one inquiry through the contact form. To undo
+a bad release, `vercel rollback` (or Instant Rollback in the dashboard) puts
+the previous production deployment back without a rebuild.
+
+### Run it in the sandbox (Preview)
+
+Push a branch or open a PR. Vercel comments the Preview URL on the PR; the
+deployment uses the Preview variables above, so booking panels show the stub
+and nothing is booked or emailed. To deploy the working tree without pushing:
+
+```bash
+vercel          # prints a unique Preview URL
+```
+
+Preview URLs sit behind Vercel Authentication by default (Settings →
+Deployment Protection), so only signed-in members of the Vercel team can open
+them. Turn on a shareable link there if someone outside the team needs to look.
+
+To exercise the **real** Hospitable widget on a preview before it goes to
+Production, add a branch-specific override: in Environment Variables, add
+`NEXT_PUBLIC_HOSPITABLE_MODE=live` for Preview and choose your branch, then
+redeploy that branch. Bear in mind the live widget is Hospitable's real
+checkout: a booking completed there is a real booking, so stop at the
+checkout page. Remove the override when you are done.
+
+### Run locally with Vercel's settings
+
+To reproduce an environment on your machine, pull its variables into
+`.env.local` (gitignored) and run the normal scripts:
+
+```bash
+vercel env pull .env.local --environment=preview      # sandbox settings
+vercel env pull .env.local --environment=production   # live settings
+pnpm build && pnpm start                              # or: pnpm dev
+```
+
+With the production variables, the booking widgets are live and the contact
+form sends real email, so treat that copy of `.env.local` with care. Delete
+or re-pull it before running `pnpm test`; the Playwright config pins its own
+values, but a stale server on port 3000 will still be reused.
