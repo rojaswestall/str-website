@@ -199,6 +199,30 @@ test.describe("home page", () => {
     ]);
     await expect(reviews.getByTestId("review-quotes-tbc")).toHaveCount(0);
 
+    // The quotes are a slideshow: one review in the middle, chevrons step
+    // either way (wrapping), a faded neighbour can be clicked to the middle,
+    // and the timer bar finishing moves on to the next review.
+    const slides = reviews.getByTestId("review-quotes").locator("li");
+    const current = slides.locator("xpath=self::*[@data-current]");
+    await expect(current).toHaveCount(1);
+    await expect(current).toContainText("Melanie");
+    await expect(reviews.getByTestId("review-counter")).toHaveText("01 / 06");
+    await reviews.getByRole("button", { name: "Next review" }).click();
+    await expect(current).toContainText("Adrián");
+    await reviews.getByRole("button", { name: "Previous review" }).click();
+    await reviews.getByRole("button", { name: "Previous review" }).click();
+    await expect(current).toContainText("Fire Side Home");
+    await expect(reviews.getByTestId("review-counter")).toHaveText("06 / 06");
+    await slides.nth(0).click();
+    await expect(current).toContainText("Melanie");
+    await reviews.getByTestId("review-timer").dispatchEvent("animationend");
+    await expect(current).toContainText("Adrián");
+    const pause = reviews.getByRole("button", { name: "Pause slideshow" });
+    await pause.click();
+    await expect(
+      reviews.getByRole("button", { name: "Play slideshow" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
     // Order on the page: Why book direct, then reviews, then hosts.
     const ids = await page
       .locator("main section[id], main section[aria-labelledby=hosts-heading]")

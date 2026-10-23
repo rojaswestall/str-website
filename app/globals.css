@@ -115,3 +115,13 @@
     }
   }
 }
+
+/* The review slideshow's timer bar (components/home/ReviewCarousel.tsx). */
+@keyframes review-timer {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

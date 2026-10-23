@@ -9,9 +9,11 @@ import { MonoHeading } from "./MonoHeading";
 export function QuoteAttribution({
   quote,
   propertyName,
+  className,
 }: {
   quote: Quote;
   propertyName?: string;
+  className?: string;
 }) {
   const parts = [
     quote.author ?? "Airbnb guest",
@@ -19,7 +21,12 @@ export function QuoteAttribution({
     propertyName,
   ].filter((part): part is string => Boolean(part));
   return (
-    <figcaption className="font-mono text-[0.74rem] tracking-[0.06em] text-muted">
+    <figcaption
+      className={cx(
+        "font-mono text-[0.74rem] tracking-[0.06em] text-muted",
+        className,
+      )}
+    >
       <span aria-hidden="true" className="text-accent">
         —{" "}
       </span>

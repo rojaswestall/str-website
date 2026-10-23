@@ -6,12 +6,12 @@ import {
   SectionHead,
   Tbc,
 } from "@/components/ui";
-import { QuoteAttribution } from "@/components/property/Quotes";
+import { ReviewCarousel } from "@/components/home/ReviewCarousel";
 import { getAllProperties } from "@/content";
 
 /*
  * `#reviews`: the Airbnb review record for each house, then guest quotes from
- * every house (two each). Ratings and counts come from content (copied from the live
+ * every house (two each) as a timed slideshow. Ratings and counts come from content (copied from the live
  * listings); the headline average is weighted by review count. Quotes are
  * never invented: until content has some, a dashed note says what is missing.
  */
@@ -26,7 +26,7 @@ export function GuestReviews() {
   const quotes = [0, 1].flatMap((index) =>
     properties.flatMap((property) => {
       const quote = property.quotes[index];
-      return quote ? [{ ...quote, property }] : [];
+      return quote ? [{ ...quote, propertyName: property.name }] : [];
     }),
   );
 
@@ -79,24 +79,10 @@ export function GuestReviews() {
       </ul>
 
       {quotes.length > 0 ? (
-        <ul
-          data-testid="review-quotes"
-          className="mt-[clamp(2rem,4vw,3rem)] grid grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))] gap-[clamp(1.75rem,4vw,3rem)]"
-        >
-          {quotes.map((quote) => (
-            <li key={quote.text}>
-              <figure className="m-0 flex flex-col gap-[0.7rem]">
-                <blockquote className="font-display text-[clamp(1.1rem,1.8vw,1.3rem)] leading-[1.4] font-normal text-ink italic">
-                  <p>&ldquo;{quote.text}&rdquo;</p>
-                </blockquote>
-                <QuoteAttribution
-                  quote={quote}
-                  propertyName={quote.property.name}
-                />
-              </figure>
-            </li>
-          ))}
-        </ul>
+        <ReviewCarousel
+          quotes={quotes}
+          className="mt-[clamp(2.5rem,5vw,4rem)]"
+        />
       ) : (
         <p
           data-testid="review-quotes-tbc"
