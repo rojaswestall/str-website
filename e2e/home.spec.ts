@@ -199,6 +199,30 @@ test.describe("home page", () => {
     ]);
     await expect(reviews.getByTestId("review-quotes-tbc")).toHaveCount(0);
 
+    // The quotes are a slideshow: one review in the middle, chevrons step
+    // either way (wrapping), a faded neighbour can be clicked to the middle,
+    // and the timer bar finishing moves on to the next review.
+    const slides = reviews.getByTestId("review-quotes").locator("li");
+    const current = slides.locator("xpath=self::*[@data-current]");
+    await expect(current).toHaveCount(1);
+    await expect(current).toContainText("Melanie");
+    await expect(reviews.getByTestId("review-counter")).toHaveText("01 / 06");
+    await reviews.getByRole("button", { name: "Next review" }).click();
+    await expect(current).toContainText("Adrián");
+    await reviews.getByRole("button", { name: "Previous review" }).click();
+    await reviews.getByRole("button", { name: "Previous review" }).click();
+    await expect(current).toContainText("Fire Side Home");
+    await expect(reviews.getByTestId("review-counter")).toHaveText("06 / 06");
+    await slides.nth(0).click();
+    await expect(current).toContainText("Melanie");
+    await reviews.getByTestId("review-timer").dispatchEvent("animationend");
+    await expect(current).toContainText("Adrián");
+    const pause = reviews.getByRole("button", { name: "Pause slideshow" });
+    await pause.click();
+    await expect(
+      reviews.getByRole("button", { name: "Play slideshow" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
     // Order on the page: Why book direct, then reviews, then hosts.
     const ids = await page
       .locator("main section[id], main section[aria-labelledby=hosts-heading]")
@@ -206,6 +230,28 @@ test.describe("home page", () => {
         sections.map((s) => s.id || s.getAttribute("aria-labelledby")),
       );
     expect(ids.slice(-3)).toEqual(["direct", "reviews", "hosts-heading"]);
+  });
+
+  test("the review slideshow starts paused under reduced motion", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const reviews = page.locator("section#reviews");
+    // Paused from the start: the button offers Play, and the timer bar is
+    // not running, so the first review stays put.
+    await expect(
+      reviews.getByRole("button", { name: "Play slideshow" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(reviews.getByTestId("review-timer")).toHaveClass(/scale-x-0/);
+    await expect(reviews.getByTestId("review-counter")).toHaveText("01 / 06");
+    // The arrows still work, and Play starts it.
+    await reviews.getByRole("button", { name: "Next review" }).click();
+    await expect(reviews.getByTestId("review-counter")).toHaveText("02 / 06");
+    await reviews.getByRole("button", { name: "Play slideshow" }).click();
+    await expect(
+      reviews.getByRole("button", { name: "Pause slideshow" }),
+    ).toHaveAttribute("aria-pressed", "false");
   });
 
   test("hosts and the direct-booking section render from content", async ({
