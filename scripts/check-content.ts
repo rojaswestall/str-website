@@ -4,8 +4,9 @@
  * Importing `@/content` parses every content module through zod, so an invalid
  * file throws here with a readable path before the build spends any time on it.
  * The structural invariants (unique slugs, at least one hero photo per
- * property) live in the schemas themselves; this script only has to import,
- * exercise the accessors, and print a short summary.
+ * property) live in the schemas themselves; this script imports, exercises
+ * the accessors, checks that image files exist and that outdoor photos come
+ * last in each gallery, and prints a short summary.
  */
 import { existsSync } from "node:fs";
 import path from "node:path";
@@ -26,6 +27,10 @@ function fail(message: string): never {
   process.exit(1);
 }
 
+/** Alt-text prefixes of outdoor shots; see the gallery-order check below. */
+const OUTDOOR =
+  /^(Front of house|Side of house|Front door|Outdoor|Backyard|Back yard)/i;
+
 const properties = getAllProperties();
 const slugs = properties.map((p) => p.slug);
 
@@ -36,6 +41,20 @@ if (new Set(slugs).size !== slugs.length) {
 for (const property of properties) {
   if (!property.photos.some((photo) => photo.role === "hero")) {
     fail(`property "${property.slug}" has no hero photo`);
+  }
+  // Gallery order: every outdoor photo comes after every indoor one (the hero
+  // is shown first regardless). Outdoor is read from the alt text, which
+  // names the shot ("Front of house", "Backyard, fence view", ...).
+  const gallery = property.photos.filter((photo) => photo.role !== "hero");
+  const firstOutdoor = gallery.findIndex((photo) => OUTDOOR.test(photo.alt));
+  const indoorAfter =
+    firstOutdoor === -1
+      ? undefined
+      : gallery.slice(firstOutdoor).find((photo) => !OUTDOOR.test(photo.alt));
+  if (indoorAfter) {
+    fail(
+      `property "${property.slug}": indoor photo "${indoorAfter.alt}" (${indoorAfter.src}) is listed after outdoor photo "${gallery[firstOutdoor]?.alt}"; outdoor photos go last`,
+    );
   }
   if (getProperty(property.slug) !== property) {
     fail(`getProperty("${property.slug}") did not return the seeded property`);

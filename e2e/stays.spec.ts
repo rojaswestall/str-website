@@ -96,6 +96,21 @@ test.describe("property pages", () => {
     await page.keyboard.press("Escape");
     await expect(popup).toHaveCount(0);
 
+    // The pop-up opens at the photo the carousel was on, and closing it hands
+    // focus back to the button that opened it (by button and by Escape).
+    await gallery.getByRole("button", { name: "Next photo" }).click();
+    await gallery.getByRole("button", { name: "Next photo" }).click();
+    await expect(counter).toContainText("03 / 31");
+    const showAll = gallery.getByRole("button", { name: "Show all 31 photos" });
+    await showAll.click();
+    await expect(popup.locator('[data-photo-index="2"]')).toBeInViewport();
+    await expect(popup.locator('[data-photo-index="0"]')).not.toBeInViewport();
+    await popup.getByRole("button", { name: "Close" }).click();
+    await expect(showAll).toBeFocused();
+    await showAll.click();
+    await page.keyboard.press("Escape");
+    await expect(showAll).toBeFocused();
+
     // Clicking the photo itself opens the pop-up too.
     await gallery
       .getByRole("button", { name: "Open all photos" })

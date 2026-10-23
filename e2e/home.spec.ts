@@ -232,6 +232,28 @@ test.describe("home page", () => {
     expect(ids.slice(-3)).toEqual(["direct", "reviews", "hosts-heading"]);
   });
 
+  test("the review slideshow starts paused under reduced motion", async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const reviews = page.locator("section#reviews");
+    // Paused from the start: the button offers Play, and the timer bar is
+    // not running, so the first review stays put.
+    await expect(
+      reviews.getByRole("button", { name: "Play slideshow" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(reviews.getByTestId("review-timer")).toHaveClass(/scale-x-0/);
+    await expect(reviews.getByTestId("review-counter")).toHaveText("01 / 06");
+    // The arrows still work, and Play starts it.
+    await reviews.getByRole("button", { name: "Next review" }).click();
+    await expect(reviews.getByTestId("review-counter")).toHaveText("02 / 06");
+    await reviews.getByRole("button", { name: "Play slideshow" }).click();
+    await expect(
+      reviews.getByRole("button", { name: "Pause slideshow" }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
   test("hosts and the direct-booking section render from content", async ({
     page,
   }) => {
