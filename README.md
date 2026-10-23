@@ -73,7 +73,9 @@ its one retry). The whole job takes about two minutes.
   holds the booking and search widgets (`PropertyWidget`, `SearchWidget`,
   their client cores, and the stubs); `embeds/` holds `TikTokEmbed`;
   `home/` holds the landing-page sections composed by `app/page.tsx`;
-  `map/` holds the `CityMap` SVG; `area/` the area guide (the home-page
+  `map/` holds `CityMap`, which renders the Apple map (`AppleCityMap`, with
+  its callout in `callout.ts`) when a MapKit token is set and the drawn SVG
+  (`CitySketch`) otherwise; `area/` the area guide (the home-page
   TikTok row, the `/area` pick cards with per-house `DriveTimes`, and the
   property page's `NearbyPicks`); `practicals/`
   the policies list; `property/` the home-page `PropertyBand` and the pieces
@@ -169,6 +171,19 @@ falls back to `http://localhost:3000` when unset.
 (placeholder panels, the default from `content/site.ts`) and `live` (the
 loader from `cdn.hsptb.com`). It is inlined at build time. A house whose
 `hospitable.propertyId` is still null renders the stub in either mode.
+
+`NEXT_PUBLIC_MAPKIT_TOKEN` turns the "Where we are" map into a live Apple
+map (MapKit JS) with the site's own callout card on each marker
+(`components/map/AppleCityMap.tsx`, `components/map/callout.ts`). Create it in
+the Apple Developer account under Certificates, Identifiers & Profiles →
+Services → Maps → Tokens, as a MapKit JS token restricted to the site's
+domains (include the Vercel preview domain if previews should show it, and
+`localhost` for local testing). It is inlined at build time. Without it, or if
+Apple Maps fails to load or rejects the token, the map is the drawn SVG
+(`components/map/CitySketch.tsx`), which is what local dev and CI render.
+Marker positions come from each house's `mapArea` in `content/properties.ts`:
+neighbourhood landmarks, never the street address, and the map caps how far
+it zooms in.
 
 The contact route (`POST /api/contact`) emails inquiries through Resend using
 `RESEND_API_KEY`, `CONTACT_FROM`, and `CONTACT_TO` (comma-separated
