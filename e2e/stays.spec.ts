@@ -89,9 +89,14 @@ test.describe("property pages", () => {
       quotes.getByRole("heading", { level: 2, name: "What guests say" }),
     ).toBeVisible();
     await expect(quotes.locator("blockquote")).toHaveCount(3);
-    await expect(quotes.locator("figcaption").first()).toContainText(
-      "Alexander",
-    );
+    // The same slideshow as the home page: one review showing, chevrons step.
+    const current = quotes.locator("li[data-current]");
+    await expect(current).toHaveCount(1);
+    await expect(current.locator("figcaption")).toContainText("Alexander");
+    await expect(quotes.getByTestId("review-counter")).toHaveText("01 / 03");
+    await quotes.getByRole("button", { name: "Next review" }).click();
+    await expect(quotes.getByTestId("review-counter")).toHaveText("02 / 03");
+    await expect(current.locator("figcaption")).not.toContainText("Alexander");
   });
 
   test("shows every practicals row with the booking FAQ, and the map with this house highlighted", async ({
