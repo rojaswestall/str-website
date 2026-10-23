@@ -69,6 +69,18 @@ export const MapPinSchema = z.object({
 });
 export type MapPin = z.infer<typeof MapPinSchema>;
 
+/*
+ * Where the house's marker sits on the Apple map (components/map/AppleCityMap).
+ * Deliberately approximate: a neighbourhood landmark, never the street
+ * address, which stays internal. The bounds keep a typo from dropping a pin
+ * outside Austin.
+ */
+export const MapAreaSchema = z.object({
+  latitude: z.number().min(30.0).max(30.6),
+  longitude: z.number().min(-98.1).max(-97.5),
+});
+export type MapArea = z.infer<typeof MapAreaSchema>;
+
 export const PropertySchema = z
   .object({
     /** URL segment under /stays/. */
@@ -107,6 +119,7 @@ export const PropertySchema = z
     photos: z.array(PhotoSchema).min(1),
     quotes: z.array(QuoteSchema),
     mapPin: MapPinSchema,
+    mapArea: MapAreaSchema,
   })
   .refine(
     (property) => property.photos.some((photo) => photo.role === "hero"),

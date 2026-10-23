@@ -24,6 +24,10 @@ import { defineConfig, devices } from "@playwright/test";
  * hospitable.live.spec.ts: the one place the real loader shape is covered
  * (script attributes, remount on client-side navigation, stub fallback when
  * a house has no property id). The real loader is intercepted, never fetched.
+ * It also runs mapkit.live.spec.ts: that build carries a dummy
+ * NEXT_PUBLIC_MAPKIT_TOKEN, so the city map is the Apple map, with MapKit JS
+ * replaced by a stand-in. The default build pins the token empty, so every
+ * other spec sees the drawn SVG map.
  */
 
 const port = 3000;
@@ -71,7 +75,11 @@ export default defineConfig({
     {
       command: `pnpm build && pnpm start --port ${port}`,
       url: baseURL,
-      env: { NEXT_PUBLIC_HOSPITABLE_MODE: "stub", NEXT_PUBLIC_SITE_URL: "" },
+      env: {
+        NEXT_PUBLIC_HOSPITABLE_MODE: "stub",
+        NEXT_PUBLIC_SITE_URL: "",
+        NEXT_PUBLIC_MAPKIT_TOKEN: "",
+      },
       reuseExistingServer: !isCI,
       // CI has no separate build step, so the build log must be visible when
       // the server fails to start.
@@ -85,6 +93,7 @@ export default defineConfig({
       env: {
         NEXT_PUBLIC_HOSPITABLE_MODE: "live",
         NEXT_PUBLIC_SITE_URL: "",
+        NEXT_PUBLIC_MAPKIT_TOKEN: "e2e-mapkit-token",
         NEXT_DIST_DIR: ".next-live",
       },
       reuseExistingServer: !isCI,
