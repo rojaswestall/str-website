@@ -1,0 +1,332 @@
+{
+  "data": {
+    "id": "02f700e5-a510-4c4f-b9f6-9d4bebdf499a",
+    "name": "Dan Jean Unit A",
+    "public_name": "Fast WiFi |Garage| Yard | 3BR • 5 Beds • Sleeps 8+",
+    "picture": "https://a0.muscache.com/im/pictures/airflow/Hosting-1655329029936239948/original/e5c37926-1b17-4ca8-8fa5-4ecbdd556df3.jpg?aki_policy=small",
+    "address": {
+      "number": "<redacted>",
+      "street": "<redacted>",
+      "city": "Austin",
+      "state": "TX",
+      "postcode": "<redacted>",
+      "country": "US",
+      "country_name": "United States",
+      "coordinates": "<redacted>",
+      "display": "<redacted>"
+    },
+    "timezone": "-0500",
+    "listed": true,
+    "currency": "USD",
+    "summary": "Welcome to your stylish South Austin retreat—perfect for families, groups, and business travelers. This fully furnished 3-bedroom home features 5 comfortable beds (including a sleeper sofa), a bright open living space, and Smart TVs for relaxing nights in. Enjoy a fully equipped kitchen, cozy bedrooms, and a peaceful neighborhood just minutes from downtown, restaurants, and local hotspots.\n\nYou’ll love the space, comfort, and convenience this home offers. Book your South Austin stay today!",
+    "description": "This is unit A. One half of townhome / duplex\n\n$150 per pet",
+    "checkin": "16:00",
+    "checkout": "10:00",
+    "amenities": [
+      "ac",
+      "alfresco_dining",
+      "babysitter_recommendations",
+      "baby_monitor",
+      "baking_sheet",
+      "bathtub",
+      "bed_linens",
+      "bidet",
+      "blender",
+      "board_games",
+      "body_soap",
+      "books",
+      "bread_maker",
+      "carbon_monoxide_detector",
+      "ceiling_fan",
+      "changing_table",
+      "childrens_books_and_toys",
+      "childrens_dinnerware",
+      "cleaning_before_checkout",
+      "cleaning_products",
+      "clothes_drying_rack",
+      "coffee",
+      "coffee_maker",
+      "conditioner",
+      "cooking_basics",
+      "crib",
+      "dining_table",
+      "dishes_and_silverware",
+      "dishwasher",
+      "dryer",
+      "essentials",
+      "ethernet_connection",
+      "ev_charger",
+      "extra_pillows_and_blankets",
+      "fire_extinguisher",
+      "first_aid_kit",
+      "freezer",
+      "free_parking",
+      "free_parking_off_premises",
+      "garden_or_backyard",
+      "hair_dryer",
+      "hangers",
+      "heating",
+      "high_chair",
+      "hot_water",
+      "hot_water_kettle",
+      "iron",
+      "kayak",
+      "keurig_coffee_machine",
+      "kitchen",
+      "kitchenette",
+      "laptop_friendly_workspace",
+      "laundromat_nearby",
+      "long_term_stays_allowed",
+      "luggage_dropoff_allowed",
+      "microwave",
+      "mini_fridge",
+      "outdoor_seating",
+      "outlet_covers",
+      "oven",
+      "pack_n_play_travel_crib",
+      "patio_or_belcony",
+      "pocket_wifi",
+      "portable_fans",
+      "private_entrance",
+      "private_living_room",
+      "record_player",
+      "recycling",
+      "refrigerator",
+      "rice_maker",
+      "room_darkening_shades",
+      "safe",
+      "shampoo",
+      "shower_gel",
+      "single_level_home",
+      "smoke_detector",
+      "sound_system",
+      "stair_gates",
+      "stove",
+      "street_parking",
+      "table_corner_guards",
+      "toaster",
+      "trash_compacter",
+      "tv",
+      "wardrobe_or_closet",
+      "washer",
+      "wine_glasses",
+      "wireless_internet"
+    ],
+    "capacity": {
+      "max": 8,
+      "bedrooms": 3,
+      "beds": 5,
+      "bathrooms": 2
+    },
+    "room_details": [
+      {
+        "type": "bedroom",
+        "beds": [
+          {
+            "type": "king_bed",
+            "quantity": 1
+          }
+        ],
+        "private": true
+      },
+      {
+        "type": "bedroom",
+        "beds": [
+          {
+            "type": "queen_bed",
+            "quantity": 1
+          }
+        ],
+        "private": true
+      },
+      {
+        "type": "bedroom",
+        "beds": [
+          {
+            "type": "bunk_bed",
+            "quantity": 1
+          }
+        ],
+        "private": true
+      },
+      {
+        "type": "full_bathroom",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "exterior",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "laundry_room",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "backyard",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "patio",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "kitchenette",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "living_room",
+        "beds": [
+          {
+            "type": "sofa_bed",
+            "quantity": 1
+          }
+        ],
+        "private": true
+      },
+      {
+        "type": "dining_room",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "kitchen",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "full_bathroom",
+        "beds": [],
+        "private": true
+      }
+    ],
+    "property_type": "house",
+    "room_type": "Entire Home",
+    "tags": [],
+    "house_rules": {
+      "pets_allowed": true,
+      "smoking_allowed": false,
+      "events_allowed": false,
+      "children_allowed": true,
+      "infants_allowed": true
+    },
+    "bookings": {
+      "fees": [
+        {
+          "name": "cleaning_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 15100,
+            "formatted": "$151.00"
+          }
+        },
+        {
+          "name": "linens_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        },
+        {
+          "name": "management_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        },
+        {
+          "name": "community_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        },
+        {
+          "name": "resort_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        }
+      ],
+      "occupancy_based_rules": {
+        "guests_included": 1,
+        "extra_guest_fee": {
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        },
+        "pet_fee": {
+          "type": "fixed",
+          "value": {
+            "amount": 15000,
+            "formatted": "$150.00"
+          }
+        }
+      },
+      "discounts": [
+        {
+          "name": "weekly",
+          "type": "percent",
+          "value": 10
+        },
+        {
+          "name": "monthly",
+          "type": "percent",
+          "value": 21
+        }
+      ],
+      "listing_markups": [
+        {
+          "platform": "agoda",
+          "type": "percent",
+          "markup": 0
+        },
+        {
+          "platform": "airbnb",
+          "type": "percent",
+          "markup": 15.5
+        },
+        {
+          "platform": "booking",
+          "type": "percent",
+          "markup": 0
+        },
+        {
+          "platform": "direct",
+          "type": "percent",
+          "markup": 11
+        },
+        {
+          "platform": "homeaway",
+          "type": "percent",
+          "markup": 0
+        }
+      ],
+      "security_deposits": [],
+      "security_deposit_collector": null,
+      "booking_policies": {
+        "cancellation": ["100% refund until 24 hours after booking accepted"],
+        "payment_terms": {
+          "status": "aligned",
+          "description": ["Payment terms are aligned for this property."],
+          "grace_period": 48
+        }
+      },
+      "site_urls": []
+    },
+    "calendar_restricted": false,
+    "parent_child": null
+  }
+}
