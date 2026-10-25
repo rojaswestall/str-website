@@ -1,9 +1,11 @@
 # Phase 0 discovery notes (Hospitable Public API v2)
 
-Captured 2026-10-25 against the live account. Raw payloads in this folder are
-real responses; street addresses, coordinates and host names were redacted
-because the repo is public. `fetch.mjs` is the helper that produced them
-(`node --env-file=.env.local discovery/fetch.mjs GET /properties`).
+Captured 2026-10-25 against the live account with plain `fetch` calls
+(`Authorization: Bearer <PAT>` against `https://public.api.hospitable.com/v2`).
+The responses the unit tests need are kept verbatim in
+`lib/booking/__fixtures__/`, with street addresses, coordinates and host
+names redacted because the repo is public; everything else learned is
+written up here.
 
 ## Properties (`GET /properties?include=listings`)
 

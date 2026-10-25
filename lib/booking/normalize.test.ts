@@ -15,13 +15,14 @@ import {
 import { UpstreamPropertySchema } from "./upstream";
 
 /*
- * Fixtures are the real responses saved during Phase 0 (discovery/), so these
- * tests pin the field names and units Hospitable actually sends.
+ * Fixtures are real Hospitable responses captured during discovery
+ * (docs/hospitable-discovery.md), so these tests pin the field names and
+ * units Hospitable actually sends rather than what the schemas assume.
  */
 function fixture(name: string): unknown {
   return JSON.parse(
     readFileSync(
-      new URL(`../../discovery/${name}.json`, import.meta.url),
+      new URL(`./__fixtures__/${name}.json`, import.meta.url),
       "utf8",
     ),
   );

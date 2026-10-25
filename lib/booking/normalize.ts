@@ -16,7 +16,7 @@ import {
 
 /*
  * Pure translations from Hospitable's shapes to the site's. No I/O, so the
- * discovery payloads serve as test fixtures.
+ * captured responses in __fixtures__/ serve as test fixtures.
  */
 
 /** Hosts we will send a guest to; anything else is refused, never followed. */

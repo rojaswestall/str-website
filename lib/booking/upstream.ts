@@ -3,7 +3,7 @@ import { z } from "zod";
 /*
  * The parts of Hospitable Public API v2 responses this site reads, as zod
  * schemas, so a changed upstream shape fails loudly in one place. Field
- * names and units were verified against real responses (discovery/NOTES.md).
+ * names and units were verified against real responses (docs/hospitable-discovery.md).
  * Unknown fields pass through untouched.
  */
 
