@@ -59,6 +59,8 @@ export const HospitableConfigSchema = z.object({
     .string()
     .regex(/^\d+$/, { message: "propertyId is the numeric data-property-id" })
     .nullable(),
+  /** Public API property id (`GET /v2/properties`), used by the booking routes. Null keeps the house out of them. */
+  uuid: z.uuid().nullable(),
 });
 export type HospitableConfig = z.infer<typeof HospitableConfigSchema>;
 
