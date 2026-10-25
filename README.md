@@ -28,13 +28,14 @@ placeholder panels and the contact form runs dry. To run the full test suite:
 
 ```bash
 pnpm exec playwright install chromium     # once
-pnpm test                                  # builds twice, runs 78 tests
+pnpm test:unit                             # 32 unit tests, no server
+pnpm test                                  # builds twice, runs 78 e2e tests
 ```
 
 What CI runs, in order:
 
 ```bash
-pnpm check:content && pnpm check:colors && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test
+pnpm check:content && pnpm check:colors && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:unit && pnpm test
 ```
 
 ## Documentation
@@ -44,7 +45,9 @@ pnpm check:content && pnpm check:colors && pnpm lint && pnpm format:check && pnp
   content.
 - [`docs/architecture.md`](docs/architecture.md) — what is built: routes,
   components, the content model, theming, the Hospitable integration, the
-  contact API, SEO, and the CSP.
+  contact API, the booking API, SEO, and the CSP.
+- [`docs/hospitable-discovery.md`](docs/hospitable-discovery.md) — what the
+  Hospitable Public API returns, verified against the live account.
 - [`docs/plan.md`](docs/plan.md) — remaining work only: go-live checklist,
   `[TBC]` content, open decisions, engineering follow-ups.
 - `design/artifact.html` — the static visual reference. Open it in a

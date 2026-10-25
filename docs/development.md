@@ -40,14 +40,21 @@ from React's dev tooling (production does not use eval).
 Copy `.env.example` to `.env.local` if you want to change anything; every
 variable is optional locally.
 
-| Variable                      | Default / unset                 | Effect                                                                      |
-| ----------------------------- | ------------------------------- | --------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`        | `http://localhost:3000`         | Origin for canonical, sitemap, OG, and JSON-LD URLs. Empty counts as unset. |
-| `NEXT_PUBLIC_HOSPITABLE_MODE` | `site.hospitable.mode` (`stub`) | `stub` shows placeholder panels; `live` loads the real Hospitable widgets.  |
-| `RESEND_API_KEY`              | unset → dry run                 | Without it, `/api/contact` logs the message and returns success.            |
-| `CONTACT_FROM`                | —                               | Sender on the Resend-verified domain. Required once a key is set.           |
-| `CONTACT_TO`                  | —                               | Comma-separated recipients. Required once a key is set.                     |
-| `NEXT_DIST_DIR`               | `.next`                         | Build directory; Playwright uses `.next-live` for the live-mode build.      |
+| Variable                                 | Default / unset                 | Effect                                                                                                  |
+| ---------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                   | `http://localhost:3000`         | Origin for canonical, sitemap, OG, and JSON-LD URLs. Empty counts as unset.                             |
+| `NEXT_PUBLIC_HOSPITABLE_MODE`            | `site.hospitable.mode` (`stub`) | `stub` shows placeholder panels; `live` loads the real Hospitable widgets.                              |
+| `RESEND_API_KEY`                         | unset → dry run                 | Without it, `/api/contact` logs the message and returns success.                                        |
+| `CONTACT_FROM`                           | —                               | Sender on the Resend-verified domain. Required once a key is set.                                       |
+| `CONTACT_TO`                             | —                               | Comma-separated recipients. Required once a key is set.                                                 |
+| `NEXT_DIST_DIR`                          | `.next`                         | Build directory; Playwright uses `.next-live` for the live-mode build.                                  |
+| `HOSPITABLE_PERSONAL_ACCESS_TOKEN`       | unset → booking routes 503      | Public API v2 token (read access). Server-only; never prefix it `NEXT_PUBLIC_`. Alias `HOSPITABLE_PAT`. |
+| `HOSPITABLE_CUSTOM_SITE_ID`              | `site.hospitable.siteUuid`      | Sent with every quote so checkout is attributed to this site.                                           |
+| `AIRBNB_MARKUP_PCT`, `DIRECT_MARKUP_PCT` | `15.5`, `11`                    | Fallback markups for a house whose Hospitable markups are missing.                                      |
+| `AIRBNB_LISTING_URLS`                    | `airbnbUrl` from content        | JSON map of property id → Airbnb URL for the price comparison link.                                     |
+| `COMPARISON_ENABLED`                     | `true`                          | `false` hides the Airbnb price comparison.                                                              |
+| `MAX_NIGHTS`                             | `90`                            | Longest stay `/api/quote` will price.                                                                   |
+| `BOOKING_ADMIN_TOKEN`                    | unset → disabled                | Token for a planned admin comparison check (16+ chars).                                                 |
 
 `NEXT_PUBLIC_*` values are inlined at build time; restart `pnpm dev` or
 rebuild after changing them.
@@ -56,6 +63,11 @@ rebuild after changing them.
 `NEXT_PUBLIC_HOSPITABLE_MODE=live` in `.env.local` and open any
 `/stays/<slug>` (all three houses have property ids) or the home hero search.
 The widgets talk to Hospitable's production services.
+
+**Trying the booking API locally:** set `HOSPITABLE_PERSONAL_ACCESS_TOKEN`
+in `.env.local`, run `pnpm dev`, and call `/api/properties`,
+`/api/calendar/<uuid>`, or `POST /api/quote`. These hit the live Hospitable
+account; a quote creates a quote record there (no reservation).
 
 ## Scripts
 
@@ -70,12 +82,13 @@ The widgets talk to Hospitable's production services.
 | `pnpm check:colors`  | Fail on raw colours under `components/` and `app/`                      |
 | `pnpm format`        | Prettier, write mode                                                    |
 | `pnpm format:check`  | Prettier, check only (CI)                                               |
+| `pnpm test:unit`     | `node:test` over `lib/**/*.test.ts`; no server, no network              |
 | `pnpm test`          | Playwright against two fresh production builds (alias: `pnpm test:e2e`) |
 
 Before pushing, run what CI runs:
 
 ```bash
-pnpm check:content && pnpm check:colors && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test
+pnpm check:content && pnpm check:colors && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:unit && pnpm test
 ```
 
 `docs/plan.md` and `design/artifact.html` are in `.prettierignore`; every
@@ -83,10 +96,21 @@ other file, including these docs, is formatted by Prettier.
 
 ## Tests
 
-All tests are Playwright end-to-end specs in `e2e/`, run against
-**production builds**, never `next dev` (Cache Components behave differently
-in dev; see the 404 note in [`architecture.md`](architecture.md)). There are
-no unit tests; the content rules live in `pnpm check:content`.
+Two kinds, plus the content rules in `pnpm check:content`:
+
+- **Unit tests** (`pnpm test:unit`, 32 tests, about a second): Node's built-in
+  test runner via `tsx` over `lib/**/*.test.ts`. Today they cover the booking
+  code (`lib/booking/{cache,config,dates,normalize}.test.ts`) against
+  recorded Hospitable responses in `lib/booking/__fixtures__/` (addresses,
+  coordinates, and host names redacted; the repo is public). No server, no
+  network, no token.
+- **End-to-end tests** (`pnpm test`): Playwright specs in `e2e/`, run against
+  **production builds**, never `next dev` (Cache Components behave
+  differently in dev; see the 404 note in
+  [`architecture.md`](architecture.md)). The booking API routes have no e2e
+  coverage yet; without a token they would only answer 503.
+
+### End-to-end
 
 `pnpm test` starts two web servers (both defined in `playwright.config.ts`):
 
@@ -124,6 +148,10 @@ dry.
 ### Running a subset
 
 ```bash
+node --import tsx --test lib/booking/normalize.test.ts   # one unit test file
+```
+
+```bash
 pnpm test e2e/stays.spec.ts                         # one file
 pnpm test e2e/a11y.spec.ts --project=chromium       # one project
 pnpm exec playwright test -g "booking panel"       # by test title
@@ -158,7 +186,8 @@ pnpm exec playwright test --list                    # list without running
 `.github/workflows/ci.yml` runs one job on `ubuntu-latest` for every pull
 request and every push to `main`: install (frozen lockfile, pnpm store
 cached), `check:content`, `check:colors`, `lint`, `format:check`,
-`typecheck`, `playwright install --with-deps chromium`, then `pnpm test`.
+`typecheck`, `test:unit`, `playwright install --with-deps chromium`, then
+`pnpm test`.
 There is no separate build step: the two Playwright web servers build the
 stub and live copies and pipe the build log, so a build error fails the e2e
 step with the Next output under `[WebServer]`. In CI, Playwright uses one

@@ -51,6 +51,9 @@ last 24 hours resolves to the previous one; that is intended.
 | `/area`                              | `app/area/page.tsx`                                   | static     | Area picks with drive times from every house                         |
 | `/search`                            | `app/search/page.tsx`                                 | static     | Hospitable search results; `noindex`, not in the sitemap             |
 | `/api/contact`                       | `app/api/contact/route.ts`                            | dynamic    | POST only (other methods 405)                                        |
+| `/api/properties`                    | `app/api/properties/route.ts`                         | dynamic    | Booking API: the bookable houses (see Booking API)                   |
+| `/api/calendar/[propertyId]`         | `app/api/calendar/[propertyId]/route.ts`              | dynamic    | Booking API: availability and nightly prices                         |
+| `/api/quote`                         | `app/api/quote/route.ts`                              | dynamic    | Booking API: POST, prices a stay and returns the checkout URL        |
 | `/sitemap.xml`                       | `app/sitemap.ts`                                      | static     | `/`, the three stays, `/area`                                        |
 | `/robots.txt`                        | `app/robots.ts`                                       | static     | Disallows `/kitchen-sink`, `/api/`, `/_404/`                         |
 | `/opengraph-image`                   | `app/opengraph-image.tsx`                             | static     | Placeholder share card                                               |
@@ -128,7 +131,10 @@ the dev-mode path. Keep the `stays.spec.ts` status assertion.
 - `content/` — typed site content (below).
 - `lib/` — non-component code: `fonts.ts` (`next/font`, self-hosted),
   `site-url.ts`, `seo.ts`, `og-font.ts`, `cx.ts`, `csp.ts`, `hospitable.ts`,
-  `hooks/useInjectedScript.ts`, `contact/` (schema, rate limit, email).
+  `hooks/useInjectedScript.ts`, `rateLimit.ts` (shared by the contact and
+  quote routes), `contact/` (schema, email), `booking/` (the Hospitable
+  Public API client behind the booking routes, with `*.test.ts` unit tests
+  and recorded responses in `__fixtures__/`).
 - `proxy.ts` — the unknown-slug 404 rewrite.
 - `scripts/` — `check-content.ts`, `check-colors.ts`.
 - `public/photos/` — one folder per house plus `area/` and `home/`.
@@ -170,7 +176,8 @@ fails `next build` and `pnpm check:content`. **Always import from
   `siteUuid`, `theme` (`boutique`), and `searchWidgetId`. Each property has
   `hospitable.propertyId`: Oak Hill `2338067` ("Parkwood A" in Hospitable),
   South Austin `2338069` ("Dan Jean Unit A"), Fire Side `2338068` ("Dan Jean
-  B").
+  B"), and `hospitable.uuid`, its Public API id used by the booking routes
+  (null keeps a house out of them).
 - **Map pins** are `mapPin: { x, y }` in `CityMap`'s 400×400 viewBox.
 - **Area picks** carry an `id` (for `/area#<id>` anchors) and `driveMinutes`
   keyed by every house slug; `content/index.ts` checks ids are unique and
@@ -266,7 +273,7 @@ Airbnb link) and, in live mode, `console.warn` once.
   indistinguishable); `400 { ok: false, message, errors }` with one message
   per field; `429` with `Retry-After`; `500` with a generic message (the
   cause is only logged). Non-JSON bodies are 400.
-- `rateLimit.ts` — in-memory sliding window, 5 valid inquiries per address
+- `lib/rateLimit.ts` — in-memory sliding window, 5 valid inquiries per address
   per 10 minutes, keyed on the first `x-forwarded-for` entry (shared
   `unknown` bucket without it). Per instance on Vercel; Upstash is the
   documented drop-in.
@@ -281,6 +288,37 @@ pending state, maps 400 errors inline (focusing the first), shows the API's
 message for 429/500, and replaces itself with a thank-you on success. The
 honeypot sits off-screen with `tabindex="-1"` (deliberately not
 `display:none`).
+
+## Booking API (first part of a custom booking widget)
+
+Three server routes put the Hospitable Public API v2 behind the site, so the
+browser never sees the access token. No page uses them yet: the widget UI
+that will call them is still to be built (see [`plan.md`](plan.md)), and the
+house pages still embed Hospitable's own booking iframe. They only read and
+quote; nothing writes reservations, calendars, or messages.
+
+- `GET /api/properties` — houses listed in `content/` that Hospitable also
+  lists, with capacity, hero image, check-in/out times, and Hospitable's
+  per-channel markups. Cached an hour per instance.
+- `GET /api/calendar/:propertyId?start&end` — per day: `available`, `price`,
+  `minStay`, `closedToArrival`, `closedToDeparture`. The 18-month window is
+  fetched once per house and cached five minutes; requests are slices of it.
+- `POST /api/quote` — zod-validated, 20 per minute per client address
+  (`lib/rateLimit.ts`), never cached. Returns Hospitable's totals, a nightly
+  breakdown derived from the calendar and reconciled against `sub_total`,
+  and the hosted checkout URL. Errors carry a `code` (`INVALID`,
+  `NOT_FOUND`, `UNAVAILABLE`, `MIN_STAY`, `MAX_NIGHTS`, `MAX_GUESTS`,
+  `RATE_LIMITED`, `UPSTREAM`, `NOT_CONFIGURED`) and a message a guest can
+  be shown. Guest details are forwarded, never logged or stored.
+
+Code is in `lib/booking/` (`config.ts` reads the environment, `client.ts`
+holds the token and is `server-only`, `normalize.ts` maps Hospitable
+payloads, `server.ts` ties it together). Without
+`HOSPITABLE_PERSONAL_ACCESS_TOKEN` every route answers `503
+NOT_CONFIGURED`. Upstream calls log method, path, status, and duration only.
+What the Public API actually returns (prices in integer cents, check-in-day
+`min_stay`, no nightly breakdown or expiry on quotes, markups per house) is
+recorded in [`hospitable-discovery.md`](hospitable-discovery.md).
 
 ## SEO
 

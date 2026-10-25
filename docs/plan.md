@@ -32,6 +32,9 @@ later item depends on the earlier ones.
   | `CONTACT_FROM`                | `Name <addr@<domain>>`  | same as prod if key set    |
   | `CONTACT_TO`                  | comma-separated inboxes | same as prod if key set    |
 
+  | `HOSPITABLE_PERSONAL_ACCESS_TOKEN` | Public API token | same (needed to try the booking API on a preview) |
+  | `HOSPITABLE_CUSTOM_SITE_ID`   | the widget's site uuid  | same                       |
+
   `NEXT_PUBLIC_*` values are inlined at build time: redeploy after changing
   them. Without `NEXT_PUBLIC_SITE_URL` every canonical, sitemap, OG, and
   JSON-LD URL says `http://localhost:3000`. Set all three Resend values
@@ -80,6 +83,26 @@ later item depends on the earlier ones.
         Debugger, X card validator, and Slack once the final share cards
         exist (stay OG image URLs carry no cache-busting hash).
 
+## 1b. Custom booking widget (in progress)
+
+The server half is merged (#36): `/api/properties`, `/api/calendar`, and
+`/api/quote` over the Hospitable Public API (see "Booking API" in
+[`architecture.md`](architecture.md)). Still to do:
+
+- [ ] The widget UI on the house pages (property switcher, priced calendar,
+      quote with the Airbnb comparison, hand-off to Hospitable's hosted
+      checkout), replacing or sitting beside the embedded booking iframe.
+- [ ] The admin comparison check (`GET /api/admin/comparison-check`, gated
+      by `BOOKING_ADMIN_TOKEN`); the variable exists but the route does not.
+- [ ] End-to-end coverage for the booking routes and the widget (today only
+      unit tests over recorded responses).
+- [ ] CSP: add `public.api.hospitable.com` only if the browser ever calls it
+      directly (the routes are server-side, so it should not).
+- [ ] **Hospitable (human):** set per-channel markups on Parkwood A
+      (Oak Hill) and Dan Jean B (Fire Side). Only Dan Jean Unit A (South
+      Austin) has them, so it is the only house the price comparison is
+      right for.
+
 ## 2. Content still marked `[TBC]` (hosts to supply)
 
 Everything below renders today as a dashed "to confirm" gap. Edit the file
@@ -123,7 +146,7 @@ named, then run `pnpm check:content`. See "Editing content" in
       name and email; analytics is cookieless).
 - [ ] Whether to move the repo to a GitHub org (nothing depends on it).
 - [ ] Shared rate limiting: the contact limiter is in memory per function
-      instance. Swap in Upstash (see the comment in `lib/contact/rateLimit.ts`)
+      instance. Swap in Upstash (see the comment in `lib/rateLimit.ts`)
       only if spam gets through.
 
 ## 4. Engineering follow-ups (no human input needed)
