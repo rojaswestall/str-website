@@ -3,27 +3,31 @@ import { defineConfig, devices } from "@playwright/test";
 /*
  * Two Chromium projects, each against its own production build. The dev
  * server is never used: with Cache Components the two behave differently
- * (see the step 9 notes on the 404 status in docs/plan.md).
+ * (see the 404 status note in docs/architecture.md).
  *
  * `chromium` (port 3000, default build, NEXT_PUBLIC_HOSPITABLE_MODE=stub)
  * runs every spec except `*.live.spec.ts`:
  *   home.spec.ts          the landing page, its sections, and the site shell
  *   stays.spec.ts         the three house pages, the stub per house, both 404s
+ *   area.spec.ts          /area: every pick with its drive time from each house
  *   theme.spec.ts         system preference, toggle, persistence, fonts
  *   contact-api.spec.ts   POST /api/contact through the `request` fixture
  *   contact-form.spec.ts  the form in the browser against the real route
  *   hospitable.spec.ts    stub mode makes no loader request; the CSP header
  *   seo.spec.ts           sitemap, robots, OG images, JSON-LD, canonical tags
  *   kitchen-sink.spec.ts  /kitchen-sink is a 404 in production
- *   a11y.spec.ts          axe on /, one stay, and the 404 in both themes
- *   visual.spec.ts        full-page screenshots into e2e/__screenshots__/
+ *   a11y.spec.ts          axe on /, one stay, /area, /search, and the 404 in
+ *                         both themes
+ *   visual.spec.ts        full-page screenshots of /, one stay, and /search
+ *                         into e2e/__screenshots__/
  *                         (gitignored; CI uploads them as an artifact)
  *
  * `chromium-live` (port 3001, a second build with
  * NEXT_PUBLIC_HOSPITABLE_MODE=live into .next-live) runs only
  * hospitable.live.spec.ts: the one place the real loader shape is covered
- * (script attributes, remount on client-side navigation, stub fallback when
- * a house has no property id). The real loader is intercepted, never fetched.
+ * (script attributes, remount on client-side navigation, no missing-id
+ * warnings, the search bar and /search). The real loaders are intercepted,
+ * never fetched.
  */
 
 const port = 3000;

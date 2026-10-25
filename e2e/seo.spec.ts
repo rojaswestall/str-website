@@ -10,7 +10,7 @@ const NAMES: Record<(typeof SLUGS)[number], string> = {
 /*
  * The test server runs without NEXT_PUBLIC_SITE_URL, so every absolute URL
  * must resolve to the Playwright baseURL (http://localhost:3000). On Vercel
- * the same code emits the real origin; see the step 11 notes in docs/plan.md.
+ * the same code emits the real origin; see "SEO" in docs/architecture.md.
  */
 function origin(baseURL: string | undefined) {
   return new URL(baseURL ?? "http://localhost:3000").origin;
