@@ -4,8 +4,9 @@ Direct-booking website for three short-term rental houses in Austin, Texas,
 run by Alexis, Gabe, and Aaron. Guests book through Hospitable's embeddable
 widgets; Airbnb stays available as a secondary link.
 
-**Status:** built and green in CI, not deployed yet. Go-live steps and the
-content still to confirm are in [`docs/plan.md`](docs/plan.md).
+**Status:** built and green in CI, with the Vercel project and domain set
+up. Resend (contact email), the enforcing CSP, and the content still to
+confirm are in [`docs/plan.md`](docs/plan.md).
 
 ## Stack
 

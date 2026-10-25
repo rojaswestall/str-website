@@ -13,15 +13,16 @@ ships, in the same PR.
 Design reference: `design/artifact.html` (static, do not edit). Original
 artifact: https://claude.ai/artifact/8bKWdaGXgFA41g5RrFBa32.
 
-## 1. Go live (needs a human with Vercel, DNS, Hospitable, and Resend access)
+## 1. Go live (needs a human with Vercel, Hospitable, and Resend access)
 
-Do these in order; each later item depends on the earlier ones.
+Done: the Vercel project and the custom domain. Do the rest in order; each
+later item depends on the earlier ones.
 
-- [ ] **Accounts and domain.** Pick the domain and who controls DNS; the
-      Vercel account/team to deploy under; a Resend account.
-- [ ] **Vercel project.** Create it from `rojaswestall/str-website`
-      (framework Next.js, Node 24). Enable Web Analytics in the dashboard.
-      Set the environment variables in the table below.
+- [ ] **Resend.** Create the account, verify the sending domain, pick the
+      `from` address (it must be on that domain), and decide the recipients
+      (all three hosts or one shared inbox).
+- [ ] **Vercel environment variables.** Add the three Resend values, and
+      confirm the rest are set as below (and Web Analytics is enabled):
 
   | Variable                      | Production              | Preview                    |
   | ----------------------------- | ----------------------- | -------------------------- |
@@ -35,11 +36,10 @@ Do these in order; each later item depends on the earlier ones.
   them. Without `NEXT_PUBLIC_SITE_URL` every canonical, sitemap, OG, and
   JSON-LD URL says `http://localhost:3000`. Set all three Resend values
   together; a key without the two addresses makes `/api/contact` answer 500.
+  Until then the form answers success but only logs each inquiry
+  (`[contact] RESEND_API_KEY is not set; dry run` in the function log), so
+  messages sent through the live site are not delivered.
 
-- [ ] **Domain.** Add it to the Vercel project and set the DNS records
-      Vercel shows.
-- [ ] **Resend.** Verify the sending domain; `CONTACT_FROM` must be on it.
-      Decide the recipients (all three hosts or one shared inbox).
 - [ ] **Hospitable dashboard.**
   - [ ] Confirm the plan includes Direct with self-hosted widgets, and that
         Stripe/payments are set up in Hospitable Direct.
@@ -106,7 +106,7 @@ named, then run `pnpm check:content`. See "Editing content" in
       keyed by slug; `null` renders t.b.c.). More than three is fine. The
       three photos under `public/photos/area/` are still striped
       placeholders.
-- [ ] Domain in `site.domain` (`content/site.ts`) once chosen.
+- [ ] The live domain in `site.domain` (`content/site.ts`; still `[TBC]`).
 - [ ] Confirm you hold the rights to every photo in `public/photos/`.
 - [ ] Brand assets: wordmark (text-only is fine), favicon, default OG image.
       Placeholders today: the "AC" monogram (`app/icon.svg`,
@@ -119,9 +119,6 @@ named, then run `pnpm check:content`. See "Editing content" in
 
 ## 3. Decisions still open
 
-- [ ] Approve or adjust the dark palette in `app/globals.css`. Measured
-      contrast on paper (light / dark): ink 12.3 / 14.9, ink-soft 7.4 / 11.2,
-      muted 5.2 / 6.6, accent 3.3 / 5.2 (accent is decoration only).
 - [ ] Whether a privacy policy page is needed (the contact form collects a
       name and email; analytics is cookieless).
 - [ ] Whether to move the repo to a GitHub org (nothing depends on it).
@@ -146,7 +143,7 @@ named, then run `pnpm check:content`. See "Editing content" in
       text exists at mount and leaves via `display:none`;
       `components/hospitable/HospitableWidget.tsx`).
 - [ ] **Tailwind default palette.** `pnpm check:colors` does not catch
-      utilities like `bg-gray-100`. Once the palette is approved, add
+      utilities like `bg-gray-100`. Now that the palette is approved, add
       `--color-*: initial;` to `@theme` in `app/globals.css` (or a second
       pattern in `scripts/check-colors.ts`).
 - [ ] **Photo dimming in dark mode.** `PhotoFrame` applies

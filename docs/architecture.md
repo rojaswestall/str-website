@@ -14,10 +14,12 @@ secondary link. The look is ported from the "Keep Austin Staying" artifact
 (`design/artifact.html`): warm paper palette, Newsreader headlines, IBM Plex
 Sans body, IBM Plex Mono labels, plus a dark mode.
 
-**Status:** feature-complete for launch and green in CI; not deployed yet.
-The site still builds in Hospitable `stub` mode by default and the CSP is
-report-only. Some copy is still `[TBC]` (rates, policies, host bios, area
-picks). See [`plan.md`](plan.md).
+**Status:** feature-complete and green in CI; the Vercel project and custom
+domain are set up. Not yet live for guests: Resend is not set up (the contact
+form runs dry and delivers nothing), the CSP is still report-only, and some
+copy is still `[TBC]` (rates, policies, host bios, area picks). The repo
+default for Hospitable is `stub` mode; production turns on `live` through
+`NEXT_PUBLIC_HOSPITABLE_MODE`. See [`plan.md`](plan.md).
 
 ## Stack and key decisions
 
@@ -32,7 +34,7 @@ picks). See [`plan.md`](plan.md).
 | Contact   | `POST /api/contact` sends via Resend; dry run without a key                                           |
 | Theme     | `next-themes` on `data-theme`, system preference plus a light / dark / system toggle                  |
 | Analytics | Vercel Web Analytics (`@vercel/analytics`, cookieless)                                                |
-| Hosting   | Vercel (not set up yet)                                                                               |
+| Hosting   | Vercel, on the custom domain                                                                          |
 | Tests     | Playwright against production builds, axe-core for accessibility                                      |
 
 Dependencies are kept on the latest stable releases their peers support.
@@ -199,7 +201,8 @@ Accessibility baseline: one h1 per route, landmarks (`banner`, named
 `navigation`s, `main`, `contentinfo`), alt text from content, a global
 `:focus-visible` ring (2 px ink, 3 px offset), `prefers-reduced-motion`
 zeroes transitions and pauses the slideshows, `PhotoFrame` dims photos with
-`dark:brightness-90`. `accent` (3.3:1 on light paper) is decoration only.
+`dark:brightness-90`. `accent` (3.3:1 on light paper) is decoration only. The dark palette is
+approved as is.
 axe reports zero violations on every audited page in both themes.
 
 ## Hospitable integration
