@@ -1,10 +1,10 @@
 /*
  * Shared Hospitable constants and the mode switch.
  *
- * The dashboard snippet (docs/plan.md, step 6) is a single script tag:
+ * The dashboard snippet (docs/architecture.md) is a single script tag:
  *
  *   <script src="https://cdn.hsptb.com/direct-booking-widget/widget-loader.prod.js"
- *           data-site-uuid="…" data-property-id="…" data-theme="multi"></script>
+ *           data-site-uuid="…" data-property-id="…" data-theme="…"></script>
  *
  * The loader reads its own data-* attributes, pings api.hospitable.com, and
  * inserts an <iframe id="booking-iframe"> from booking.hospitable.com directly

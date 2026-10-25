@@ -3,7 +3,7 @@ import type { AreaPick } from "./types";
 /*
  * Area-guide picks, shown on /area and, closest first, in "Near this house" on
  * each property page. Titles and blurbs are placeholders until the hosts
- * choose the places (docs/plan.md, "Needed before step 3"); the artifact's
+ * choose the places (docs/plan.md, "Content still marked [TBC]"); the artifact's
  * prompt text for each slot is kept as the blurb so the page still reads as a
  * brief.
  *

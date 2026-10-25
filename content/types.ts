@@ -51,7 +51,7 @@ export type Quote = z.infer<typeof QuoteSchema>;
  *
  * The dashboard snippet (Hospitable → Direct → self-hosted site) is a single
  * `<script>` tag whose `data-property-id` names the house; there is no
- * separate "widget id". The real snippet is recorded in docs/plan.md, step 6.
+ * separate "widget id". The real snippet is recorded in docs/architecture.md.
  */
 export const HospitableConfigSchema = z.object({
   /** `data-property-id` from the snippet. Null until the house is matched to one (open item, step 6 / 14). */

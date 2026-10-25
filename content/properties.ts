@@ -4,13 +4,13 @@ import type { Property } from "./types";
 /*
  * The three houses, seeded from design/artifact.html.
  *
- * Still unconfirmed (docs/plan.md, "Needed before step 3"):
- * - final names for South Austin Stay and Fire Side Home
+ * Still unconfirmed (docs/plan.md, "Content still marked [TBC]"):
+ * - final house names, if these are not final
  * - nightly rate and minimum nights (null here; render as "t.b.c.")
- * - Hospitable property ids for Oak Hill and South Austin Stay (`data-property-id`
- *   in each house's dashboard snippet; null renders the stub). Fire Side Home
- *   is "Dan Jean B" in Hospitable, property 2338068, from the snippet in
- *   docs/plan.md.
+ *
+ * `hospitable.propertyId` is the `data-property-id` from each house's
+ * dashboard snippet (see docs/architecture.md, "Hospitable integration");
+ * the comment beside each names the listing in Hospitable.
  *
  * Photos live in content/photos.ts. Guest quotes, names, and months are from
  * the Airbnb reviews (whitespace and stray typos tidied; the month is when

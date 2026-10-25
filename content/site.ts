@@ -1,8 +1,8 @@
 import type { SiteConfig } from "./types";
 
 /*
- * Site-wide configuration. The domain is an open item (docs/plan.md, "Needed
- * before step 7 / 14"); it is a `[TBC]` placeholder and should render as
+ * Site-wide configuration. The domain is an open item (docs/plan.md, "Go
+ * live"); it is a `[TBC]` placeholder and should render as
  * such, never as a live link.
  *
  * Hospitable: `siteUuid` and `theme` come from the real embed snippet. The
@@ -21,7 +21,7 @@ export const site: SiteConfig = {
   domain: "[TBC] domain",
   hospitable: {
     mode: "stub",
-    // From the dashboard snippet pasted into docs/plan.md (step 6).
+    // From the dashboard snippet (docs/architecture.md, "Hospitable integration").
     siteUuid: "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb",
     theme: "boutique",
     // `identifier` from Direct → Property Search (step 14).
