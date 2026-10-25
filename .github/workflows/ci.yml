@@ -47,6 +47,11 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # node:test over lib/**/*.test.ts: the booking normalizers against the
+      # real Hospitable payloads saved in discovery/. No server, no network.
+      - name: Unit tests
+        run: pnpm test:unit
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 

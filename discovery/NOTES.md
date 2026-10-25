@@ -13,6 +13,11 @@ because the repo is public. `fetch.mjs` is the helper that produced them
 | Dan Jean B      | `cb8bcbdd-75f6-49f4-b9a5-cea0b8df861d` | 2338068                   | 1598953749522814358 | 0%            | 0%            |
 | Dan Jean Unit A | `02f700e5-a510-4c4f-b9f6-9d4bebdf499a` | 2338069                   | 1655329029936239948 | 11%           | 15.5%         |
 
+**Decision (2026-10-25):** only Dan Jean Unit A has the per-channel markups
+configured, so it is the development and test property. Parkwood A and
+Dan Jean B are ignored for now; the widget reads markups per property from
+the API, so they pick up the comparison automatically once markups are set.
+
 All three: `listed: true`, `currency: USD`, `capacity.max: 8`, 3 bedrooms,
 check-in 16:00 / check-out 10:00, pets allowed, `calendar_restricted: false`.
 `timezone` comes back as the UTC offset string `"-0500"`, not an IANA zone,
