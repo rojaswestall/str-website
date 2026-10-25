@@ -18,6 +18,16 @@ configured, so it is the development and test property. Parkwood A and
 Dan Jean B are ignored for now; the widget reads markups per property from
 the API, so they pick up the comparison automatically once markups are set.
 
+**Airbnb check (2026-10-25, Dan Jean Unit A):** the Airbnb host calendar
+shows `floor(base × 1.155)` to the dollar on all three dates checked, so
+the comparison formula is verified against real Airbnb numbers.
+
+| Date       | Calendar base | floor(base × 1.155) | Airbnb host calendar |
+| ---------- | ------------- | ------------------- | -------------------- |
+| 2026-11-02 | $112          | $129                | $129                 |
+| 2026-12-31 | $223          | $257                | $257                 |
+| 2027-02-25 | $203          | $234                | $234                 |
+
 All three: `listed: true`, `currency: USD`, `capacity.max: 8`, 3 bedrooms,
 check-in 16:00 / check-out 10:00, pets allowed, `calendar_restricted: false`.
 `timezone` comes back as the UTC offset string `"-0500"`, not an IANA zone,
