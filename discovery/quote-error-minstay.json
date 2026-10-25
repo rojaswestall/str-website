@@ -1,0 +1,4 @@
+{
+  "status_code": 422,
+  "reason_phrase": "The length of stay is below your minimum stay requirement for these dates."
+}

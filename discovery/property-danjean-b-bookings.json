@@ -1,0 +1,338 @@
+{
+  "data": {
+    "id": "cb8bcbdd-75f6-49f4-b9a5-cea0b8df861d",
+    "name": "Dan Jean B",
+    "public_name": "Spacious 3BR Home • Near Radio Coffee • Fast Wi-Fi",
+    "picture": "https://a0.muscache.com/im/pictures/hosting/Hosting-1598953749522814358/original/dcae6acf-aedc-4145-81a2-f58f79edbc75.jpeg?aki_policy=small",
+    "address": {
+      "number": "<redacted>",
+      "street": "<redacted>",
+      "city": "Austin",
+      "state": "TX",
+      "postcode": "<redacted>",
+      "country": "US",
+      "country_name": "United States",
+      "coordinates": "<redacted>",
+      "display": "<redacted>"
+    },
+    "timezone": "-0500",
+    "listed": true,
+    "currency": "USD",
+    "summary": "Enjoy this spacious 3BR/2.5BA home in South Austin (one half of townhome), steps from the popular Radio Coffee & Beer. Bright open layout, fully equipped kitchen, fast Wi-Fi, smart TV, and comfortable bedrooms make it perfect for families, groups, or business travelers. Quiet neighborhood with easy access to Downtown, restaurants, nightlife, and major highways. Ideal for weekend getaways or extended stays—experience comfort, convenience, and the best of Austin living.",
+    "description": "We have a garage where you can plug in your EV and use the laundry. Also a fully fenced yard! So bring your furry friends :)\n\n$150 per pet",
+    "checkin": "16:00",
+    "checkout": "10:00",
+    "amenities": [
+      "ac",
+      "alfresco_dining",
+      "babysitter_recommendations",
+      "baby_bath",
+      "baby_monitor",
+      "baking_sheet",
+      "bathtub",
+      "beach_essentials",
+      "bed_linens",
+      "bidet",
+      "blender",
+      "board_games",
+      "body_soap",
+      "books",
+      "bread_maker",
+      "carbon_monoxide_detector",
+      "ceiling_fan",
+      "changing_table",
+      "childrens_books_and_toys",
+      "childrens_dinnerware",
+      "cleaning_before_checkout",
+      "cleaning_products",
+      "clothes_drying_rack",
+      "coffee",
+      "coffee_maker",
+      "conditioner",
+      "cooking_basics",
+      "crib",
+      "dining_table",
+      "dishes_and_silverware",
+      "dishwasher",
+      "dryer",
+      "essentials",
+      "ethernet_connection",
+      "ev_charger",
+      "extra_pillows_and_blankets",
+      "fire_extinguisher",
+      "fire_pit",
+      "first_aid_kit",
+      "freezer",
+      "free_parking",
+      "garden_or_backyard",
+      "hair_dryer",
+      "hangers",
+      "heating",
+      "high_chair",
+      "hot_water",
+      "hot_water_kettle",
+      "iron",
+      "kayak",
+      "keurig_coffee_machine",
+      "kitchen",
+      "kitchenette",
+      "laptop_friendly_workspace",
+      "laundromat_nearby",
+      "long_term_stays_allowed",
+      "luggage_dropoff_allowed",
+      "microwave",
+      "mini_fridge",
+      "outdoor_seating",
+      "outlet_covers",
+      "oven",
+      "pack_n_play_travel_crib",
+      "patio_or_belcony",
+      "pocket_wifi",
+      "portable_fans",
+      "private_entrance",
+      "private_living_room",
+      "record_player",
+      "refrigerator",
+      "rice_maker",
+      "room_darkening_shades",
+      "safe",
+      "shampoo",
+      "shower_gel",
+      "single_level_home",
+      "smoke_detector",
+      "sound_system",
+      "stair_gates",
+      "stove",
+      "street_parking",
+      "table_corner_guards",
+      "toaster",
+      "trash_compacter",
+      "tv",
+      "wardrobe_or_closet",
+      "washer",
+      "wine_glasses",
+      "wireless_internet"
+    ],
+    "capacity": {
+      "max": 8,
+      "bedrooms": 3,
+      "beds": 5,
+      "bathrooms": 2.5
+    },
+    "room_details": [
+      {
+        "type": "bedroom",
+        "beds": [
+          {
+            "type": "king_bed",
+            "quantity": 1
+          }
+        ],
+        "private": true
+      },
+      {
+        "type": "bedroom",
+        "beds": [
+          {
+            "type": "queen_bed",
+            "quantity": 1
+          }
+        ],
+        "private": true
+      },
+      {
+        "type": "bedroom",
+        "beds": [
+          {
+            "type": "bunk_bed",
+            "quantity": 1
+          }
+        ],
+        "private": true
+      },
+      {
+        "type": "full_bathroom",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "full_bathroom",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "half_bathroom",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "kitchen",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "backyard",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "garage",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "exterior",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "patio",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "laundry_room",
+        "beds": [],
+        "private": true
+      },
+      {
+        "type": "living_room",
+        "beds": [
+          {
+            "type": "sofa_bed",
+            "quantity": 1
+          }
+        ],
+        "private": true
+      },
+      {
+        "type": "dining_room",
+        "beds": [],
+        "private": true
+      }
+    ],
+    "property_type": "house",
+    "room_type": "Entire Home",
+    "tags": [],
+    "house_rules": {
+      "pets_allowed": true,
+      "smoking_allowed": false,
+      "events_allowed": false,
+      "children_allowed": true,
+      "infants_allowed": true
+    },
+    "bookings": {
+      "fees": [
+        {
+          "name": "cleaning_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 15100,
+            "formatted": "$151.00"
+          }
+        },
+        {
+          "name": "linens_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        },
+        {
+          "name": "management_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        },
+        {
+          "name": "community_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        },
+        {
+          "name": "resort_fee",
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        }
+      ],
+      "occupancy_based_rules": {
+        "guests_included": 1,
+        "extra_guest_fee": {
+          "type": "fixed",
+          "value": {
+            "amount": 0,
+            "formatted": "$0.00"
+          }
+        },
+        "pet_fee": {
+          "type": "fixed",
+          "value": {
+            "amount": 15000,
+            "formatted": "$150.00"
+          }
+        }
+      },
+      "discounts": [
+        {
+          "name": "weekly",
+          "type": "percent",
+          "value": 9
+        },
+        {
+          "name": "monthly",
+          "type": "percent",
+          "value": 18
+        }
+      ],
+      "listing_markups": [
+        {
+          "platform": "agoda",
+          "type": "percent",
+          "markup": 0
+        },
+        {
+          "platform": "airbnb",
+          "type": "percent",
+          "markup": 0
+        },
+        {
+          "platform": "booking",
+          "type": "percent",
+          "markup": 0
+        },
+        {
+          "platform": "direct",
+          "type": "percent",
+          "markup": 0
+        },
+        {
+          "platform": "homeaway",
+          "type": "percent",
+          "markup": 0
+        }
+      ],
+      "security_deposits": [],
+      "security_deposit_collector": null,
+      "booking_policies": {
+        "cancellation": ["100% refund until 24 hours after booking accepted"],
+        "payment_terms": {
+          "status": "aligned",
+          "description": ["Payment terms are aligned for this property."],
+          "grace_period": 48
+        }
+      },
+      "site_urls": []
+    },
+    "calendar_restricted": false,
+    "parent_child": null
+  }
+}

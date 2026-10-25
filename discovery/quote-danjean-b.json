@@ -1,0 +1,64 @@
+{
+  "data": {
+    "quote_id": "e31f3484-acf4-43ba-acda-71f12827d6e9",
+    "booking_url": "https://booking.hospitable.com/book/external/2338068/e31f3484-acf4-43ba-acda-71f12827d6e9",
+    "currency": "USD",
+    "financials": {
+      "taxes": [
+        {
+          "amount": 2640,
+          "formatted": "$26.40",
+          "label": "State lodging tax",
+          "category": "Taxes"
+        },
+        {
+          "amount": 4840,
+          "formatted": "$48.40",
+          "label": "City lodging tax",
+          "category": "Taxes"
+        }
+      ],
+      "fees": [
+        {
+          "amount": 15100,
+          "formatted": "$151.00",
+          "label": "Cleaning fee",
+          "category": "Guest fees"
+        },
+        {
+          "amount": 0,
+          "formatted": "$0.00",
+          "label": "Service fee",
+          "category": "Guest fees"
+        }
+      ],
+      "discounts": [],
+      "totals": {
+        "sub_total": {
+          "amount": 28900,
+          "formatted": "$289.00",
+          "label": "Sub Total",
+          "category": "Subtotal"
+        },
+        "total_fees": {
+          "amount": 15100,
+          "formatted": "$151.00",
+          "label": "Total Fees",
+          "category": "Guest total price"
+        },
+        "total": {
+          "amount": 51480,
+          "formatted": "$514.80",
+          "label": "Total Price",
+          "category": "Guest total price"
+        },
+        "total_without_taxes": {
+          "amount": 44000,
+          "formatted": "$440.00",
+          "label": "Total without taxes",
+          "category": "Guest total price"
+        }
+      }
+    }
+  }
+}

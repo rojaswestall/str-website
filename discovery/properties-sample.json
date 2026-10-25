@@ -1,0 +1,850 @@
+{
+  "data": [
+    {
+      "id": "2bfb62de-2f47-409f-b276-a47d5b405043",
+      "name": "Parkwood A",
+      "public_name": "Cozy 3BR Oak Hill Retreat • Fireplace • Fast Wi-Fi",
+      "picture": "https://a0.muscache.com/im/pictures/airflow/Hosting-1598934202273477463/original/ba8734d4-d7b3-4ea6-99f5-bd06c53cbb70.jpg?aki_policy=small",
+      "address": {
+        "number": "<redacted>",
+        "street": "<redacted>",
+        "city": "Austin",
+        "state": "TX",
+        "postcode": "<redacted>",
+        "country": "US",
+        "country_name": "United States",
+        "coordinates": "<redacted>",
+        "display": "<redacted>"
+      },
+      "timezone": "-0500",
+      "listed": true,
+      "currency": "USD",
+      "summary": "Relax in this cozy 3BR/2BA one Half of a Townhouse Oak Hill home just minutes from Downtown Austin. Features a spacious living room with fireplace, fully equipped kitchen, fast Wi-Fi, smart TV, and comfortable beds for families, friends, or business travelers. Quiet neighborhood with easy access to Hwy 290 & 71, dining, shopping, and outdoor parks. Ideal for long stays or weekend getaways. Enjoy comfort, privacy, and convenience in one perfect Austin home.",
+      "description": "Enjoy our spacious backyard that’s fenced in. Bring your furry friends!\n\n$150 per pet",
+      "checkin": "16:00",
+      "checkout": "10:00",
+      "amenities": [
+        "ac",
+        "alfresco_dining",
+        "babysitter_recommendations",
+        "baby_monitor",
+        "baking_sheet",
+        "bathtub",
+        "beach_essentials",
+        "bed_linens",
+        "bidet",
+        "blender",
+        "board_games",
+        "body_soap",
+        "books",
+        "bread_maker",
+        "carbon_monoxide_detector",
+        "ceiling_fan",
+        "changing_table",
+        "childrens_books_and_toys",
+        "childrens_dinnerware",
+        "cleaning_before_checkout",
+        "cleaning_products",
+        "clothes_drying_rack",
+        "coffee",
+        "coffee_maker",
+        "conditioner",
+        "cooking_basics",
+        "crib",
+        "dining_table",
+        "dishes_and_silverware",
+        "dishwasher",
+        "dryer",
+        "essentials",
+        "ethernet_connection",
+        "ev_charger",
+        "extra_pillows_and_blankets",
+        "fireplace",
+        "fireplace_guards",
+        "fire_extinguisher",
+        "first_aid_kit",
+        "freezer",
+        "free_parking",
+        "garden_or_backyard",
+        "hair_dryer",
+        "hangers",
+        "heating",
+        "high_chair",
+        "hot_water",
+        "hot_water_kettle",
+        "iron",
+        "kayak",
+        "kitchen",
+        "kitchenette",
+        "laptop_friendly_workspace",
+        "laundromat_nearby",
+        "long_term_stays_allowed",
+        "luggage_dropoff_allowed",
+        "microwave",
+        "mini_fridge",
+        "nespresso_machine",
+        "outdoor_seating",
+        "outlet_covers",
+        "oven",
+        "pack_n_play_travel_crib",
+        "patio_or_belcony",
+        "pocket_wifi",
+        "portable_fans",
+        "private_entrance",
+        "private_living_room",
+        "record_player",
+        "refrigerator",
+        "rice_maker",
+        "room_darkening_shades",
+        "safe",
+        "shampoo",
+        "shower_gel",
+        "single_level_home",
+        "smoke_detector",
+        "sound_system",
+        "stair_gates",
+        "stove",
+        "street_parking",
+        "table_corner_guards",
+        "toaster",
+        "trash_compacter",
+        "tv",
+        "wardrobe_or_closet",
+        "washer",
+        "wine_glasses",
+        "wireless_internet"
+      ],
+      "capacity": {
+        "max": 8,
+        "bedrooms": 3,
+        "beds": 4,
+        "bathrooms": 2
+      },
+      "room_details": [
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "bunk_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "king_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "queen_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "full_bathroom",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "full_bathroom",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "kitchen",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "backyard",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "garage",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "exterior",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "patio",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "laundry_room",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "dining_room",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "kitchenette",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "living_room",
+          "beds": [],
+          "private": true
+        }
+      ],
+      "property_type": "house",
+      "room_type": "Entire Home",
+      "tags": [],
+      "house_rules": {
+        "pets_allowed": true,
+        "smoking_allowed": false,
+        "events_allowed": false,
+        "children_allowed": true,
+        "infants_allowed": true
+      },
+      "listings": [
+        {
+          "platform": "airbnb",
+          "platform_id": "1598934202273477463",
+          "platform_user_id": "669243320",
+          "platform_picture": "https://a0.muscache.com/im/pictures/user/User/original/114be22a-981b-4ed8-bacb-087d175e764f.jpeg?aki_policy=profile_x_medium",
+          "co_hosts": [
+            {
+              "user_id": "371997272",
+              "name": "Aaron Williamson",
+              "channel_name": "Aaron Williamson"
+            },
+            {
+              "user_id": "157328254",
+              "name": "Gabe Rojas-Westall",
+              "channel_name": "Gabe Rojas-Westall"
+            }
+          ],
+          "platform_name": "<redacted>",
+          "platform_email": "alexis.rojaswestall@gmail.com"
+        },
+        {
+          "platform": "direct",
+          "platform_id": "b6b0c5c4-f9b7-5a43-9d52-989cf1f014fe",
+          "platform_user_id": "e5129ed9-da50-5436-a7f3-d886ae00256c",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": "<redacted>",
+          "platform_email": null
+        },
+        {
+          "platform": "manual",
+          "platform_id": "379664dc-b884-5d6d-ab09-320e63e05f52",
+          "platform_user_id": "manual_527465",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": "<redacted>",
+          "platform_email": null
+        },
+        {
+          "platform": "gvr",
+          "platform_id": "74b63dfd-71c0-5efd-ae23-f3ad8d1df2e1",
+          "platform_user_id": "4e358ac4-bf9a-559a-b611-04fc127e744c",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": null,
+          "platform_email": null
+        }
+      ],
+      "ical_imports": [],
+      "calendar_restricted": false,
+      "parent_child": null
+    },
+    {
+      "id": "cb8bcbdd-75f6-49f4-b9a5-cea0b8df861d",
+      "name": "Dan Jean B",
+      "public_name": "Spacious 3BR Home • Near Radio Coffee • Fast Wi-Fi",
+      "picture": "https://a0.muscache.com/im/pictures/hosting/Hosting-1598953749522814358/original/dcae6acf-aedc-4145-81a2-f58f79edbc75.jpeg?aki_policy=small",
+      "address": {
+        "number": "<redacted>",
+        "street": "<redacted>",
+        "city": "Austin",
+        "state": "TX",
+        "postcode": "<redacted>",
+        "country": "US",
+        "country_name": "United States",
+        "coordinates": "<redacted>",
+        "display": "<redacted>"
+      },
+      "timezone": "-0500",
+      "listed": true,
+      "currency": "USD",
+      "summary": "Enjoy this spacious 3BR/2.5BA home in South Austin (one half of townhome), steps from the popular Radio Coffee & Beer. Bright open layout, fully equipped kitchen, fast Wi-Fi, smart TV, and comfortable bedrooms make it perfect for families, groups, or business travelers. Quiet neighborhood with easy access to Downtown, restaurants, nightlife, and major highways. Ideal for weekend getaways or extended stays—experience comfort, convenience, and the best of Austin living.",
+      "description": "We have a garage where you can plug in your EV and use the laundry. Also a fully fenced yard! So bring your furry friends :)\n\n$150 per pet",
+      "checkin": "16:00",
+      "checkout": "10:00",
+      "amenities": [
+        "ac",
+        "alfresco_dining",
+        "babysitter_recommendations",
+        "baby_bath",
+        "baby_monitor",
+        "baking_sheet",
+        "bathtub",
+        "beach_essentials",
+        "bed_linens",
+        "bidet",
+        "blender",
+        "board_games",
+        "body_soap",
+        "books",
+        "bread_maker",
+        "carbon_monoxide_detector",
+        "ceiling_fan",
+        "changing_table",
+        "childrens_books_and_toys",
+        "childrens_dinnerware",
+        "cleaning_before_checkout",
+        "cleaning_products",
+        "clothes_drying_rack",
+        "coffee",
+        "coffee_maker",
+        "conditioner",
+        "cooking_basics",
+        "crib",
+        "dining_table",
+        "dishes_and_silverware",
+        "dishwasher",
+        "dryer",
+        "essentials",
+        "ethernet_connection",
+        "ev_charger",
+        "extra_pillows_and_blankets",
+        "fire_extinguisher",
+        "fire_pit",
+        "first_aid_kit",
+        "freezer",
+        "free_parking",
+        "garden_or_backyard",
+        "hair_dryer",
+        "hangers",
+        "heating",
+        "high_chair",
+        "hot_water",
+        "hot_water_kettle",
+        "iron",
+        "kayak",
+        "keurig_coffee_machine",
+        "kitchen",
+        "kitchenette",
+        "laptop_friendly_workspace",
+        "laundromat_nearby",
+        "long_term_stays_allowed",
+        "luggage_dropoff_allowed",
+        "microwave",
+        "mini_fridge",
+        "outdoor_seating",
+        "outlet_covers",
+        "oven",
+        "pack_n_play_travel_crib",
+        "patio_or_belcony",
+        "pocket_wifi",
+        "portable_fans",
+        "private_entrance",
+        "private_living_room",
+        "record_player",
+        "refrigerator",
+        "rice_maker",
+        "room_darkening_shades",
+        "safe",
+        "shampoo",
+        "shower_gel",
+        "single_level_home",
+        "smoke_detector",
+        "sound_system",
+        "stair_gates",
+        "stove",
+        "street_parking",
+        "table_corner_guards",
+        "toaster",
+        "trash_compacter",
+        "tv",
+        "wardrobe_or_closet",
+        "washer",
+        "wine_glasses",
+        "wireless_internet"
+      ],
+      "capacity": {
+        "max": 8,
+        "bedrooms": 3,
+        "beds": 5,
+        "bathrooms": 2.5
+      },
+      "room_details": [
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "king_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "queen_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "bunk_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "full_bathroom",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "full_bathroom",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "half_bathroom",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "kitchen",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "backyard",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "garage",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "exterior",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "patio",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "laundry_room",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "living_room",
+          "beds": [
+            {
+              "type": "sofa_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "dining_room",
+          "beds": [],
+          "private": true
+        }
+      ],
+      "property_type": "house",
+      "room_type": "Entire Home",
+      "tags": [],
+      "house_rules": {
+        "pets_allowed": true,
+        "smoking_allowed": false,
+        "events_allowed": false,
+        "children_allowed": true,
+        "infants_allowed": true
+      },
+      "listings": [
+        {
+          "platform": "airbnb",
+          "platform_id": "1598953749522814358",
+          "platform_user_id": "669243320",
+          "platform_picture": "https://a0.muscache.com/im/pictures/user/User/original/114be22a-981b-4ed8-bacb-087d175e764f.jpeg?aki_policy=profile_x_medium",
+          "co_hosts": [
+            {
+              "user_id": "371997272",
+              "name": "Aaron Williamson",
+              "channel_name": "Aaron Williamson"
+            },
+            {
+              "user_id": "157328254",
+              "name": "Gabe Rojas-Westall",
+              "channel_name": "Gabe Rojas-Westall"
+            }
+          ],
+          "platform_name": "<redacted>",
+          "platform_email": "alexis.rojaswestall@gmail.com"
+        },
+        {
+          "platform": "direct",
+          "platform_id": "5e31d547-69d8-57d0-b6e5-f2f41f948daf",
+          "platform_user_id": "e5129ed9-da50-5436-a7f3-d886ae00256c",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": "<redacted>",
+          "platform_email": null
+        },
+        {
+          "platform": "manual",
+          "platform_id": "18d49ca1-727a-5e68-9c9a-4a945a089647",
+          "platform_user_id": "manual_527465",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": "<redacted>",
+          "platform_email": null
+        },
+        {
+          "platform": "gvr",
+          "platform_id": "80b7147f-5442-5762-afb5-34c3fe010ae2",
+          "platform_user_id": "4e358ac4-bf9a-559a-b611-04fc127e744c",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": null,
+          "platform_email": null
+        }
+      ],
+      "ical_imports": [],
+      "calendar_restricted": false,
+      "parent_child": null
+    },
+    {
+      "id": "02f700e5-a510-4c4f-b9f6-9d4bebdf499a",
+      "name": "Dan Jean Unit A",
+      "public_name": "Fast WiFi |Garage| Yard | 3BR • 5 Beds • Sleeps 8+",
+      "picture": "https://a0.muscache.com/im/pictures/airflow/Hosting-1655329029936239948/original/e5c37926-1b17-4ca8-8fa5-4ecbdd556df3.jpg?aki_policy=small",
+      "address": {
+        "number": "<redacted>",
+        "street": "<redacted>",
+        "city": "Austin",
+        "state": "TX",
+        "postcode": "<redacted>",
+        "country": "US",
+        "country_name": "United States",
+        "coordinates": "<redacted>",
+        "display": "<redacted>"
+      },
+      "timezone": "-0500",
+      "listed": true,
+      "currency": "USD",
+      "summary": "Welcome to your stylish South Austin retreat—perfect for families, groups, and business travelers. This fully furnished 3-bedroom home features 5 comfortable beds (including a sleeper sofa), a bright open living space, and Smart TVs for relaxing nights in. Enjoy a fully equipped kitchen, cozy bedrooms, and a peaceful neighborhood just minutes from downtown, restaurants, and local hotspots.\n\nYou’ll love the space, comfort, and convenience this home offers. Book your South Austin stay today!",
+      "description": "This is unit A. One half of townhome / duplex\n\n$150 per pet",
+      "checkin": "16:00",
+      "checkout": "10:00",
+      "amenities": [
+        "ac",
+        "alfresco_dining",
+        "babysitter_recommendations",
+        "baby_monitor",
+        "baking_sheet",
+        "bathtub",
+        "bed_linens",
+        "bidet",
+        "blender",
+        "board_games",
+        "body_soap",
+        "books",
+        "bread_maker",
+        "carbon_monoxide_detector",
+        "ceiling_fan",
+        "changing_table",
+        "childrens_books_and_toys",
+        "childrens_dinnerware",
+        "cleaning_before_checkout",
+        "cleaning_products",
+        "clothes_drying_rack",
+        "coffee",
+        "coffee_maker",
+        "conditioner",
+        "cooking_basics",
+        "crib",
+        "dining_table",
+        "dishes_and_silverware",
+        "dishwasher",
+        "dryer",
+        "essentials",
+        "ethernet_connection",
+        "ev_charger",
+        "extra_pillows_and_blankets",
+        "fire_extinguisher",
+        "first_aid_kit",
+        "freezer",
+        "free_parking",
+        "free_parking_off_premises",
+        "garden_or_backyard",
+        "hair_dryer",
+        "hangers",
+        "heating",
+        "high_chair",
+        "hot_water",
+        "hot_water_kettle",
+        "iron",
+        "kayak",
+        "keurig_coffee_machine",
+        "kitchen",
+        "kitchenette",
+        "laptop_friendly_workspace",
+        "laundromat_nearby",
+        "long_term_stays_allowed",
+        "luggage_dropoff_allowed",
+        "microwave",
+        "mini_fridge",
+        "outdoor_seating",
+        "outlet_covers",
+        "oven",
+        "pack_n_play_travel_crib",
+        "patio_or_belcony",
+        "pocket_wifi",
+        "portable_fans",
+        "private_entrance",
+        "private_living_room",
+        "record_player",
+        "recycling",
+        "refrigerator",
+        "rice_maker",
+        "room_darkening_shades",
+        "safe",
+        "shampoo",
+        "shower_gel",
+        "single_level_home",
+        "smoke_detector",
+        "sound_system",
+        "stair_gates",
+        "stove",
+        "street_parking",
+        "table_corner_guards",
+        "toaster",
+        "trash_compacter",
+        "tv",
+        "wardrobe_or_closet",
+        "washer",
+        "wine_glasses",
+        "wireless_internet"
+      ],
+      "capacity": {
+        "max": 8,
+        "bedrooms": 3,
+        "beds": 5,
+        "bathrooms": 2
+      },
+      "room_details": [
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "king_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "queen_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "bedroom",
+          "beds": [
+            {
+              "type": "bunk_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "full_bathroom",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "exterior",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "laundry_room",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "backyard",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "patio",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "kitchenette",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "living_room",
+          "beds": [
+            {
+              "type": "sofa_bed",
+              "quantity": 1
+            }
+          ],
+          "private": true
+        },
+        {
+          "type": "dining_room",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "kitchen",
+          "beds": [],
+          "private": true
+        },
+        {
+          "type": "full_bathroom",
+          "beds": [],
+          "private": true
+        }
+      ],
+      "property_type": "house",
+      "room_type": "Entire Home",
+      "tags": [],
+      "house_rules": {
+        "pets_allowed": true,
+        "smoking_allowed": false,
+        "events_allowed": false,
+        "children_allowed": true,
+        "infants_allowed": true
+      },
+      "listings": [
+        {
+          "platform": "airbnb",
+          "platform_id": "1655329029936239948",
+          "platform_user_id": "669243320",
+          "platform_picture": "https://a0.muscache.com/im/pictures/user/User/original/114be22a-981b-4ed8-bacb-087d175e764f.jpeg?aki_policy=profile_x_medium",
+          "co_hosts": [
+            {
+              "user_id": "371997272",
+              "name": "Aaron Williamson",
+              "channel_name": "Aaron Williamson"
+            },
+            {
+              "user_id": "157328254",
+              "name": "Gabe Rojas-Westall",
+              "channel_name": "Gabe Rojas-Westall"
+            }
+          ],
+          "platform_name": "<redacted>",
+          "platform_email": "alexis.rojaswestall@gmail.com"
+        },
+        {
+          "platform": "direct",
+          "platform_id": "0fb2d7d3-29dc-5b05-ac78-b45ded07bae7",
+          "platform_user_id": "e5129ed9-da50-5436-a7f3-d886ae00256c",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": "<redacted>",
+          "platform_email": null
+        },
+        {
+          "platform": "manual",
+          "platform_id": "363355ce-4257-5a90-a882-29a2e841e37a",
+          "platform_user_id": "manual_527465",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": "<redacted>",
+          "platform_email": null
+        },
+        {
+          "platform": "gvr",
+          "platform_id": "71fcf13a-2ea4-58ef-861a-7e7b6ba8da9b",
+          "platform_user_id": "4e358ac4-bf9a-559a-b611-04fc127e744c",
+          "platform_picture": null,
+          "co_hosts": [],
+          "platform_name": null,
+          "platform_email": null
+        }
+      ],
+      "ical_imports": [],
+      "calendar_restricted": false,
+      "parent_child": null
+    }
+  ],
+  "links": {
+    "first": "http://public.api.hospitable.com/v2/properties?page=1",
+    "last": "http://public.api.hospitable.com/v2/properties?page=1",
+    "prev": null,
+    "next": null
+  },
+  "meta": {
+    "current_page": 1,
+    "from": 1,
+    "last_page": 1,
+    "links": [
+      {
+        "url": null,
+        "label": "&laquo; Previous",
+        "active": false
+      },
+      {
+        "url": "http://public.api.hospitable.com/v2/properties?page=1",
+        "label": "1",
+        "active": true
+      },
+      {
+        "url": null,
+        "label": "Next &raquo;",
+        "active": false
+      }
+    ],
+    "path": "http://public.api.hospitable.com/v2/properties",
+    "per_page": 50,
+    "to": 3,
+    "total": 3
+  }
+}
