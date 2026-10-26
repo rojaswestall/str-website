@@ -3,8 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Eyebrow } from "@/components/ui";
-import { nightsBetween, todayInBookingZone } from "@/lib/booking/dates";
-import { formatDollars, formatRange, plural } from "@/lib/booking/format";
+import { getJson, postQuote } from "@/lib/booking/api-client";
+import { nightsBetween } from "@/lib/booking/dates";
+import {
+  formatCents,
+  formatDollars,
+  formatRange,
+  plural,
+} from "@/lib/booking/format";
+import { isTrustedCheckoutUrl } from "@/lib/booking/normalize";
+import { normalizePhone } from "@/lib/booking/phone";
 import {
   clampGuests,
   DEFAULT_GUESTS,
@@ -14,18 +22,22 @@ import {
   type Selection,
   toDayMap,
 } from "@/lib/booking/rules";
+import { fieldErrors, GuestDetailsSchema } from "@/lib/booking/schema";
 import type {
   BookingProperty,
   CalendarDay,
   CalendarResponse,
+  GuestDetails,
   PropertiesResponse,
 } from "@/lib/booking/types";
 import { cx } from "@/lib/cx";
 
 import { Calendar, type SelectVia } from "./Calendar";
+import { EMPTY_GUEST_FORM, GuestForm, type GuestFormValues } from "./GuestForm";
 import { GuestPicker } from "./GuestPicker";
-import { PricePanel } from "./PricePanel";
+import { PricePanel, type ReserveState } from "./PricePanel";
 import { StickySummary } from "./StickySummary";
+import { useQuote } from "./useQuote";
 
 export type BookingWidgetProps = {
   /** Hospitable property id. Omit for a switcher over every bookable house. */
@@ -44,19 +56,23 @@ type Catalog = {
   comparisonEnabled: boolean;
 };
 
-type CalendarData = { end: string; days: CalendarDay[] };
+/** `start` is today in the booking time zone, decided by the server. */
+type CalendarData = { start: string; end: string; days: CalendarDay[] };
+
+type FormErrors = Partial<Record<keyof GuestFormValues, string>>;
 
 /*
  * The site's own booking widget. Reads /api/properties once and
- * /api/calendar/:id per house; the browser never talks to Hospitable. Emits
- * `widget_loaded` and `dates_selected` as bubbling DOM CustomEvents for the
- * host page's analytics. All amounts shown here are calendar previews; the
- * quote (Phase 3) is the only price a guest acts on.
+ * /api/calendar/:id per house, prices a chosen stay with /api/quote, and on
+ * Reserve re-quotes with the guest's details and sends them to Hospitable's
+ * hosted checkout; the browser never talks to Hospitable directly and the
+ * site never takes payment. Emits `widget_loaded`, `dates_selected`,
+ * `quote_shown` and `reserve_clicked` as bubbling DOM CustomEvents for the
+ * host page's analytics. Guest details live in component state only.
  */
 export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
   const root = useRef<HTMLDivElement>(null);
   const priceHeading = useRef<HTMLParagraphElement>(null);
-  const today = useMemo(() => todayInBookingZone(), []);
 
   const [catalog, setCatalog] = useState<Load<Catalog>>({ status: "loading" });
   const [activeId, setActiveId] = useState<string | undefined>(propertyId);
@@ -66,6 +82,10 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
   const [selection, setSelection] = useState<Selection>(EMPTY_SELECTION);
   const [guests, setGuests] = useState<Guests>(DEFAULT_GUESTS);
   const [reload, setReload] = useState(0);
+  const [calendarReload, setCalendarReload] = useState(0);
+  const [form, setForm] = useState<GuestFormValues>(EMPTY_GUEST_FORM);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [reserve, setReserve] = useState<ReserveState>({ status: "idle" });
 
   const emit = useCallback((name: string, detail: unknown) => {
     root.current?.dispatchEvent(
@@ -77,7 +97,10 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
     const controller = new AbortController();
     getJson<PropertiesResponse>("/api/properties", controller.signal)
       .then((body) => {
-        if (!body.ok) throw new Error(body.message);
+        if (!body.ok) {
+          setCatalog({ status: "error", message: body.message });
+          return;
+        }
         const data = {
           properties: body.properties,
           maxNights: body.maxNights,
@@ -87,9 +110,8 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
         setActiveId((id) => id ?? data.properties[0]?.id);
         emit("widget_loaded", { properties: data.properties.map((p) => p.id) });
       })
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-        setCatalog({ status: "error", message: describe(error) });
+      .catch(() => {
+        /* aborted on unmount or retry */
       });
     return () => controller.abort();
   }, [emit, reload]);
@@ -102,41 +124,71 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
       controller.signal,
     )
       .then((body) => {
-        if (!body.ok) throw new Error(body.message);
+        if (!body.ok) {
+          setCalendar({ status: "error", message: body.message });
+          return;
+        }
         setCalendar({
           status: "ready",
-          data: { end: body.end, days: body.days },
+          data: { start: body.start, end: body.end, days: body.days },
         });
       })
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-        setCalendar({ status: "error", message: describe(error) });
+      .catch(() => {
+        /* aborted */
       });
     return () => controller.abort();
-  }, [activeId, reload]);
+  }, [activeId, reload, calendarReload]);
 
   const property =
     catalog.status === "ready"
       ? catalog.data.properties.find((p) => p.id === activeId)
       : undefined;
+  // The browser clock is never consulted: "today" comes with the calendar.
   const limits = useMemo(
     () => ({
-      today,
+      today: calendar.status === "ready" ? calendar.data.start : "",
       maxNights: catalog.status === "ready" ? catalog.data.maxNights : 90,
     }),
-    [today, catalog],
+    [calendar, catalog],
   );
   const dayMap = useMemo(
     () => toDayMap(calendar.status === "ready" ? calendar.data.days : []),
     [calendar],
   );
+  const boundedGuests = property
+    ? clampGuests(guests, {
+        maxGuests: property.maxGuests,
+        petsAllowed: property.petsAllowed,
+      })
+    : guests;
+
+  const quote = useQuote({
+    propertyId: property?.id,
+    selection,
+    guests: boundedGuests,
+  });
+
+  const shownQuoteId = useRef<string | null>(null);
+  useEffect(() => {
+    if (quote.state.status !== "ready") return;
+    const q = quote.state.quote;
+    if (shownQuoteId.current === q.quoteId) return;
+    shownQuoteId.current = q.quoteId;
+    emit("quote_shown", {
+      propertyId: q.propertyId,
+      checkIn: q.checkIn,
+      checkOut: q.checkOut,
+      total: q.total,
+      currency: q.currency,
+    });
+  }, [quote.state, emit]);
 
   // Loading states are set where a fetch is triggered (here, in retry, and
   // in the initial state), never inside the effects that run the fetch.
   function switchProperty(id: string) {
     setActiveId(id);
     setCalendar({ status: "loading" });
-    setSelection(EMPTY_SELECTION);
+    changeStay(EMPTY_SELECTION);
   }
 
   function retry() {
@@ -145,8 +197,24 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
     setReload((n) => n + 1);
   }
 
-  function onSelect(next: Selection, via: SelectVia) {
+  function refreshCalendar() {
+    setCalendar({ status: "loading" });
+    setCalendarReload((n) => n + 1);
+  }
+
+  /** Any change to the stay invalidates a pending Reserve. */
+  function changeStay(next: Selection) {
     setSelection(next);
+    setReserve({ status: "idle" });
+  }
+
+  function changeGuests(next: Guests) {
+    setGuests(next);
+    setReserve({ status: "idle" });
+  }
+
+  function onSelect(next: Selection, via: SelectVia) {
+    changeStay(next);
     if (next.checkIn && next.checkOut) {
       emit("dates_selected", {
         propertyId: activeId,
@@ -158,6 +226,104 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
         requestAnimationFrame(() => priceHeading.current?.focus());
       }
     }
+  }
+
+  function validateForm(
+    values: GuestFormValues,
+  ): { ok: true; details: GuestDetails } | { ok: false; errors: FormErrors } {
+    const parsed = GuestDetailsSchema.safeParse({
+      ...values,
+      phone: normalizePhone(values.phone) ?? values.phone,
+    });
+    if (parsed.success) return { ok: true, details: parsed.data };
+    return { ok: false, errors: fieldErrors(parsed.error) as FormErrors };
+  }
+
+  function onFieldBlur(field: keyof GuestFormValues) {
+    const result = validateForm(form);
+    setFormErrors((prev) => ({
+      ...prev,
+      [field]: result.ok ? undefined : result.errors[field],
+    }));
+  }
+
+  function goToCheckout(url: string) {
+    if (!isTrustedCheckoutUrl(url)) {
+      setReserve({
+        status: "error",
+        message:
+          "We couldn't open checkout safely. Please try again or contact us.",
+      });
+      return;
+    }
+    setReserve({ status: "redirecting" });
+    window.location.assign(url);
+  }
+
+  async function onReserve() {
+    if (quote.state.status !== "ready" || !property) return;
+    const shown = quote.state.quote;
+
+    const result = validateForm(form);
+    if (!result.ok) {
+      setFormErrors(result.errors);
+      const first = Object.keys(result.errors)[0];
+      root.current
+        ?.querySelector<HTMLInputElement>(`input[name="${first}"]`)
+        ?.focus();
+      return;
+    }
+    setFormErrors({});
+
+    emit("reserve_clicked", {
+      propertyId: property.id,
+      checkIn: shown.checkIn,
+      checkOut: shown.checkOut,
+      total: shown.total,
+      currency: shown.currency,
+    });
+
+    // Second click after a changed total: the quote on screen already
+    // carries the guest's details, so go straight to its checkout.
+    if (reserve.status === "confirm") {
+      goToCheckout(shown.bookingUrl);
+      return;
+    }
+
+    setReserve({ status: "loading" });
+    const final = await postQuote({
+      propertyId: property.id,
+      checkIn: shown.checkIn,
+      checkOut: shown.checkOut,
+      adults: boundedGuests.adults,
+      children: boundedGuests.children,
+      infants: boundedGuests.infants,
+      pets: boundedGuests.pets,
+      guestDetails: result.details,
+    });
+
+    if (!final.ok) {
+      if (final.code === "UNAVAILABLE") {
+        // Someone booked a night while the guest was deciding.
+        refreshCalendar();
+        changeStay(EMPTY_SELECTION);
+        setReserve({
+          status: "error",
+          message:
+            "Sorry — those dates were just booked. The calendar has been refreshed; please choose different dates.",
+        });
+        return;
+      }
+      setReserve({ status: "error", message: final.message });
+      return;
+    }
+
+    if (final.quote.total !== shown.total) {
+      quote.replace(final.quote);
+      setReserve({ status: "confirm", previousTotal: shown.total });
+      return;
+    }
+    goToCheckout(final.quote.bookingUrl);
   }
 
   const nights =
@@ -227,22 +393,38 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
                 onSelect={onSelect}
               />
               <GuestPicker
-                guests={clampGuests(guests, {
-                  maxGuests: property.maxGuests,
-                  petsAllowed: property.petsAllowed,
-                })}
+                guests={boundedGuests}
                 maxGuests={property.maxGuests}
                 petsAllowed={property.petsAllowed}
-                onChange={setGuests}
+                onChange={changeGuests}
               />
               <PricePanel
                 selection={selection}
-                guests={guests}
-                previewTotal={previewTotal}
+                guests={boundedGuests}
                 nights={nights}
                 currency={property.currency}
+                previewTotal={previewTotal}
+                quote={quote.state}
+                reserve={reserve}
+                form={
+                  <GuestForm
+                    values={form}
+                    errors={formErrors}
+                    disabled={
+                      reserve.status === "loading" ||
+                      reserve.status === "redirecting"
+                    }
+                    onChange={(values) => {
+                      setForm(values);
+                      if (reserve.status === "error")
+                        setReserve({ status: "idle" });
+                    }}
+                    onBlur={onFieldBlur}
+                  />
+                }
                 headingRef={priceHeading}
-                onClear={() => setSelection(EMPTY_SELECTION)}
+                onRetryQuote={quote.refresh}
+                onClear={() => changeStay(EMPTY_SELECTION)}
               />
               <StickySummary
                 label={
@@ -253,12 +435,35 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
                       : "Select dates to see price"
                 }
                 amount={
-                  previewTotal !== null
-                    ? `${formatDollars(previewTotal, property.currency)} est.`
-                    : ""
+                  quote.state.status === "ready"
+                    ? formatCents(quote.state.quote.total, property.currency)
+                    : previewTotal !== null
+                      ? `${formatDollars(previewTotal, property.currency)} est.`
+                      : ""
                 }
-                reserveDisabled
-                reserveHint="Reserving opens with the next release"
+                reserveLabel={
+                  reserve.status === "confirm"
+                    ? "Reserve again"
+                    : reserve.status === "loading" ||
+                        reserve.status === "redirecting"
+                      ? "One moment…"
+                      : "Reserve"
+                }
+                reserveDisabled={
+                  quote.state.status !== "ready" ||
+                  reserve.status === "loading" ||
+                  reserve.status === "redirecting"
+                }
+                reserveHint={
+                  !selection.checkIn || !selection.checkOut
+                    ? "Choose your dates first"
+                    : quote.state.status === "loading"
+                      ? "Pricing your stay…"
+                      : quote.state.status === "error"
+                        ? "We couldn't price these dates"
+                        : undefined
+                }
+                onReserve={() => void onReserve()}
               />
             </>
           )}
@@ -358,30 +563,4 @@ function Failure({
       ) : null}
     </div>
   );
-}
-
-async function getJson<T>(url: string, signal: AbortSignal): Promise<T> {
-  const response = await fetch(url, {
-    signal,
-    headers: { Accept: "application/json" },
-  });
-  let body: unknown = null;
-  try {
-    body = await response.json();
-  } catch {
-    throw new Error("We couldn't load the booking calendar. Please try again.");
-  }
-  if (
-    !response.ok &&
-    !(body && typeof body === "object" && "message" in body)
-  ) {
-    throw new Error("We couldn't load the booking calendar. Please try again.");
-  }
-  return body as T;
-}
-
-function describe(error: unknown): string {
-  return error instanceof Error && error.message
-    ? error.message
-    : "Something went wrong loading the booking calendar.";
 }
