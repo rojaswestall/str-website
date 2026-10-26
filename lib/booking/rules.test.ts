@@ -17,7 +17,7 @@ import {
 } from "./rules";
 
 /*
- * Parkwood A's real 60-day calendar (discovery/calendar-sample.json), from
+ * Parkwood A's real 60-day calendar (__fixtures__/calendar-sample.json), from
  * 2026-10-25. Landmarks used below:
  *   Oct 29–Nov 1 reserved; Nov 2–5 free (min 1); Nov 6–7 reserved;
  *   Nov 20–21 free with min stay 2; Nov 28 free with min stay 4.
@@ -25,7 +25,7 @@ import {
 const days = normalizeCalendar(
   JSON.parse(
     readFileSync(
-      new URL("../../discovery/calendar-sample.json", import.meta.url),
+      new URL("./__fixtures__/calendar-sample.json", import.meta.url),
       "utf8",
     ),
   ),
