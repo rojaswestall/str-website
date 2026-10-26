@@ -66,6 +66,22 @@ export type Quote = {
   bookingUrl: string;
   /** Hospitable sends no expiry; kept so the widget has one place to look. */
   quoteExpiresAt: string | null;
+  /** Present only when booking direct is cheaper and the feature is on. */
+  comparison: QuoteComparison | null;
+};
+
+/**
+ * What the same nights would cost on Airbnb, estimated from the base rates
+ * and the house's configured Airbnb markup. Nightly totals only: cleaning
+ * fee and taxes are the same on both channels.
+ */
+export type QuoteComparison = {
+  airbnbNightlyTotal: Cents;
+  directNightlyTotal: Cents;
+  /** Always positive. */
+  savings: Cents;
+  /** The public Airbnb listing, so a guest can check. */
+  airbnbUrl: string;
 };
 
 export type GuestDetails = {
