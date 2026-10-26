@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { BookingWidget } from "@/components/booking";
 import { PropertyWidget } from "@/components/hospitable";
 import { Button } from "@/components/ui";
@@ -10,6 +12,11 @@ import { resolveHospitableMode } from "@/lib/hospitable";
  * Hospitable widget for this house (or its stub); then a short note and the
  * Airbnb fallback. `id="book"` is the anchor the home page's "Book direct"
  * buttons point at.
+ *
+ * The native widget reads request-time data (today's date, live calendar),
+ * so under Cache Components it must sit in its own Suspense boundary: the
+ * prerendered page carries the fallback and the widget fills in on the
+ * client. Without the boundary `next build` fails prerendering the page.
  */
 export function BookingPanel({
   property,
@@ -34,7 +41,18 @@ export function BookingPanel({
         Book direct
       </h2>
       {native ? (
-        <BookingWidget propertyId={property.hospitable.uuid!} />
+        <Suspense
+          fallback={
+            <div
+              role="status"
+              className="border border-hairline bg-paper-2 p-[clamp(1rem,3vw,1.75rem)] font-mono text-[0.72rem] tracking-[0.08em] text-muted uppercase"
+            >
+              Loading the booking calendar…
+            </div>
+          }
+        >
+          <BookingWidget propertyId={property.hospitable.uuid!} />
+        </Suspense>
       ) : (
         <PropertyWidget property={property} />
       )}
