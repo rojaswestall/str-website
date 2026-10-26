@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 
 import { postQuote } from "@/lib/booking/api-client";
 import {
@@ -34,6 +34,10 @@ function reducer(tracked: Tracked, { key, action }: TrackedAction): Tracked {
  * ever describes the stay it was asked for: while the inputs differ from
  * the last answered request the state reads as loading, so stale amounts
  * never appear against new dates.
+ *
+ * The request is rebuilt only when one of its primitive inputs changes;
+ * depending on the `selection` / `guests` objects themselves would restart
+ * the debounce on every parent render and re-quote in a loop.
  */
 export function useQuote(input: {
   propertyId: string | undefined;
@@ -52,19 +56,19 @@ export function useQuote(input: {
   });
   const [attempt, setAttempt] = useState(0);
 
-  const { propertyId, selection, guests } = input;
+  const { propertyId } = input;
+  const { checkIn, checkOut } = input.selection;
+  const { adults, children, infants, pets } = input.guests;
+  const request = useMemo<QuoteRequest | null>(
+    () =>
+      propertyId && checkIn && checkOut
+        ? { propertyId, checkIn, checkOut, adults, children, infants, pets }
+        : null,
+    [propertyId, checkIn, checkOut, adults, children, infants, pets],
+  );
+
   useEffect(() => {
-    if (!key || !propertyId || !selection.checkIn || !selection.checkOut)
-      return;
-    const request: QuoteRequest = {
-      propertyId,
-      checkIn: selection.checkIn,
-      checkOut: selection.checkOut,
-      adults: guests.adults,
-      children: guests.children,
-      infants: guests.infants,
-      pets: guests.pets,
-    };
+    if (!key || !request) return;
     const controller = new AbortController();
     const timer = setTimeout(() => {
       postQuote(request, controller.signal)
@@ -85,7 +89,7 @@ export function useQuote(input: {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [key, attempt, propertyId, selection, guests]);
+  }, [key, request, attempt]);
 
   const refresh = useCallback(() => {
     dispatch({ key, action: { type: "request" } });
