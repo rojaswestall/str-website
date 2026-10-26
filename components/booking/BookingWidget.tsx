@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Eyebrow } from "@/components/ui";
 import { nightsBetween, todayInBookingZone } from "@/lib/booking/dates";
+import { formatDollars, formatRange, plural } from "@/lib/booking/format";
 import {
   clampGuests,
   DEFAULT_GUESTS,
@@ -24,6 +25,7 @@ import { cx } from "@/lib/cx";
 import { Calendar, type SelectVia } from "./Calendar";
 import { GuestPicker } from "./GuestPicker";
 import { PricePanel } from "./PricePanel";
+import { StickySummary } from "./StickySummary";
 
 export type BookingWidgetProps = {
   /** Hospitable property id. Omit for a switcher over every bookable house. */
@@ -54,6 +56,7 @@ type CalendarData = { end: string; days: CalendarDay[] };
 export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
   const root = useRef<HTMLDivElement>(null);
   const priceHeading = useRef<HTMLParagraphElement>(null);
+  const pricePanel = useRef<HTMLDivElement>(null);
   const today = useMemo(() => todayInBookingZone(), []);
 
   const [catalog, setCatalog] = useState<Load<Catalog>>({ status: "loading" });
@@ -240,7 +243,23 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
                 nights={nights}
                 currency={property.currency}
                 headingRef={priceHeading}
+                panelRef={pricePanel}
                 onClear={() => setSelection(EMPTY_SELECTION)}
+              />
+              <StickySummary
+                active={selection.checkIn !== null}
+                label={
+                  selection.checkIn && selection.checkOut
+                    ? `${plural(nights, "night")} · ${formatRange(selection.checkIn, selection.checkOut)}`
+                    : "Choose a check-out date"
+                }
+                amount={
+                  previewTotal !== null
+                    ? `${formatDollars(previewTotal, property.currency)} est.`
+                    : ""
+                }
+                reserveDisabled
+                panelRef={pricePanel}
               />
             </>
           )}
