@@ -306,8 +306,8 @@ function Day({
           view.available &&
           view.blocked &&
           "text-muted/60",
-        disabled ? "cursor-not-allowed" : "cursor-pointer hover:bg-slot-a",
-        selected && "hover:bg-ink",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
+        !disabled && !selected && "hover:bg-slot-a",
         today && "underline decoration-dotted underline-offset-4",
       )}
     >
