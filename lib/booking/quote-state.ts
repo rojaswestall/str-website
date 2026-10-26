@@ -43,6 +43,24 @@ export function quoteReducer(
   }
 }
 
+/** A quote state together with the key of the stay it describes. */
+export type TrackedQuote = { key: string | null; state: QuoteState };
+
+export const IDLE_TRACKED: TrackedQuote = { key: null, state: IDLE_QUOTE };
+
+/**
+ * Applies an action that was raised for stay `key`. A result for a
+ * different stay than the one tracked starts fresh under its own key; the
+ * hook then shows it only while that key is still the current one.
+ */
+export function trackedQuoteReducer(
+  tracked: TrackedQuote,
+  { key, action }: { key: string | null; action: QuoteAction },
+): TrackedQuote {
+  const base = key === tracked.key ? tracked.state : IDLE_QUOTE;
+  return { key, state: quoteReducer(base, action) };
+}
+
 /** Identity of a quote request; a change means the current quote no longer applies. */
 export function quoteKey(
   propertyId: string | undefined,

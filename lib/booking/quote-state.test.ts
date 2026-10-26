@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { IDLE_QUOTE, quoteKey, quoteReducer } from "./quote-state";
+import {
+  IDLE_QUOTE,
+  IDLE_TRACKED,
+  quoteKey,
+  quoteReducer,
+  trackedQuoteReducer,
+} from "./quote-state";
 import type { BookingErrorBody, Quote } from "./types";
 
 const quote = { quoteId: "q1", total: 46759 } as Quote;
@@ -68,5 +74,47 @@ describe("quoteKey", () => {
       quoteKey("p", { ...stay, checkOut: "2026-11-05" }, guests),
     );
     assert.notEqual(a, quoteKey("q", stay, guests));
+  });
+});
+
+describe("trackedQuoteReducer", () => {
+  const stay = { checkIn: "2026-11-02", checkOut: "2026-11-04" };
+  const guests = { adults: 2, children: 0, infants: 0, pets: 0 };
+  const k = quoteKey("p", stay, guests);
+
+  it("accepts the first result for a stay without a prior request", () => {
+    const tracked = trackedQuoteReducer(IDLE_TRACKED, {
+      key: k,
+      action: { type: "success", quote },
+    });
+    assert.deepEqual(tracked, { key: k, state: { status: "ready", quote } });
+  });
+
+  it("starts fresh when a result arrives for another stay", () => {
+    const ready = trackedQuoteReducer(IDLE_TRACKED, {
+      key: k,
+      action: { type: "success", quote },
+    });
+    const other = quoteKey("p", stay, { ...guests, pets: 1 });
+    const next = trackedQuoteReducer(ready, {
+      key: other,
+      action: { type: "failure", error },
+    });
+    assert.deepEqual(next, {
+      key: other,
+      state: { status: "error", error, previous: null },
+    });
+  });
+
+  it("keeps the previous quote through a refresh of the same stay", () => {
+    const ready = trackedQuoteReducer(IDLE_TRACKED, {
+      key: k,
+      action: { type: "success", quote },
+    });
+    const loading = trackedQuoteReducer(ready, {
+      key: k,
+      action: { type: "request" },
+    });
+    assert.deepEqual(loading.state, { status: "loading", previous: quote });
   });
 });

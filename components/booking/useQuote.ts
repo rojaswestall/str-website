@@ -5,28 +5,15 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { postQuote } from "@/lib/booking/api-client";
 import {
   IDLE_QUOTE,
-  type QuoteAction,
+  IDLE_TRACKED,
   quoteKey,
-  quoteReducer,
   type QuoteState,
+  trackedQuoteReducer,
 } from "@/lib/booking/quote-state";
 import type { Guests, Selection } from "@/lib/booking/rules";
 import type { Quote, QuoteRequest } from "@/lib/booking/types";
 
 const DEBOUNCE_MS = 400;
-
-type Tracked = { key: string | null; state: QuoteState };
-
-type TrackedAction = { key: string | null; action: QuoteAction };
-
-/** Results for a stay the guest has since changed are dropped. */
-function reducer(tracked: Tracked, { key, action }: TrackedAction): Tracked {
-  if (key !== tracked.key) {
-    if (action.type !== "request") return tracked;
-    return { key, state: quoteReducer(IDLE_QUOTE, action) };
-  }
-  return { key, state: quoteReducer(tracked.state, action) };
-}
 
 /*
  * Prices the current stay with /api/quote, 400ms after the last change to
@@ -50,10 +37,7 @@ export function useQuote(input: {
   replace: (quote: Quote) => void;
 } {
   const key = quoteKey(input.propertyId, input.selection, input.guests);
-  const [tracked, dispatch] = useReducer(reducer, {
-    key: null,
-    state: IDLE_QUOTE,
-  });
+  const [tracked, dispatch] = useReducer(trackedQuoteReducer, IDLE_TRACKED);
   const [attempt, setAttempt] = useState(0);
 
   const { propertyId } = input;
