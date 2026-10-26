@@ -1,12 +1,15 @@
+import { BookingWidget } from "@/components/booking";
 import { PropertyWidget } from "@/components/hospitable";
 import { Button } from "@/components/ui";
-import type { Property } from "@/content";
+import { getSite, type Property } from "@/content";
 import { cx } from "@/lib/cx";
+import { resolveHospitableMode } from "@/lib/hospitable";
 
 /**
- * The booking column: the Hospitable widget for this house (or its stub), a
- * short note, and the Airbnb fallback. `id="book"` is the anchor the home
- * page's "Book direct" buttons point at.
+ * The booking column: the site's own widget in native mode, otherwise the
+ * Hospitable widget for this house (or its stub); then a short note and the
+ * Airbnb fallback. `id="book"` is the anchor the home page's "Book direct"
+ * buttons point at.
  */
 export function BookingPanel({
   property,
@@ -15,6 +18,9 @@ export function BookingPanel({
   property: Property;
   className?: string;
 }) {
+  const native =
+    resolveHospitableMode(getSite().hospitable.mode) === "native" &&
+    property.hospitable.uuid !== null;
   return (
     <section
       id="book"
@@ -27,7 +33,11 @@ export function BookingPanel({
       >
         Book direct
       </h2>
-      <PropertyWidget property={property} />
+      {native ? (
+        <BookingWidget propertyId={property.hospitable.uuid!} />
+      ) : (
+        <PropertyWidget property={property} />
+      )}
       <p className="font-mono text-[0.72rem] tracking-[0.04em] text-muted">
         Same calendar as Airbnb, no platform fee
       </p>

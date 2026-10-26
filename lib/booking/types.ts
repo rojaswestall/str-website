@@ -108,7 +108,14 @@ export type BookingErrorBody = {
 };
 
 export type PropertiesResponse =
-  { ok: true; properties: BookingProperty[] } | BookingErrorBody;
+  | {
+      ok: true;
+      properties: BookingProperty[];
+      /** Longest stay the quote route will price. */
+      maxNights: number;
+      comparisonEnabled: boolean;
+    }
+  | BookingErrorBody;
 
 export type CalendarResponse =
   | {

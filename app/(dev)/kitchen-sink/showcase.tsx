@@ -1,3 +1,4 @@
+import { BookingWidget } from "@/components/booking";
 import { ContactForm } from "@/components/contact";
 import { MonoHeading } from "@/components/property";
 import { getAllProperties, getPolicies, getProperty } from "@/content";
@@ -210,6 +211,14 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
             confirmed yet render as a dashed gap rather than an invented number.
           </p>
         </Prose>
+      </Section>
+
+      <Section hairline>
+        <SectionHead
+          title="BookingWidget"
+          meta="property switcher · live /api data"
+        />
+        <BookingWidget />
       </Section>
     </>
   );
