@@ -224,11 +224,11 @@ function LoadingBreakdown({
   currency: string;
 }) {
   return (
-    <div>
+    <div aria-busy="true">
       <p className="sr-only">Pricing these dates…</p>
       <dl
         aria-hidden="true"
-        className="flex flex-col gap-[0.45rem] text-[0.92rem]"
+        className="flex animate-pulse flex-col gap-[0.45rem] text-[0.92rem]"
       >
         <Row label="Nights" amount={<Bar />} />
         <Row label="Cleaning fee" amount={<Bar />} />
@@ -236,9 +236,9 @@ function LoadingBreakdown({
         <Row label="Total" amount={<Bar wide />} total />
       </dl>
       {previewTotal !== null ? (
-        <p className="mt-2 font-mono text-[0.66rem] tracking-[0.04em] text-muted">
-          Confirming the nightly estimate of{" "}
-          {formatDollars(previewTotal, currency)}…
+        <p className="mt-2 animate-pulse font-mono text-[0.66rem] tracking-[0.04em] text-muted">
+          Pricing your stay… confirming the nightly estimate of{" "}
+          {formatDollars(previewTotal, currency)}
         </p>
       ) : null}
     </div>

@@ -441,6 +441,10 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
                       ? `${formatDollars(previewTotal, property.currency)} est.`
                       : ""
                 }
+                amountPending={
+                  quote.state.status === "loading" ||
+                  reserve.status === "loading"
+                }
                 reserveLabel={
                   reserve.status === "confirm"
                     ? "Reserve again"
