@@ -2,7 +2,6 @@
 
 import { type RefObject } from "react";
 
-import { Button } from "@/components/ui";
 import {
   formatDollars,
   formatLongDate,
@@ -19,8 +18,6 @@ export type PricePanelProps = {
   nights: number;
   currency: string;
   headingRef: RefObject<HTMLParagraphElement | null>;
-  /** The panel's root, watched by the sticky summary bar. */
-  panelRef: RefObject<HTMLDivElement | null>;
   onClear: () => void;
 };
 
@@ -37,7 +34,6 @@ export function PricePanel({
   nights,
   currency,
   headingRef,
-  panelRef,
   onClear,
 }: PricePanelProps) {
   const { checkIn, checkOut } = selection;
@@ -52,7 +48,6 @@ export function PricePanel({
 
   return (
     <div
-      ref={panelRef}
       aria-live="polite"
       className="flex flex-col gap-3 border-t border-hairline pt-4"
     >
@@ -107,26 +102,15 @@ export function PricePanel({
           : "Prices under each date are the nightly rate for booking direct, before cleaning fee and taxes."}
       </p>
 
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Inert until the quote and checkout hand-off land (Phase 3). */}
-        <Button
-          disabled
-          aria-disabled
-          title="Reserving opens with the next release"
-          className="opacity-60"
+      {checkIn ? (
+        <button
+          type="button"
+          onClick={onClear}
+          className="cursor-pointer self-start font-mono text-[0.72rem] tracking-[0.06em] text-muted underline underline-offset-4 hover:text-ink"
         >
-          Reserve
-        </Button>
-        {checkIn ? (
-          <button
-            type="button"
-            onClick={onClear}
-            className="cursor-pointer font-mono text-[0.72rem] tracking-[0.06em] text-muted underline underline-offset-4 hover:text-ink"
-          >
-            Clear dates
-          </button>
-        ) : null}
-      </div>
+          Clear dates
+        </button>
+      ) : null}
     </div>
   );
 }

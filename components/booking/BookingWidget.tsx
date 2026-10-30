@@ -56,7 +56,6 @@ type CalendarData = { end: string; days: CalendarDay[] };
 export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
   const root = useRef<HTMLDivElement>(null);
   const priceHeading = useRef<HTMLParagraphElement>(null);
-  const pricePanel = useRef<HTMLDivElement>(null);
   const today = useMemo(() => todayInBookingZone(), []);
 
   const [catalog, setCatalog] = useState<Load<Catalog>>({ status: "loading" });
@@ -243,15 +242,15 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
                 nights={nights}
                 currency={property.currency}
                 headingRef={priceHeading}
-                panelRef={pricePanel}
                 onClear={() => setSelection(EMPTY_SELECTION)}
               />
               <StickySummary
-                active={selection.checkIn !== null}
                 label={
                   selection.checkIn && selection.checkOut
                     ? `${plural(nights, "night")} · ${formatRange(selection.checkIn, selection.checkOut)}`
-                    : "Choose a check-out date"
+                    : selection.checkIn
+                      ? "Choose a check-out date"
+                      : "Select dates to see price"
                 }
                 amount={
                   previewTotal !== null
@@ -259,7 +258,7 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
                     : ""
                 }
                 reserveDisabled
-                panelRef={pricePanel}
+                reserveHint="Reserving opens with the next release"
               />
             </>
           )}

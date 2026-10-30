@@ -32,7 +32,13 @@ export function BookingPanel({
     <section
       id="book"
       aria-labelledby="book-heading"
-      className={cx("flex scroll-mt-6 flex-col gap-[1.1rem]", className)}
+      className={cx(
+        // On wide screens the column is sticky (see the house page), so it
+        // must never be taller than the viewport: it scrolls inside itself
+        // and the widget's Reserve footer pins to its bottom edge.
+        "flex scroll-mt-6 flex-col gap-[1.1rem] lg:max-h-[calc(100vh_-_4rem)] lg:overflow-y-auto lg:overscroll-contain",
+        className,
+      )}
     >
       <h2
         id="book-heading"

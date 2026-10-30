@@ -1,7 +1,8 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useState } from "react";
 
+import { plural } from "@/lib/booking/format";
 import {
   clampGuests,
   type Guests,
@@ -25,7 +26,12 @@ type Row = {
   max: number;
 };
 
-/** Four stepper rows. Adults and children count toward the house's capacity. */
+/*
+ * One summary row ("2 guests · 1 pet") that opens into four stepper rows.
+ * Collapsed by default so the card stays short enough to fit beside the
+ * house copy; most guests never change the default party. Adults and
+ * children count toward the house's capacity.
+ */
 export function GuestPicker({
   guests,
   maxGuests,
@@ -33,6 +39,7 @@ export function GuestPicker({
   onChange,
 }: GuestPickerProps) {
   const id = useId();
+  const [open, setOpen] = useState(false);
   const occupancy = guests.adults + guests.children;
   const rows: Row[] = [
     {
@@ -69,6 +76,14 @@ export function GuestPicker({
       : []),
   ];
 
+  const summary = [
+    plural(occupancy, "guest"),
+    guests.infants ? plural(guests.infants, "infant") : null,
+    guests.pets ? plural(guests.pets, "pet") : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   function set(key: keyof Guests, value: number) {
     onChange(
       clampGuests({ ...guests, [key]: value }, { maxGuests, petsAllowed }),
@@ -76,19 +91,40 @@ export function GuestPicker({
   }
 
   return (
-    <div role="group" aria-labelledby={`${id}-label`}>
-      <div className="mb-2 flex items-baseline justify-between gap-3">
-        <p
-          id={`${id}-label`}
-          className="font-mono text-[0.74rem] tracking-[0.08em] text-ink uppercase"
-        >
-          Guests
-        </p>
-        <p className="font-mono text-[0.66rem] tracking-[0.04em] text-muted">
-          Sleeps up to {maxGuests} · {occupancy} of {maxGuests}
-        </p>
-      </div>
-      <ul className="divide-y divide-hairline border-y border-hairline">
+    <div className="border-y border-hairline">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={`${id}-rows`}
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full cursor-pointer items-center justify-between gap-3 py-[0.7rem] text-left"
+      >
+        <span className="flex flex-col gap-[0.15rem]">
+          <span className="font-mono text-[0.74rem] tracking-[0.08em] text-ink uppercase">
+            Guests
+          </span>
+          <span className="font-mono text-[0.66rem] tracking-[0.04em] text-muted">
+            Sleeps up to {maxGuests}
+          </span>
+        </span>
+        <span className="flex items-center gap-3">
+          <span className="text-[0.92rem] text-ink">{summary}</span>
+          <span
+            aria-hidden="true"
+            className={cx(
+              "font-mono text-[0.8rem] text-muted transition-transform duration-[120ms]",
+              open && "rotate-180",
+            )}
+          >
+            ▾
+          </span>
+        </span>
+      </button>
+      <ul
+        id={`${id}-rows`}
+        hidden={!open}
+        className="divide-y divide-hairline border-t border-hairline"
+      >
         {rows.map((row) => {
           const value = guests[row.key];
           return (
