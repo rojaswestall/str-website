@@ -15,16 +15,21 @@
 export const HOSPITABLE_LOADER_SRC =
   "https://cdn.hsptb.com/direct-booking-widget/widget-loader.prod.js";
 
-export type HospitableMode = "stub" | "live";
+/**
+ * "stub": placeholder panels. "live": Hospitable's embedded widget.
+ * "native": the site's own booking widget (components/booking), which talks
+ * to /api/* and hands off to Hospitable's hosted checkout.
+ */
+export type HospitableMode = "stub" | "live" | "native";
 
 function isMode(value: string | undefined): value is HospitableMode {
-  return value === "stub" || value === "live";
+  return value === "stub" || value === "live" || value === "native";
 }
 
 /**
  * `NEXT_PUBLIC_HOSPITABLE_MODE` wins when it is set to a valid value; otherwise
  * the mode from `content/site.ts` applies. The env var is inlined at build
- * time, so a Vercel environment flips the whole deployment to live.
+ * time, so a Vercel environment flips the whole deployment.
  */
 export function resolveHospitableMode(
   contentMode: HospitableMode,
