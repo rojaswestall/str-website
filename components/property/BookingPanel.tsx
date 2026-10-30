@@ -51,9 +51,24 @@ export function BookingPanel({
           fallback={
             <div
               role="status"
-              className="border border-hairline bg-paper-2 p-[clamp(1rem,3vw,1.75rem)] font-mono text-[0.72rem] tracking-[0.08em] text-muted uppercase"
+              aria-busy="true"
+              className="flex flex-col gap-4 border border-hairline bg-paper-2 p-[clamp(1rem,3vw,1.75rem)]"
             >
-              Loading the booking calendar…
+              <p className="font-mono text-[0.72rem] tracking-[0.08em] text-muted uppercase">
+                Loading the booking calendar…
+              </p>
+              <div
+                aria-hidden="true"
+                className="flex animate-pulse flex-col gap-4"
+              >
+                <div className="h-6 w-44 bg-slot-b" />
+                <div className="grid grid-cols-7 gap-1">
+                  {Array.from({ length: 35 }, (_, i) => (
+                    <div key={i} className="min-h-[2.9rem] bg-slot-a" />
+                  ))}
+                </div>
+                <div className="h-12 bg-slot-a" />
+              </div>
             </div>
           }
         >

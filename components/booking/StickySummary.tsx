@@ -8,6 +8,8 @@ export type StickySummaryProps = {
   label: string;
   /** "$512 est." or "$467.59"; empty while nothing can be shown. */
   amount: string;
+  /** The amount is about to change (a quote is in flight): pulse it. */
+  amountPending?: boolean;
   reserveLabel?: string;
   reserveDisabled: boolean;
   /** Why Reserve is disabled, for the tooltip. */
@@ -26,6 +28,7 @@ export type StickySummaryProps = {
 export function StickySummary({
   label,
   amount,
+  amountPending = false,
   reserveLabel = "Reserve",
   reserveDisabled,
   reserveHint,
@@ -43,7 +46,10 @@ export function StickySummary({
           </p>
           <p
             aria-live="polite"
-            className="text-[1.05rem] font-medium text-ink tabular-nums"
+            className={cx(
+              "text-[1.05rem] font-medium text-ink tabular-nums",
+              amountPending && "animate-pulse text-muted",
+            )}
           >
             {amount || "—"}
           </p>

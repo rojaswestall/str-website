@@ -306,21 +306,33 @@ function PropertySwitcher({
   );
 }
 
+/*
+ * Placeholder in the calendar's shape while the catalog or calendar loads.
+ * It pulses so a slow response reads as loading rather than as a broken
+ * widget; the visible line says what is happening. (prefers-reduced-motion
+ * switches the pulse off site-wide in globals.css.)
+ */
 function Skeleton({ calendar = false }: { calendar?: boolean }) {
   return (
-    <div
-      role="status"
-      aria-label="Loading the booking calendar"
-      className="flex flex-col gap-4"
-    >
-      {!calendar ? <div className="h-5 w-40 bg-slot-b" /> : null}
-      <div className="h-8 bg-slot-a" />
-      <div className="grid grid-cols-7 gap-1">
-        {Array.from({ length: 35 }, (_, i) => (
-          <div key={i} className="min-h-[2.9rem] bg-slot-a" />
-        ))}
+    <div role="status" aria-busy="true" className="flex flex-col gap-4">
+      <p className="font-mono text-[0.72rem] tracking-[0.08em] text-muted uppercase">
+        Loading the booking calendar…
+      </p>
+      <div aria-hidden="true" className="flex animate-pulse flex-col gap-4">
+        {!calendar ? <div className="h-6 w-44 bg-slot-b" /> : null}
+        <div className="flex items-center justify-between gap-2">
+          <div className="h-8 w-8 bg-slot-b" />
+          <div className="h-4 w-32 bg-slot-b" />
+          <div className="h-8 w-8 bg-slot-b" />
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {Array.from({ length: 35 }, (_, i) => (
+            <div key={i} className="min-h-[2.9rem] bg-slot-a" />
+          ))}
+        </div>
+        <div className="h-12 bg-slot-a" />
+        <div className="h-16 bg-slot-a" />
       </div>
-      <div className="h-24 bg-slot-a" />
     </div>
   );
 }
