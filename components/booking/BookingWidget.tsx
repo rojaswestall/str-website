@@ -346,133 +346,137 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
       data-testid="booking-widget"
       data-property-id={activeId}
       className={cx(
-        "flex flex-col gap-5 border border-hairline bg-paper-2 p-[clamp(1rem,3vw,1.75rem)]",
+        "flex flex-col border border-hairline bg-paper-2",
         className,
       )}
     >
-      {catalog.status === "loading" ? (
-        <Skeleton />
-      ) : catalog.status === "error" ? (
-        <Failure message={catalog.message} onRetry={retry} />
-      ) : (
-        <>
-          <div className="flex flex-col gap-[0.35rem]">
-            <Eyebrow>Book direct</Eyebrow>
-            {propertyId === undefined && catalog.data.properties.length > 1 ? (
-              <PropertySwitcher
-                properties={catalog.data.properties}
-                activeId={activeId}
-                onChange={switchProperty}
-              />
-            ) : (
-              <p className="font-display text-[1.35rem] leading-[1.25] text-ink">
-                {property?.name}
-              </p>
-            )}
-          </div>
+      {/* The body is padded; the footer below it spans the card's full width. */}
+      <div className="flex flex-col gap-5 p-[clamp(1rem,3vw,1.75rem)]">
+        {catalog.status === "loading" ? (
+          <Skeleton />
+        ) : catalog.status === "error" ? (
+          <Failure message={catalog.message} onRetry={retry} />
+        ) : (
+          <>
+            <div className="flex flex-col gap-[0.35rem]">
+              <Eyebrow>Book direct</Eyebrow>
+              {propertyId === undefined &&
+              catalog.data.properties.length > 1 ? (
+                <PropertySwitcher
+                  properties={catalog.data.properties}
+                  activeId={activeId}
+                  onChange={switchProperty}
+                />
+              ) : (
+                <p className="font-display text-[1.35rem] leading-[1.25] text-ink">
+                  {property?.name}
+                </p>
+              )}
+            </div>
 
-          {property === undefined ? (
-            <Failure
-              message="This house isn't available to book online."
-              onRetry={null}
-            />
-          ) : calendar.status === "loading" ? (
-            <Skeleton calendar />
-          ) : calendar.status === "error" ? (
-            <Failure message={calendar.message} onRetry={retry} />
-          ) : (
-            <>
-              <Calendar
-                key={property.id}
-                days={dayMap}
-                limits={limits}
-                windowEnd={calendar.data.end}
-                selection={selection}
-                directMarkupPct={property.markups.directPct}
-                currency={property.currency}
-                onSelect={onSelect}
+            {property === undefined ? (
+              <Failure
+                message="This house isn't available to book online."
+                onRetry={null}
               />
-              <GuestPicker
-                guests={boundedGuests}
-                maxGuests={property.maxGuests}
-                petsAllowed={property.petsAllowed}
-                onChange={changeGuests}
-              />
-              <PricePanel
-                selection={selection}
-                guests={boundedGuests}
-                nights={nights}
-                currency={property.currency}
-                previewTotal={previewTotal}
-                quote={quote.state}
-                reserve={reserve}
-                form={
-                  <GuestForm
-                    values={form}
-                    errors={formErrors}
-                    disabled={
-                      reserve.status === "loading" ||
-                      reserve.status === "redirecting"
-                    }
-                    onChange={(values) => {
-                      setForm(values);
-                      if (reserve.status === "error")
-                        setReserve({ status: "idle" });
-                    }}
-                    onBlur={onFieldBlur}
-                  />
-                }
-                headingRef={priceHeading}
-                onRetryQuote={quote.refresh}
-                onClear={() => changeStay(EMPTY_SELECTION)}
-              />
-              <StickySummary
-                label={
-                  selection.checkIn && selection.checkOut
-                    ? `${plural(nights, "night")} · ${formatRange(selection.checkIn, selection.checkOut)}`
-                    : selection.checkIn
-                      ? "Choose a check-out date"
-                      : "Select dates to see price"
-                }
-                amount={
-                  quote.state.status === "ready"
-                    ? formatCents(quote.state.quote.total, property.currency)
-                    : previewTotal !== null
-                      ? `${formatDollars(previewTotal, property.currency)} est.`
-                      : ""
-                }
-                amountPending={
-                  quote.state.status === "loading" ||
-                  reserve.status === "loading"
-                }
-                reserveLabel={
-                  reserve.status === "confirm"
-                    ? "Reserve again"
-                    : reserve.status === "loading" ||
+            ) : calendar.status === "loading" ? (
+              <Skeleton calendar />
+            ) : calendar.status === "error" ? (
+              <Failure message={calendar.message} onRetry={retry} />
+            ) : (
+              <>
+                <Calendar
+                  key={property.id}
+                  days={dayMap}
+                  limits={limits}
+                  windowEnd={calendar.data.end}
+                  selection={selection}
+                  directMarkupPct={property.markups.directPct}
+                  currency={property.currency}
+                  onSelect={onSelect}
+                />
+                <GuestPicker
+                  guests={boundedGuests}
+                  maxGuests={property.maxGuests}
+                  petsAllowed={property.petsAllowed}
+                  onChange={changeGuests}
+                />
+                <PricePanel
+                  selection={selection}
+                  guests={boundedGuests}
+                  nights={nights}
+                  currency={property.currency}
+                  previewTotal={previewTotal}
+                  quote={quote.state}
+                  reserve={reserve}
+                  form={
+                    <GuestForm
+                      values={form}
+                      errors={formErrors}
+                      disabled={
+                        reserve.status === "loading" ||
                         reserve.status === "redirecting"
-                      ? "One moment…"
-                      : "Reserve"
-                }
-                reserveDisabled={
-                  quote.state.status !== "ready" ||
-                  reserve.status === "loading" ||
-                  reserve.status === "redirecting"
-                }
-                reserveHint={
-                  !selection.checkIn || !selection.checkOut
-                    ? "Choose your dates first"
-                    : quote.state.status === "loading"
-                      ? "Pricing your stay…"
-                      : quote.state.status === "error"
-                        ? "We couldn't price these dates"
-                        : undefined
-                }
-                onReserve={() => void onReserve()}
-              />
-            </>
-          )}
-        </>
-      )}
+                      }
+                      onChange={(values) => {
+                        setForm(values);
+                        if (reserve.status === "error")
+                          setReserve({ status: "idle" });
+                      }}
+                      onBlur={onFieldBlur}
+                    />
+                  }
+                  headingRef={priceHeading}
+                  onRetryQuote={quote.refresh}
+                  onClear={() => changeStay(EMPTY_SELECTION)}
+                />
+              </>
+            )}
+          </>
+        )}
+      </div>
+      {property && calendar.status === "ready" ? (
+        <StickySummary
+          label={
+            selection.checkIn && selection.checkOut
+              ? `${plural(nights, "night")} · ${formatRange(selection.checkIn, selection.checkOut)}`
+              : selection.checkIn
+                ? "Choose a check-out date"
+                : "Select dates to see price"
+          }
+          amount={
+            quote.state.status === "ready"
+              ? formatCents(quote.state.quote.total, property.currency)
+              : previewTotal !== null
+                ? `${formatDollars(previewTotal, property.currency)} est.`
+                : ""
+          }
+          amountPending={
+            quote.state.status === "loading" || reserve.status === "loading"
+          }
+          reserveLabel={
+            reserve.status === "confirm"
+              ? "Reserve again"
+              : reserve.status === "loading" || reserve.status === "redirecting"
+                ? "One moment…"
+                : "Reserve"
+          }
+          reserveDisabled={
+            quote.state.status !== "ready" ||
+            reserve.status === "loading" ||
+            reserve.status === "redirecting"
+          }
+          reserveHint={
+            !selection.checkIn || !selection.checkOut
+              ? "Choose your dates first"
+              : quote.state.status === "loading"
+                ? "Pricing your stay…"
+                : quote.state.status === "error"
+                  ? "We couldn't price these dates"
+                  : undefined
+          }
+          onReserve={() => void onReserve()}
+        />
+      ) : null}
     </div>
   );
 }
