@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getBookingConfig } from "./config";
+import { withRetry } from "./retry";
 import { type UpstreamError, UpstreamErrorSchema } from "./upstream";
 
 /*
@@ -9,10 +10,15 @@ import { type UpstreamError, UpstreamErrorSchema } from "./upstream";
  * component ever imports this module. Only request metadata is logged —
  * method, path, status, duration, and Hospitable's reason phrase — never a
  * request or response body, which is where guest details would be.
+ *
+ * GET requests (properties, calendar) are retried once when the failure
+ * looks transient: a dropped connection, the 12-second timeout, a 429, or a
+ * 5xx. POST (quote) is never retried: each call creates a quote record in
+ * Hospitable, and the widget has its own "Try again".
  */
 
-const BASE_URL = "https://public.api.hospitable.com/v2";
 const TIMEOUT_MS = 12_000;
+const RETRY_DELAY_MS = 300;
 
 export class HospitableError extends Error {
   readonly status: number;
@@ -26,6 +32,11 @@ export class HospitableError extends Error {
     this.status = status;
     this.path = path;
     this.body = body;
+  }
+
+  /** Network failure, timeout, rate limit, or a server-side error. */
+  get transient(): boolean {
+    return this.status === 0 || this.status === 429 || this.status >= 500;
   }
 }
 
@@ -48,8 +59,8 @@ export type HospitableRequest = {
   body?: unknown;
 };
 
-function buildUrl(path: string, query?: Query): URL {
-  const url = new URL(`${BASE_URL}${path}`);
+function buildUrl(baseUrl: string, path: string, query?: Query): URL {
+  const url = new URL(`${baseUrl}${path}`);
   for (const [key, value] of Object.entries(query ?? {})) {
     if (value !== undefined && value !== "") {
       url.searchParams.set(key, String(value));
@@ -67,16 +78,13 @@ function parseError(text: string): UpstreamError | null {
   }
 }
 
-/** Calls Hospitable and returns the parsed JSON body; throws HospitableError on non-2xx. */
-export async function hospitableFetch(
+async function attempt(
+  method: "GET" | "POST",
   path: string,
-  request: HospitableRequest = {},
+  url: URL,
+  token: string,
+  body: unknown,
 ): Promise<unknown> {
-  const token = getBookingConfig().hospitable.pat;
-  if (!token) throw new HospitableNotConfiguredError();
-
-  const method = request.method ?? "GET";
-  const url = buildUrl(path, request.query);
   const started = Date.now();
 
   let response: Response;
@@ -86,11 +94,9 @@ export async function hospitableFetch(
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
-        ...(request.body !== undefined
-          ? { "Content-Type": "application/json" }
-          : {}),
+        ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
       },
-      body: request.body !== undefined ? JSON.stringify(request.body) : null,
+      body: body !== undefined ? JSON.stringify(body) : null,
       signal: AbortSignal.timeout(TIMEOUT_MS),
       cache: "no-store",
     });
@@ -105,12 +111,14 @@ export async function hospitableFetch(
   const ms = Date.now() - started;
 
   if (!response.ok) {
-    const body = parseError(text);
-    const reason = body?.reason_phrase ? ` reason="${body.reason_phrase}"` : "";
+    const parsed = parseError(text);
+    const reason = parsed?.reason_phrase
+      ? ` reason="${parsed.reason_phrase}"`
+      : "";
     console.warn(
       `[hospitable] ${method} ${path} ${response.status} ${ms}ms${reason}`,
     );
-    throw new HospitableError(response.status, path, body);
+    throw new HospitableError(response.status, path, parsed);
   }
 
   console.info(`[hospitable] ${method} ${path} ${response.status} ${ms}ms`);
@@ -121,4 +129,23 @@ export async function hospitableFetch(
       reason_phrase: "response was not JSON",
     });
   }
+}
+
+/** Calls Hospitable and returns the parsed JSON body; throws HospitableError on non-2xx. */
+export async function hospitableFetch(
+  path: string,
+  request: HospitableRequest = {},
+): Promise<unknown> {
+  const { pat, baseUrl } = getBookingConfig().hospitable;
+  if (!pat) throw new HospitableNotConfiguredError();
+
+  const method = request.method ?? "GET";
+  const url = buildUrl(baseUrl, path, request.query);
+
+  return withRetry(() => attempt(method, path, url, pat, request.body), {
+    attempts: method === "GET" ? 2 : 1,
+    delayMs: RETRY_DELAY_MS,
+    shouldRetry: (error) => error instanceof HospitableError && error.transient,
+    onRetry: () => console.warn(`[hospitable] ${method} ${path} retrying`),
+  });
 }

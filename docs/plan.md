@@ -27,13 +27,14 @@ later item depends on the earlier ones.
   | Variable                      | Production              | Preview                    |
   | ----------------------------- | ----------------------- | -------------------------- |
   | `NEXT_PUBLIC_SITE_URL`        | `https://<domain>`      | the preview origin or prod |
-  | `NEXT_PUBLIC_HOSPITABLE_MODE` | `live`                  | `stub`                     |
+  | `NEXT_PUBLIC_HOSPITABLE_MODE` | `live` → `native` (1b)  | `native`                   |
   | `RESEND_API_KEY`              | Resend key              | optional (dry run without) |
   | `CONTACT_FROM`                | `Name <addr@<domain>>`  | same as prod if key set    |
   | `CONTACT_TO`                  | comma-separated inboxes | same as prod if key set    |
 
-  | `HOSPITABLE_PERSONAL_ACCESS_TOKEN` | Public API token | same (needed to try the booking API on a preview) |
+  | `HOSPITABLE_PERSONAL_ACCESS_TOKEN` | Public API token | same (the native widget needs it) |
   | `HOSPITABLE_CUSTOM_SITE_ID`   | the widget's site uuid  | same                       |
+  | `BOOKING_ADMIN_TOKEN`         | `openssl rand -hex 24`  | same or unset              |
 
   `NEXT_PUBLIC_*` values are inlined at build time: redeploy after changing
   them. Without `NEXT_PUBLIC_SITE_URL` every canonical, sitemap, OG, and
@@ -65,7 +66,8 @@ later item depends on the earlier ones.
       `e2e/hospitable.spec.ts`, which asserts the report-only header and no
       enforcing one.
 - [ ] **Verify on the production domain.**
-  - [ ] A test booking reaches Hospitable checkout on all three house pages.
+  - [ ] A test booking reaches Hospitable checkout on all three house pages
+        (with the native widget, see 1b; with the embed, through the iframe).
   - [ ] The hero search bar submits to `/search` and results link to the
         right house pages.
   - [ ] One real inquiry through the contact form arrives with the guest as
@@ -83,25 +85,54 @@ later item depends on the earlier ones.
         Debugger, X card validator, and Slack once the final share cards
         exist (stay OG image URLs carry no cache-busting hash).
 
-## 1b. Custom booking widget (in progress)
+## 1b. Switch Production to the native booking widget
 
-The server half is merged (#36): `/api/properties`, `/api/calendar`, and
-`/api/quote` over the Hospitable Public API (see "Booking API" in
-[`architecture.md`](architecture.md)). Still to do:
+The widget, routes, comparison, admin check, e2e coverage and docs are all
+merged (#36–#39 and the hardening PR; see "Booking widget and API" in
+[`architecture.md`](architecture.md) and `CHANGELOG.md`). Vercel Preview
+already runs `NEXT_PUBLIC_HOSPITABLE_MODE=native`. Production still embeds
+Hospitable's widget; flipping it is a deliberate step, in this order, and
+only with a go from the hosts.
 
-- [ ] The widget UI on the house pages (property switcher, priced calendar,
-      quote with the Airbnb comparison, hand-off to Hospitable's hosted
-      checkout), replacing or sitting beside the embedded booking iframe.
-- [ ] The admin comparison check (`GET /api/admin/comparison-check`, gated
-      by `BOOKING_ADMIN_TOKEN`); the variable exists but the route does not.
-- [ ] End-to-end coverage for the booking routes and the widget (today only
-      unit tests over recorded responses).
-- [ ] CSP: add `public.api.hospitable.com` only if the browser ever calls it
-      directly (the routes are server-side, so it should not).
-- [ ] **Hospitable (human):** set per-channel markups on Parkwood A
-      (Oak Hill) and Dan Jean B (Fire Side). Only Dan Jean Unit A (South
+- [ ] **Hospitable (human).** Set per-channel markups on Parkwood A
+      (Oak Hill) and Dan Jean B (Fire Side); only Dan Jean Unit A (South
       Austin) has them, so it is the only house the price comparison is
-      right for.
+      right for today (the other two show no comparison line, correctly).
+      Check the Direct site's booking settings: the checkout currently says
+      "This booking is non-refundable once accepted" while the API reports
+      a refund-within-24-hours policy, and bookings are "Request to book"
+      (the host must accept each one) rather than instant — decide both.
+- [ ] **One real test booking on the Preview.** Pick Dan Jean Unit A,
+      reserve with a real card, accept the request in Hospitable, confirm
+      the reservation, the confirmation email, the lock code and the
+      cleaner task all fire, then cancel and refund it in Hospitable.
+- [ ] **Spot-check the comparison.** With `BOOKING_ADMIN_TOKEN` set on the
+      Preview, call `/api/admin/comparison-check?propertyId=<uuid>&date=…`
+      for two or three dates and compare `airbnbEstimate` with the Airbnb
+      host calendar. A mismatch means the Airbnb markup in Hospitable has
+      changed; the formula itself was verified on Nov 2 2026, Dec 31 2026
+      and Feb 25 2027.
+- [ ] **Vercel Production env.** `HOSPITABLE_PERSONAL_ACCESS_TOKEN`,
+      `HOSPITABLE_CUSTOM_SITE_ID` and `BOOKING_ADMIN_TOKEN` present;
+      `COMPARISON_ENABLED` unset or `true`. Then set
+      `NEXT_PUBLIC_HOSPITABLE_MODE=native` for Production and redeploy
+      (`NEXT_PUBLIC_*` is inlined at build time).
+- [ ] **After the deploy.** On the production domain: pick dates on each
+      house page and confirm a total appears; Reserve on Dan Jean A reaches
+      the Hospitable checkout pre-filled; `booking_*` events appear in
+      Vercel Web Analytics; the function log shows `[hospitable] GET …`
+      lines and no `[booking:*]` errors. Keep the Airbnb link under the
+      widget.
+- [ ] **Rollback.** Set `NEXT_PUBLIC_HOSPITABLE_MODE=live` on Production and
+      redeploy; the embedded widget returns and nothing else changes. The
+      routes keep working either way.
+- [ ] CSP: add `public.api.hospitable.com` only if the browser ever calls it
+      directly (the routes are server-side, so it should not; the e2e suite
+      asserts the browser makes no off-site request).
+- [ ] Later, if latency on cold starts matters: the calendar and property
+      caches are per function instance; a shared cache (Upstash, like the
+      rate limiter note below) would make the first request on a new
+      instance as fast as the rest.
 
 ## 2. Content still marked `[TBC]` (hosts to supply)
 

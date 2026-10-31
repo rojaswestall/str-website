@@ -47,17 +47,19 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      # node:test over lib/**/*.test.ts: the booking normalizers against the
-      # real Hospitable payloads in lib/booking/__fixtures__/. No server, no network.
+      # node:test over lib/**/*.test.ts: the booking code against the real
+      # Hospitable payloads in lib/booking/__fixtures__/. No server, no network.
       - name: Unit tests
         run: pnpm test:unit
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
-      # Playwright's two web servers each run `pnpm build` (stub and live) and
-      # pipe the build log in CI, so there is no separate build step; a build
-      # failure fails this step with the Next error in the log.
+      # Playwright's web servers run `pnpm build` three times (stub, live, and
+      # native mode) plus the stand-in Hospitable API, and pipe the build logs
+      # in CI, so there is no separate build step; a build failure fails this
+      # step with the Next error in the log. The native build needs no secret:
+      # it talks only to e2e/mock-hospitable/server.mjs.
       - name: Build and run end-to-end tests
         run: pnpm test
 

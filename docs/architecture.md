@@ -23,19 +23,19 @@ default for Hospitable is `stub` mode; production turns on `live` through
 
 ## Stack and key decisions
 
-| Area      | Choice                                                                                                |
-| --------- | ----------------------------------------------------------------------------------------------------- |
-| Framework | Next.js 16.4 App Router (Turbopack), React 19.3, `cacheComponents` and `partialPrefetching` on        |
-| Language  | TypeScript 6 strict with `noUncheckedIndexedAccess` (stays on 6.x until typescript-eslint supports 7) |
-| Styling   | Tailwind v4 through the `@tailwindcss/turbopack` loader (not PostCSS); tokens in `app/globals.css`    |
-| Tooling   | pnpm 12 (exact pin), Node 24 LTS, ESLint 10 flat config, Prettier with the Tailwind plugin            |
-| Content   | Typed data files in `content/`, parsed through zod 4 at import; photos in `public/photos/`            |
-| Booking   | Hospitable Direct: per-house booking loader and the property search widget                            |
-| Contact   | `POST /api/contact` sends via Resend; dry run without a key                                           |
-| Theme     | `next-themes` on `data-theme`, system preference plus a light / dark / system toggle                  |
-| Analytics | Vercel Web Analytics (`@vercel/analytics`, cookieless)                                                |
-| Hosting   | Vercel, on the custom domain                                                                          |
-| Tests     | Playwright against production builds, axe-core for accessibility                                      |
+| Area      | Choice                                                                                                     |
+| --------- | ---------------------------------------------------------------------------------------------------------- |
+| Framework | Next.js 16.4 App Router (Turbopack), React 19.3, `cacheComponents` and `partialPrefetching` on             |
+| Language  | TypeScript 6 strict with `noUncheckedIndexedAccess` (stays on 6.x until typescript-eslint supports 7)      |
+| Styling   | Tailwind v4 through the `@tailwindcss/turbopack` loader (not PostCSS); tokens in `app/globals.css`         |
+| Tooling   | pnpm 12 (exact pin), Node 24 LTS, ESLint 10 flat config, Prettier with the Tailwind plugin                 |
+| Content   | Typed data files in `content/`, parsed through zod 4 at import; photos in `public/photos/`                 |
+| Booking   | Own widget over the Hospitable Public API, paying on Hospitable's checkout; Hospitable's embed as fallback |
+| Contact   | `POST /api/contact` sends via Resend; dry run without a key                                                |
+| Theme     | `next-themes` on `data-theme`, system preference plus a light / dark / system toggle                       |
+| Analytics | Vercel Web Analytics (`@vercel/analytics`, cookieless)                                                     |
+| Hosting   | Vercel, on the custom domain                                                                               |
+| Tests     | Playwright against production builds, axe-core for accessibility                                           |
 
 Dependencies are kept on the latest stable releases their peers support.
 pnpm's default one-day `minimumReleaseAge` means a version published in the
@@ -123,6 +123,11 @@ the dev-mode path. Keep the `stays.spec.ts` status assertion.
   - `home/`, `area/`, `practicals/`, `map/` (`CityMap` SVG), `property/`
     (`PropertyBand`, `PropertyHeader`, `Gallery`, `AmenityList`, `Quotes`,
     `BookingPanel`, `PropertyCard`, `OtherHouses`, `MonoHeading`).
+  - `booking/` — the site's own widget: `BookingWidget` (client; state,
+    fetching, Reserve), `Calendar`, `GuestPicker`, `PricePanel`,
+    `GuestForm`, `StickySummary` (the pinned total and Reserve footer),
+    `useQuote` (debounced quoting), `BookingAnalytics` (DOM events →
+    Vercel). See "Booking widget and API".
   - `hospitable/` — `PropertyWidget` and `SearchWidget` (Server Components to
     mount) and their client cores `HospitableWidget` / `HospitableSearch`,
     plus the stubs.
@@ -289,36 +294,98 @@ message for 429/500, and replaces itself with a thank-you on success. The
 honeypot sits off-screen with `tabindex="-1"` (deliberately not
 `display:none`).
 
-## Booking API (first part of a custom booking widget)
+## Booking widget and API
 
-Three server routes put the Hospitable Public API v2 behind the site, so the
-browser never sees the access token. No page uses them yet: the widget UI
-that will call them is still to be built (see [`plan.md`](plan.md)), and the
-house pages still embed Hospitable's own booking iframe. They only read and
-quote; nothing writes reservations, calendars, or messages.
+In `native` mode (`NEXT_PUBLIC_HOSPITABLE_MODE`, or `site.hospitable.mode`)
+the house pages render the site's own widget instead of Hospitable's embed.
+It talks only to three routes on this site, which put the Hospitable Public
+API v2 behind the server so the browser never sees the access token. They
+only read and quote; nothing writes reservations, calendars, or messages.
+
+### Routes
 
 - `GET /api/properties` — houses listed in `content/` that Hospitable also
   lists, with capacity, hero image, check-in/out times, and Hospitable's
   per-channel markups. Cached an hour per instance.
-- `GET /api/calendar/:propertyId?start&end` — per day: `available`, `price`,
-  `minStay`, `closedToArrival`, `closedToDeparture`. The 18-month window is
-  fetched once per house and cached five minutes; requests are slices of it.
+- `GET /api/calendar/:propertyId?start&end` — per day: `available`, `price`
+  (Hospitable's base rate, cents), `minStay`, `closedToArrival`,
+  `closedToDeparture`. The 18-month window is fetched once per house and
+  cached five minutes; requests are slices of it.
 - `POST /api/quote` — zod-validated, 20 per minute per client address
   (`lib/rateLimit.ts`), never cached. Returns Hospitable's totals, a nightly
   breakdown derived from the calendar and reconciled against `sub_total`,
-  and the hosted checkout URL. Errors carry a `code` (`INVALID`,
+  the hosted checkout URL, and, when the comparison is on and direct is
+  cheaper, the Airbnb estimate. Errors carry a `code` (`INVALID`,
   `NOT_FOUND`, `UNAVAILABLE`, `MIN_STAY`, `MAX_NIGHTS`, `MAX_GUESTS`,
   `RATE_LIMITED`, `UPSTREAM`, `NOT_CONFIGURED`) and a message a guest can
   be shown. Guest details are forwarded, never logged or stored.
+- `GET /api/admin/comparison-check?propertyId&date` — `Bearer
+BOOKING_ADMIN_TOKEN`, compared in constant time; a 404 while the token is
+  unset. Returns the base rate, the Airbnb estimate and the direct preview
+  for one night, for checking the formula against the real host calendar.
 
-Code is in `lib/booking/` (`config.ts` reads the environment, `client.ts`
-holds the token and is `server-only`, `normalize.ts` maps Hospitable
-payloads, `server.ts` ties it together). Without
-`HOSPITABLE_PERSONAL_ACCESS_TOKEN` every route answers `503
-NOT_CONFIGURED`. Upstream calls log method, path, status, and duration only.
-What the Public API actually returns (prices in integer cents, check-in-day
-`min_stay`, no nightly breakdown or expiry on quotes, markups per house) is
-recorded in [`hospitable-discovery.md`](hospitable-discovery.md).
+Code is in `lib/booking/`: `config.ts` reads the environment, `client.ts`
+holds the token (`server-only`), builds URLs from `HOSPITABLE_API_BASE_URL`,
+times out at 12 s, and retries a GET once on a network failure, timeout,
+429 or 5xx (a quote POST is never retried); `normalize.ts` maps Hospitable
+payloads and the checkout-URL allow-list; `comparison.ts` is the Airbnb
+formula; `rules.ts` the calendar rules; `quote-state.ts` the quote reducer;
+`server.ts` ties it together, including `loadInitialBookingData` for the
+first paint. Without `HOSPITABLE_PERSONAL_ACCESS_TOKEN` every route answers
+`503 NOT_CONFIGURED`. Upstream calls log method, path, status, and duration
+only. What the Public API actually returns (prices in integer cents,
+check-in-day `min_stay`, no nightly breakdown or expiry on quotes, markups
+per house) is recorded in [`hospitable-discovery.md`](hospitable-discovery.md).
+
+### The widget
+
+`BookingPanel` (a Server Component) wraps `<Suspense>` around an async
+child that awaits `connection()`, reads the catalog and this house's
+calendar in parallel through the same cached loaders the routes use, and
+renders `BookingWidget` with them as `initial`. The prerendered page carries
+the skeleton; the boundary streams in with the priced calendar; the widget
+makes no request until the guest picks dates. If that read fails, `initial`
+is omitted and the widget fetches on the client and shows its own error
+states, so the server read is an optimisation, never a dependency.
+
+Inside the widget: `Calendar` is an ARIA grid with a roving tabindex, one
+month on narrow containers and two from `@xl`; every day knows whether it
+can be a check-in (available, not closed to arrival, not past) and, once a
+check-in is chosen, whether it is a reachable check-out (minimum stay from
+the check-in day's `minStay`, no booked night crossed, within `MAX_NIGHTS`,
+not closed to departure). Each day shows the direct nightly preview,
+`round(base × (1 + direct markup))`. `useQuote` posts to `/api/quote` 400 ms
+after the last change, cancels stale requests, and never shows a quote
+against dates it was not asked for. `PricePanel` shows Hospitable's
+breakdown and total (the only numbers the guest pays), the comparison line
+with its disclosure, and the `GuestForm`. `StickySummary` is a permanent
+footer pinned to the bottom of whatever scrolls (the page on a phone, the
+booking column itself on wide screens, which is `sticky` and scrolls inside
+`max-h-[calc(100vh-4rem)]`) with the running total, the struck-through
+Airbnb-equivalent total when there is a saving, and the one Reserve button.
+
+Reserve validates the form, re-quotes with `guestDetails` so Hospitable's
+checkout is pre-filled, and if the total differs from the one on screen
+replaces it and asks for one more click ("Reserve again"). `UNAVAILABLE`
+on that final quote clears the stay and refreshes the calendar. The
+redirect uses `window.location.assign` in the same tab and only to
+`https://booking.hospitable.com` (`isTrustedCheckoutUrl`). The widget emits
+`widget_loaded`, `dates_selected`, `quote_shown`, `comparison_shown`, and
+`reserve_clicked` as bubbling `CustomEvent`s without guest details;
+`BookingAnalytics` forwards them to Vercel Web Analytics as
+`booking_<event>`.
+
+### Airbnb comparison
+
+Airbnb shows `floor(base × (1 + Airbnb markup))` per night in whole dollars
+(verified against the real host calendar on three dates). The saving is
+that nightly total minus Hospitable's `sub_total`; cleaning fee and taxes
+are the same on both channels, so the struck-through footer figure is the
+quoted total plus the saving. The line is shown only when the saving is
+positive and `COMPARISON_ENABLED` is not `false`; it never states an Airbnb
+price as fact, and it links to the listing. Only Dan Jean Unit A (South
+Austin) has markups set in Hospitable today, so it is the only house the
+comparison is right for (see [`plan.md`](plan.md)).
 
 ## SEO
 

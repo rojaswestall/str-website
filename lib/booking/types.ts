@@ -144,3 +144,23 @@ export type CalendarResponse =
   | BookingErrorBody;
 
 export type QuoteResponse = { ok: true; quote: Quote } | BookingErrorBody;
+
+/**
+ * What the server hands the widget at render time so the calendar is in
+ * the first HTML instead of two fetches later. `calendar` is null when the
+ * house is not bookable or its calendar could not be read; the widget then
+ * fetches (or fails) on the client exactly as it would with nothing.
+ */
+export type InitialBookingData = {
+  catalog: {
+    properties: BookingProperty[];
+    maxNights: number;
+    comparisonEnabled: boolean;
+  };
+  calendar: {
+    propertyId: string;
+    start: string;
+    end: string;
+    days: CalendarDay[];
+  } | null;
+};

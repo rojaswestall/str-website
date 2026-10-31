@@ -17,6 +17,22 @@ describe("getBookingConfig", () => {
     assert.equal(config.comparisonEnabled, true);
     assert.equal(config.maxNights, 90);
     assert.equal(config.adminToken, null);
+    assert.equal(
+      config.hospitable.baseUrl,
+      "https://public.api.hospitable.com/v2",
+    );
+  });
+
+  it("lets the e2e suite point the client at a local stand-in", () => {
+    assert.equal(
+      getBookingConfig({ HOSPITABLE_API_BASE_URL: "http://127.0.0.1:3999/v2/" })
+        .hospitable.baseUrl,
+      "http://127.0.0.1:3999/v2",
+    );
+    assert.throws(
+      () => getBookingConfig({ HOSPITABLE_API_BASE_URL: "not a url" }),
+      /HOSPITABLE_API_BASE_URL/,
+    );
   });
 
   it("reads the token under either name and ignores blanks", () => {

@@ -29,6 +29,7 @@ import type {
   CalendarDay,
   CalendarResponse,
   GuestDetails,
+  InitialBookingData,
   PropertiesResponse,
 } from "@/lib/booking/types";
 import { cx } from "@/lib/cx";
@@ -43,6 +44,13 @@ import { useQuote } from "./useQuote";
 export type BookingWidgetProps = {
   /** Hospitable property id. Omit for a switcher over every bookable house. */
   propertyId?: string;
+  /**
+   * Catalog and calendar read on the server (lib/booking/server.ts,
+   * `loadInitialBookingData`). With it the first HTML already holds the
+   * priced calendar and the widget makes no request until dates are picked;
+   * without it the widget fetches both on mount.
+   */
+  initial?: InitialBookingData;
   className?: string;
 };
 
@@ -68,18 +76,46 @@ type FormErrors = Partial<Record<keyof GuestFormValues, string>>;
  * Reserve re-quotes with the guest's details and sends them to Hospitable's
  * hosted checkout; the browser never talks to Hospitable directly and the
  * site never takes payment. Emits `widget_loaded`, `dates_selected`,
- * `quote_shown` and `reserve_clicked` as bubbling DOM CustomEvents for the
- * host page's analytics. Guest details live in component state only.
+ * `quote_shown`, `comparison_shown` and `reserve_clicked` as bubbling DOM
+ * CustomEvents for the host page's analytics (BookingAnalytics forwards them
+ * to Vercel). Guest details live in component state only.
+ *
+ * Given `initial`, the server has already read the catalog and calendar:
+ * state starts ready, the HTML holds the priced calendar, and the mount
+ * effects skip their first fetch. Without it the widget loads itself.
  */
-export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
+export function BookingWidget({
+  propertyId,
+  initial,
+  className,
+}: BookingWidgetProps) {
   const root = useRef<HTMLDivElement>(null);
   const priceHeading = useRef<HTMLParagraphElement>(null);
 
-  const [catalog, setCatalog] = useState<Load<Catalog>>({ status: "loading" });
-  const [activeId, setActiveId] = useState<string | undefined>(propertyId);
-  const [calendar, setCalendar] = useState<Load<CalendarData>>({
-    status: "loading",
-  });
+  const seededCalendar =
+    initial?.calendar && initial.calendar.propertyId === propertyId
+      ? initial.calendar
+      : null;
+  const [catalog, setCatalog] = useState<Load<Catalog>>(() =>
+    initial
+      ? { status: "ready", data: initial.catalog }
+      : { status: "loading" },
+  );
+  const [activeId, setActiveId] = useState<string | undefined>(
+    () => propertyId ?? initial?.catalog.properties[0]?.id,
+  );
+  const [calendar, setCalendar] = useState<Load<CalendarData>>(() =>
+    seededCalendar
+      ? {
+          status: "ready",
+          data: {
+            start: seededCalendar.start,
+            end: seededCalendar.end,
+            days: seededCalendar.days,
+          },
+        }
+      : { status: "loading" },
+  );
   const [selection, setSelection] = useState<Selection>(EMPTY_SELECTION);
   const [guests, setGuests] = useState<Guests>(DEFAULT_GUESTS);
   const [reload, setReload] = useState(0);
@@ -94,7 +130,13 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
     );
   }, []);
 
+  const seeded = useRef({
+    catalog: initial !== undefined,
+    calendarFor: seededCalendar?.propertyId ?? null,
+  });
+
   useEffect(() => {
+    if (seeded.current.catalog && reload === 0) return;
     const controller = new AbortController();
     getJson<PropertiesResponse>("/api/properties", controller.signal)
       .then((body) => {
@@ -109,16 +151,32 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
         };
         setCatalog({ status: "ready", data });
         setActiveId((id) => id ?? data.properties[0]?.id);
-        emit("widget_loaded", { properties: data.properties.map((p) => p.id) });
       })
       .catch(() => {
         /* aborted on unmount or retry */
       });
     return () => controller.abort();
-  }, [emit, reload]);
+  }, [reload]);
+
+  // Once per mount, however the catalog arrived.
+  const announced = useRef(false);
+  useEffect(() => {
+    if (announced.current || catalog.status !== "ready") return;
+    announced.current = true;
+    emit("widget_loaded", {
+      properties: catalog.data.properties.map((p) => p.id),
+    });
+  }, [catalog, emit]);
 
   useEffect(() => {
     if (!activeId) return;
+    if (
+      seeded.current.calendarFor === activeId &&
+      reload === 0 &&
+      calendarReload === 0
+    ) {
+      return;
+    }
     const controller = new AbortController();
     getJson<CalendarResponse>(
       `/api/calendar/${encodeURIComponent(activeId)}`,
