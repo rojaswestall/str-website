@@ -162,5 +162,10 @@ export async function createQuote(
     checkOut: request.checkOut,
     days,
     directMarkupPct: property.markups.directPct,
+    comparison: {
+      enabled: config.comparisonEnabled,
+      airbnbMarkupPct: property.markups.airbnbPct,
+      airbnbUrl: property.airbnbUrl,
+    },
   });
 }

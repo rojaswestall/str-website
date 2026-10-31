@@ -181,6 +181,13 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
       total: q.total,
       currency: q.currency,
     });
+    if (q.comparison) {
+      emit("comparison_shown", {
+        propertyId: q.propertyId,
+        savings: q.comparison.savings,
+        currency: q.currency,
+      });
+    }
   }, [quote.state, emit]);
 
   // Loading states are set where a fetch is triggered (here, in retry, and
