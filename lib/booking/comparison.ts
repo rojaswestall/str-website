@@ -18,6 +18,19 @@ export function airbnbNightlyCents(
   return Math.floor((base / 100) * (1 + airbnbMarkupPct / 100)) * 100;
 }
 
+/**
+ * What the whole stay would come to on Airbnb: the quoted total plus the
+ * nightly saving, since the cleaning fee and taxes are the same on both
+ * channels. Struck through next to the real total, so the gap between the
+ * two is exactly the saving the widget states.
+ */
+export function airbnbEquivalentTotalCents(
+  total: Cents,
+  comparison: Pick<QuoteComparison, "savings">,
+): Cents {
+  return total + comparison.savings;
+}
+
 /** Sum of Airbnb's nightly prices for a stay, or null if a night is missing. */
 export function airbnbStayCents(
   days: readonly CalendarDay[],

@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 
 import {
+  airbnbEquivalentTotalCents,
   airbnbNightlyCents,
   airbnbStayCents,
   compareWithAirbnb,
@@ -89,6 +90,15 @@ describe("compareWithAirbnb", () => {
       }),
       null,
     );
+  });
+
+  it("puts the Airbnb-equivalent total exactly one saving above the quote", () => {
+    const comparison = compareWithAirbnb(stay);
+    assert.ok(comparison);
+    // The real quote's total for this stay: nights + cleaning + taxes.
+    const was = airbnbEquivalentTotalCents(50_499, comparison);
+    assert.equal(was, 51_435);
+    assert.equal(was - 50_499, comparison.savings);
   });
 });
 
