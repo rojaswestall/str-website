@@ -301,11 +301,13 @@ function Day({
           view.role !== "between" &&
           !view.available &&
           "text-muted/60 line-through",
+        // Still clickable as a fresh check-in, so it must stay readable
+        // (muted on paper-2 is 4.8:1; the /60 tint was 2.3:1).
         !selected &&
           view.role !== "between" &&
           view.available &&
           view.blocked &&
-          "text-muted/60",
+          "text-muted",
         disabled ? "cursor-not-allowed" : "cursor-pointer",
         !disabled && !selected && "hover:bg-slot-a",
         today && "underline decoration-dotted underline-offset-4",
@@ -316,7 +318,12 @@ function Day({
         aria-hidden="true"
         className={cx(
           "font-mono text-[0.58rem] tracking-[0.02em]",
-          selected ? "text-paper/70" : "text-muted",
+          // Each pair clears 4.5:1 in both themes (muted on slot-b did not).
+          selected
+            ? "text-paper/70"
+            : view.role === "between"
+              ? "text-ink-soft"
+              : "text-muted",
           !nightly && "invisible",
         )}
       >

@@ -8,7 +8,12 @@ import { getBookingConfig } from "./config";
 import { addMonths, todayInBookingZone } from "./dates";
 import { markupPct, normalizeCalendar, normalizeQuote } from "./normalize";
 import type { ParsedQuoteRequest } from "./schema";
-import type { BookingProperty, CalendarDay, Quote } from "./types";
+import type {
+  BookingProperty,
+  CalendarDay,
+  InitialBookingData,
+  Quote,
+} from "./types";
 import { UpstreamPropertyListSchema } from "./upstream";
 
 /*
@@ -105,6 +110,45 @@ export async function getCalendarWindow(
   );
 }
 
+/**
+ * The widget's first paint, read on the server: the catalog and this
+ * house's calendar, fetched in parallel (both cached). Never throws — a
+ * failure here only costs the guest the head start, not the widget, which
+ * falls back to fetching on the client and showing its own error states.
+ */
+export async function loadInitialBookingData(
+  propertyId: string,
+): Promise<InitialBookingData | null> {
+  const [properties, window] = await Promise.allSettled([
+    listBookingProperties(),
+    getCalendarWindow(propertyId),
+  ]);
+  if (properties.status === "rejected") {
+    console.warn(
+      `[booking] initial data unavailable: ${describe(properties.reason)}`,
+    );
+    return null;
+  }
+  const { maxNights, comparisonEnabled } = getBookingConfig();
+  const bookable = properties.value.some((p) => p.id === propertyId);
+  if (window.status === "rejected" && bookable) {
+    console.warn(
+      `[booking] initial calendar unavailable: ${describe(window.reason)}`,
+    );
+  }
+  return {
+    catalog: { properties: properties.value, maxNights, comparisonEnabled },
+    calendar:
+      bookable && window.status === "fulfilled"
+        ? { propertyId, ...window.value }
+        : null,
+  };
+}
+
+function describe(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export async function createQuote(
   request: ParsedQuoteRequest,
   property: BookingProperty,
@@ -152,7 +196,7 @@ export async function createQuote(
     days = (await getCalendarWindow(property.id)).days;
   } catch (error) {
     console.warn(
-      `[booking] calendar unavailable for nightly breakdown: ${error instanceof Error ? error.message : String(error)}`,
+      `[booking] calendar unavailable for nightly breakdown: ${describe(error)}`,
     );
   }
 

@@ -11,10 +11,17 @@ import { z } from "zod";
 
 const percent = z.coerce.number().min(0).max(100);
 
+export const HOSPITABLE_API_URL = "https://public.api.hospitable.com/v2";
+
 const EnvSchema = z.object({
   HOSPITABLE_PAT: z.string().trim().min(1).optional(),
   HOSPITABLE_PERSONAL_ACCESS_TOKEN: z.string().trim().min(1).optional(),
   HOSPITABLE_CUSTOM_SITE_ID: z.uuid().optional(),
+  /** Overridden only by the e2e suite, which points it at a local stand-in. */
+  HOSPITABLE_API_BASE_URL: z
+    .url()
+    .default(HOSPITABLE_API_URL)
+    .transform((url) => url.replace(/\/+$/, "")),
   AIRBNB_MARKUP_PCT: percent.default(15.5),
   DIRECT_MARKUP_PCT: percent.default(11),
   /** JSON object: Hospitable property id → public Airbnb listing URL. */
@@ -49,6 +56,8 @@ export type BookingConfig = {
     pat: string | null;
     /** `custom_site_id` for quotes; null falls back to content's site uuid. */
     customSiteId: string | null;
+    /** Public API origin and version prefix, without a trailing slash. */
+    baseUrl: string;
   };
   airbnbMarkupPct: number;
   directMarkupPct: number;
@@ -80,6 +89,7 @@ export function getBookingConfig(env: Env = process.env): BookingConfig {
     hospitable: {
       pat: e.HOSPITABLE_PAT ?? e.HOSPITABLE_PERSONAL_ACCESS_TOKEN ?? null,
       customSiteId: e.HOSPITABLE_CUSTOM_SITE_ID ?? null,
+      baseUrl: e.HOSPITABLE_API_BASE_URL,
     },
     airbnbMarkupPct: e.AIRBNB_MARKUP_PCT,
     directMarkupPct: e.DIRECT_MARKUP_PCT,
