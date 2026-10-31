@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Eyebrow } from "@/components/ui";
 import { getJson, postQuote } from "@/lib/booking/api-client";
+import { airbnbEquivalentTotalCents } from "@/lib/booking/comparison";
 import { nightsBetween } from "@/lib/booking/dates";
 import {
   formatCents,
@@ -181,6 +182,13 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
       total: q.total,
       currency: q.currency,
     });
+    if (q.comparison) {
+      emit("comparison_shown", {
+        propertyId: q.propertyId,
+        savings: q.comparison.savings,
+        currency: q.currency,
+      });
+    }
   }, [quote.state, emit]);
 
   // Loading states are set where a fetch is triggered (here, in retry, and
@@ -452,6 +460,20 @@ export function BookingWidget({ propertyId, className }: BookingWidgetProps) {
           }
           amountPending={
             quote.state.status === "loading" || reserve.status === "loading"
+          }
+          comparison={
+            quote.state.status === "ready" && quote.state.quote.comparison
+              ? {
+                  wasAmount: formatCents(
+                    airbnbEquivalentTotalCents(
+                      quote.state.quote.total,
+                      quote.state.quote.comparison,
+                    ),
+                    property.currency,
+                  ),
+                  savedNote: `${formatCents(quote.state.quote.comparison.savings, property.currency)} saved vs booking on Airbnb`,
+                }
+              : undefined
           }
           reserveLabel={
             reserve.status === "confirm"

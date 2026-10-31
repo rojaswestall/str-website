@@ -11,7 +11,7 @@ import {
 } from "@/lib/booking/format";
 import type { QuoteState } from "@/lib/booking/quote-state";
 import type { Guests, Selection } from "@/lib/booking/rules";
-import type { Quote } from "@/lib/booking/types";
+import type { Quote, QuoteComparison } from "@/lib/booking/types";
 import { cx } from "@/lib/cx";
 
 export type ReserveState =
@@ -105,7 +105,12 @@ export function PricePanel({
           ) : null}
         </div>
       ) : ready ? (
-        <Breakdown quote={ready} nights={nights} currency={currency} />
+        <>
+          <Breakdown quote={ready} nights={nights} currency={currency} />
+          {ready.comparison ? (
+            <Comparison comparison={ready.comparison} currency={currency} />
+          ) : null}
+        </>
       ) : (
         <LoadingBreakdown previewTotal={previewTotal} currency={currency} />
       )}
@@ -285,6 +290,55 @@ function Bar({ wide = false }: { wide?: boolean }) {
         wide ? "w-20" : "w-14",
       )}
     />
+  );
+}
+
+/*
+ * "Book direct and save $X vs. Airbnb", with the disclosure and a link to
+ * the listing so a sceptical guest can check. Only rendered when the server
+ * found a positive saving; the copy never claims a specific Airbnb price.
+ */
+function Comparison({
+  comparison,
+  currency,
+}: {
+  comparison: QuoteComparison;
+  currency: string;
+}) {
+  return (
+    <div
+      data-testid="airbnb-comparison"
+      className="flex flex-col gap-[0.4rem] border-t border-hairline pt-3"
+    >
+      <p className="text-[0.92rem] text-ink">
+        Book direct and save{" "}
+        <span className="font-medium tabular-nums">
+          {formatCents(comparison.savings, currency)}
+        </span>{" "}
+        vs. Airbnb
+      </p>
+      <details className="group font-mono text-[0.66rem] leading-[1.5] tracking-[0.04em] text-muted">
+        <summary className="cursor-pointer list-none underline underline-offset-4 hover:text-ink">
+          How we estimate this
+        </summary>
+        <p className="mt-[0.35rem] max-w-[44ch]">
+          Estimated from our Airbnb nightly rates for these dates (
+          {formatCents(comparison.airbnbNightlyTotal, currency)} for the nights
+          on Airbnb, {formatCents(comparison.directNightlyTotal, currency)}{" "}
+          here); cleaning fee and taxes are the same on both. Prices on Airbnb
+          may vary by guest or promotion.{" "}
+          <a
+            href={comparison.airbnbUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-ink underline underline-offset-4"
+          >
+            Check the listing on Airbnb
+          </a>
+          .
+        </p>
+      </details>
+    </div>
   );
 }
 

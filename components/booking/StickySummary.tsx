@@ -10,6 +10,12 @@ export type StickySummaryProps = {
   amount: string;
   /** The amount is about to change (a quote is in flight): pulse it. */
   amountPending?: boolean;
+  /**
+   * What the stay would come to on Airbnb, shown struck through before the
+   * amount, with the saving spelled out beneath. Only when the server found
+   * a positive saving.
+   */
+  comparison?: { wasAmount: string; savedNote: string };
   reserveLabel?: string;
   reserveDisabled: boolean;
   /** Why Reserve is disabled, for the tooltip. */
@@ -29,6 +35,7 @@ export function StickySummary({
   label,
   amount,
   amountPending = false,
+  comparison,
   reserveLabel = "Reserve",
   reserveDisabled,
   reserveHint,
@@ -51,8 +58,25 @@ export function StickySummary({
               amountPending && "animate-pulse text-muted",
             )}
           >
+            {comparison && !amountPending ? (
+              <s
+                data-testid="booking-footer-was"
+                className="mr-2 font-normal text-muted"
+              >
+                <span className="sr-only">On Airbnb, about </span>
+                {comparison.wasAmount}
+              </s>
+            ) : null}
             {amount || "—"}
           </p>
+          {comparison && !amountPending ? (
+            <p
+              data-testid="booking-footer-saved"
+              className="truncate font-mono text-[0.66rem] tracking-[0.04em] text-ink-soft"
+            >
+              {comparison.savedNote}
+            </p>
+          ) : null}
         </div>
         <Button
           disabled={reserveDisabled}

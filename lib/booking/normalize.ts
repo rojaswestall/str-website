@@ -1,3 +1,4 @@
+import { compareWithAirbnb } from "./comparison";
 import { nightsBetween, nightsOf } from "./dates";
 import type {
   BookingErrorCode,
@@ -115,6 +116,12 @@ export function normalizeQuote(
     /** Calendar days covering the stay, for the nightly breakdown. */
     days?: readonly CalendarDay[];
     directMarkupPct: number;
+    /** Omit to leave `comparison` null. */
+    comparison?: {
+      enabled: boolean;
+      airbnbMarkupPct: number;
+      airbnbUrl: string;
+    };
   },
 ): Quote {
   const { data } = UpstreamQuoteSchema.parse(raw);
@@ -152,6 +159,17 @@ export function normalizeQuote(
     currency: data.currency,
     bookingUrl: data.booking_url,
     quoteExpiresAt: null,
+    comparison: stay.comparison
+      ? compareWithAirbnb({
+          enabled: stay.comparison.enabled,
+          days: stay.days,
+          checkIn: stay.checkIn,
+          checkOut: stay.checkOut,
+          airbnbMarkupPct: stay.comparison.airbnbMarkupPct,
+          directNightlyTotal: subTotal,
+          airbnbUrl: stay.comparison.airbnbUrl,
+        })
+      : null,
   };
 }
 
