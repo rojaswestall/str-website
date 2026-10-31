@@ -37,7 +37,7 @@ export function StickySummary({
   return (
     <div
       data-testid="booking-footer"
-      className="sticky bottom-0 z-10 -mx-[clamp(1rem,3vw,1.75rem)] -mb-[clamp(1rem,3vw,1.75rem)] border-t border-hairline bg-paper-2 px-[clamp(1rem,3vw,1.75rem)] pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      className="sticky bottom-0 z-10 border-t border-hairline bg-paper-2 px-[clamp(1rem,3vw,1.75rem)] pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
