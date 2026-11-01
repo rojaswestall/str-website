@@ -120,10 +120,7 @@ the dev-mode path. Keep the `stays.spec.ts` status assertion.
   - `layout/` — `SkipLink`, `SiteHeader`, `SiteFooter`.
   - `theme/` — `ThemeProvider`, `ThemeToggle` (`data-theme-toggle`,
     `data-mode` for tests).
-  - `home/`, `area/`, `practicals/`, `map/` (`CityMap`: the Apple map in
-    `AppleCityMap` with its custom callout in `callout.ts` when
-    `NEXT_PUBLIC_MAPKIT_TOKEN` is set, else the drawn SVG in `CitySketch`),
-    `property/`
+  - `home/`, `area/`, `practicals/`, `map/` (`CityMap` SVG), `property/`
     (`PropertyBand`, `PropertyHeader`, `Gallery`, `AmenityList`, `Quotes`,
     `BookingPanel`, `PropertyCard`, `OtherHouses`, `MonoHeading`).
   - `booking/` — the site's own widget: `BookingWidget` (client; state,
@@ -186,9 +183,7 @@ fails `next build` and `pnpm check:content`. **Always import from
   South Austin `2338069` ("Dan Jean Unit A"), Fire Side `2338068` ("Dan Jean
   B"), and `hospitable.uuid`, its Public API id used by the booking routes
   (null keeps a house out of them).
-- **Map pins** are `mapPin: { x, y }` in `CitySketch`'s 400×400 viewBox, and
-  `mapArea: { latitude, longitude }` on the Apple map: a neighbourhood-level
-  point, never the street address (the map also caps zoom at about 2.5 km).
+- **Map pins** are `mapPin: { x, y }` in `CityMap`'s 400×400 viewBox.
 - **Area picks** carry an `id` (for `/area#<id>` anchors) and `driveMinutes`
   keyed by every house slug; `content/index.ts` checks ids are unique and
   every house has a time.
