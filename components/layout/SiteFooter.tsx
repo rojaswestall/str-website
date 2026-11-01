@@ -1,20 +1,23 @@
-import Link from "next/link";
+import { MessageDialog } from "@/components/contact";
 import { Container, Tbc } from "@/components/ui";
-import { getLicenses, getSite, isTbc } from "@/content";
-
-const link =
-  "border-b border-hairline pb-px text-ink no-underline transition-[border-color] duration-[120ms] hover:border-ink";
+import { getAllProperties, getLicenses, getSite, isTbc } from "@/content";
 
 /**
  * The artifact's footer: display-font colophon with the domain under it, a
  * mono contact column, and the City of Austin STR license line, one entry per
  * house, read from the content layer. There is no public email or Instagram:
- * the contact column links to the contact form in the home page's `#direct`
- * section. An unconfirmed domain renders as a dashed `Tbc` gap.
+ * the contact column's "Send us a message" button opens the contact form in a
+ * pop-up on any page (`MessageDialog`), with the house pre-selected on a house
+ * page. An unconfirmed domain renders as a dashed `Tbc` gap.
  */
 export function SiteFooter() {
   const site = getSite();
   const licenses = getLicenses();
+  // MessageDialog is a Client Component: pass only the slug/name pairs.
+  const properties = getAllProperties().map(({ slug, name }) => ({
+    slug,
+    name,
+  }));
 
   return (
     <footer className="border-t border-hairline py-[clamp(2.5rem,5vw,3.5rem)]">
@@ -26,10 +29,8 @@ export function SiteFooter() {
           </span>
         </p>
 
-        <address className="flex flex-col items-start gap-[0.35rem] font-mono text-[0.8rem] text-ink-soft not-italic">
-          <Link href="/#direct" className={link}>
-            Send us a message
-          </Link>
+        <address className="flex flex-col items-start gap-[0.75rem] font-mono text-[0.8rem] text-ink-soft not-italic">
+          <MessageDialog properties={properties} />
           <span>Phone shared with guests after booking</span>
         </address>
 
