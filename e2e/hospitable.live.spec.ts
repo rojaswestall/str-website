@@ -86,6 +86,12 @@ const SEARCH_SCRIPT_SRC =
   "https://hospitable.b-cdn.net/direct-property-search-widget/hospitable-search-widget.prod.js";
 
 test.describe("hospitable widgets (live mode)", () => {
+  // This build has a MapKit token; keep Apple's CDN out of these tests
+  // (mapkit.live.spec.ts covers the map). The map falls back to the SVG.
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/*.apple-mapkit.com/**", (route) => route.abort());
+  });
+
   test("mounts the loader once and re-mounts after client-side navigation away and back", async ({
     page,
   }) => {
