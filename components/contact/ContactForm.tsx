@@ -14,8 +14,8 @@ import type { ContactFieldErrors } from "@/lib/contact/schema";
 
 /*
  * The contact form that replaces the artifact's waitlist signup. It posts the
- * fields exactly as named to POST /api/contact (contract in the step 7 notes in
- * docs/plan.md): optional fields go up as "" and the API treats them as absent,
+ * fields exactly as named to POST /api/contact (contract in the Contact section
+ * of docs/architecture.md): optional fields go up as "" and the API treats them as absent,
  * so nothing is massaged here. Without RESEND_API_KEY the route dry-runs and
  * still answers 200, so the success state below is what a real send shows too.
  *

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { sendInquiry } from "@/lib/contact/email";
-import { clientKey, consume } from "@/lib/contact/rateLimit";
 import {
   ContactInquirySchema,
   fieldErrors,
   isHoneypotFilled,
 } from "@/lib/contact/schema";
+import { clientKey, consume } from "@/lib/rateLimit";
 
 /*
  * POST /api/contact — the contact form's endpoint (step 10 posts JSON here).
