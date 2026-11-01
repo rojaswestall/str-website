@@ -17,10 +17,12 @@ import type { Property } from "./types";
  * the review was posted). Ratings and review counts were copied from the
  * listings on 2026-10-12.
  *
- * `mapArea` places each house on the Apple map at neighbourhood precision
- * (rounded to roughly half a kilometre and kept off the real address, which
- * is internal). The two South Austin houses are drawn apart on purpose; the
- * map never shows them as neighbours. The map also caps how far it zooms in.
+ * `mapArea` places each house on the Apple map at a nearby intersection, never
+ * the street address (which stays internal); the map also caps how far it
+ * zooms in. South Austin Stay and Fire Side Home are Dan Jean Units A and B,
+ * one building near Manchaca Rd & William Cannon Dr: their pins sit about
+ * 500 m apart, either side of that intersection, so each can be tapped on its
+ * own on the zoomed-out map.
  */
 
 export const properties: Property[] = [
@@ -76,7 +78,8 @@ export const properties: Property[] = [
       },
     ],
     mapPin: { x: 85, y: 299 },
-    mapArea: { latitude: 30.234, longitude: -97.858 },
+    // Parkwood Dr near School Rd, East Oak Hill.
+    mapArea: { latitude: 30.238, longitude: -97.855 },
   },
   {
     slug: "south-austin",
@@ -131,7 +134,8 @@ export const properties: Property[] = [
     ],
     // Both South Austin houses sit near (266, 299); offset so the dots read apart.
     mapPin: { x: 258, y: 292 },
-    mapArea: { latitude: 30.225, longitude: -97.792 },
+    // Dan Jean Unit A: Manchaca Rd & William Cannon Dr, set 250 m west.
+    mapArea: { latitude: 30.2025, longitude: -97.8071 },
   },
   {
     slug: "fire-side",
@@ -186,6 +190,7 @@ export const properties: Property[] = [
       },
     ],
     mapPin: { x: 274, y: 306 },
-    mapArea: { latitude: 30.219, longitude: -97.784 },
+    // Dan Jean Unit B: Manchaca Rd & William Cannon Dr, set 250 m east.
+    mapArea: { latitude: 30.2025, longitude: -97.8019 },
   },
 ];
