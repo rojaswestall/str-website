@@ -86,8 +86,22 @@ function nextReservedDay(today: string): string {
   throw new Error("unreachable");
 }
 
+/**
+ * Waits until the calendar is on screen. `isVisible()` does not wait, and the
+ * widget can still be hidden for a moment after navigation; checking a date
+ * then reads as "not in this month" and pages past it. That only bites when
+ * the date is in the first month shown (early in a month), which is why it
+ * passed for most of October and failed on November 1.
+ */
+async function calendarReady(widget: Locator) {
+  await expect(
+    widget.locator('[role="gridcell"][data-date]').first(),
+  ).toBeVisible();
+}
+
 async function clickDate(widget: Locator, date: string) {
   const cell = widget.locator(`[role="gridcell"][data-date="${date}"]`);
+  await calendarReady(widget);
   for (let i = 0; i < 4 && !(await cell.isVisible()); i++) {
     await widget.getByRole("button", { name: "Next month" }).click();
   }
@@ -213,6 +227,7 @@ test.describe("native booking widget", () => {
     const reserved = widget.locator(
       `[role="gridcell"][data-date="${nextReservedDay(today)}"]`,
     );
+    await calendarReady(widget);
     for (let i = 0; i < 3 && !(await reserved.isVisible()); i++) {
       await widget.getByRole("button", { name: "Next month" }).click();
     }
