@@ -1,5 +1,5 @@
 import { CityMap } from "@/components/map/CityMap";
-import { SearchWidget } from "@/components/hospitable";
+import { CheckDates } from "@/components/search";
 import { Container, Eyebrow, PhotoFrame } from "@/components/ui";
 import { getAllProperties, getHosts, getSite } from "@/content";
 
@@ -69,8 +69,8 @@ export function Hero() {
             >
               Check dates across all {houseCount}
             </p>
-            <div aria-labelledby="search-label" role="group">
-              <SearchWidget />
+            <div aria-labelledby="search-label" role="search">
+              <CheckDates variant="bar" />
             </div>
           </div>
           <CityMap className="min-[760px]:justify-self-end" />

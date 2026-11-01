@@ -13,10 +13,9 @@ import { expect, test, type Page } from "@playwright/test";
  * house without an id (HospitableWidget.tsx) has no house left to exercise
  * it and is not covered here.
  *
- * The property search script (hospitable.b-cdn.net) is replaced the same way,
- * with a stand-in that defines the <hospitable-direct-mps> custom element and
- * echoes its attributes, so the hero bar and the results page are covered
- * without the real one.
+ * The "check dates" search is the site's own (components/search) and needs
+ * only the booking API token, which this build does not have; here it falls
+ * back to the house links. search.native.spec.ts covers the real thing.
  */
 const FAKE_LOADER = `
   (() => {
@@ -29,26 +28,6 @@ const FAKE_LOADER = `
     marker.textContent = "fake hospitable widget";
     script.insertAdjacentElement("afterend", marker);
   })();
-`;
-
-const FAKE_SEARCH_SCRIPT = `
-  if (!customElements.get("hospitable-direct-mps")) {
-    customElements.define("hospitable-direct-mps", class extends HTMLElement {
-      connectedCallback() {
-        // Like the real widget: an open shadow root, attached a frame later.
-        requestAnimationFrame(() => {
-          const root = this.shadowRoot ?? this.attachShadow({ mode: "open" });
-          const marker = document.createElement("div");
-          marker.dataset.testid = "hospitable-search-marker";
-          marker.dataset.identifier = this.getAttribute("identifier") ?? "";
-          marker.dataset.type = this.getAttribute("type") ?? "";
-          marker.dataset.resultsUrl = this.getAttribute("results-url") ?? "";
-          marker.textContent = "fake hospitable search";
-          root.replaceChildren(marker);
-        });
-      }
-    });
-  }
 `;
 
 async function interceptLoader(page: Page) {
@@ -64,26 +43,10 @@ async function interceptLoader(page: Page) {
   return loads;
 }
 
-async function interceptSearchScript(page: Page) {
-  const loads: string[] = [];
-  await page.route("**/hospitable.b-cdn.net/**", async (route) => {
-    loads.push(route.request().url());
-    await route.fulfill({
-      status: 200,
-      contentType: "application/javascript",
-      body: FAKE_SEARCH_SCRIPT,
-    });
-  });
-  return loads;
-}
-
 const SITE_UUID = "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb";
 const FIRE_SIDE_PROPERTY_ID = "2338068";
 const OAK_HILL_PROPERTY_ID = "2338067";
 const THEME = "boutique";
-const SEARCH_WIDGET_ID = "178e46fc-3dbb-4433-ac2d-3ebe9d9cca07";
-const SEARCH_SCRIPT_SRC =
-  "https://hospitable.b-cdn.net/direct-property-search-widget/hospitable-search-widget.prod.js";
 
 test.describe("hospitable widgets (live mode)", () => {
   // This build has a MapKit token; keep Apple's CDN out of these tests
@@ -171,56 +134,39 @@ test.describe("hospitable widgets (live mode)", () => {
     ).toEqual([]);
   });
 
-  test("the home hero mounts the search bar pointing at /search, and /search mounts the results widget", async ({
+  test("a stay in the URL reaches the house page, where the loader reads it", async ({
+    page,
+  }) => {
+    const loads = await interceptLoader(page);
+    await page.goto(
+      "/stays/oak-hill?checkin=2027-03-05&checkout=2027-03-08&adults=2&children=0&infants=0&pets=0#book",
+    );
+    await expect(page.getByTestId("hospitable-live-marker")).toHaveAttribute(
+      "data-property-id",
+      OAK_HILL_PROPERTY_ID,
+    );
+    expect(loads).toHaveLength(1);
+    // The loader itself copies these from location.search into its iframe.
+    expect(new URL(page.url()).searchParams.get("checkin")).toBe("2027-03-05");
+  });
+
+  test("the home hero and /search load no Hospitable script", async ({
     page,
   }) => {
     const loaderLoads = await interceptLoader(page);
-    const searchLoads = await interceptSearchScript(page);
+    const searchLoads: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("hospitable.b-cdn.net"))
+        searchLoads.push(request.url());
+    });
 
     await page.goto("/");
-    const frame = page.getByTestId("hospitable-search");
-    await expect(frame).toHaveAttribute("data-variant", "bar");
-    await expect(page.getByTestId("hospitable-search-stub")).toHaveCount(0);
-
-    const bar = frame.locator("hospitable-direct-mps");
-    await expect(bar).toHaveAttribute("identifier", SEARCH_WIDGET_ID);
-    await expect(bar).toHaveAttribute("type", "custom");
-    await expect(bar).toHaveAttribute("results-url", "/search");
-
-    // The stand-in upgraded the element once the script landed.
-    const marker = page.getByTestId("hospitable-search-marker");
-    await expect(marker).toHaveAttribute("data-identifier", SEARCH_WIDGET_ID);
-    await expect(marker).toHaveAttribute("data-results-url", "/search");
-    // The layout adjustments were appended into the shadow root, once.
-    await expect
-      .poll(() =>
-        bar.evaluate(
-          (element) =>
-            element.shadowRoot?.querySelectorAll(
-              "style[data-austin-collection]",
-            ).length,
-        ),
-      )
-      .toBe(1);
-    await expect(
-      page.locator(`script[src="${SEARCH_SCRIPT_SRC}"]`),
-    ).toHaveCount(1);
-
-    // The results page: the same element without results-url.
+    await expect(page.getByTestId("check-dates-fallback")).toBeVisible();
     await page.goto("/search");
-    const results = page.getByTestId("hospitable-search");
-    await expect(results).toHaveAttribute("data-variant", "results");
-    const widget = results.locator("hospitable-direct-mps");
-    await expect(widget).toHaveAttribute("identifier", SEARCH_WIDGET_ID);
-    await expect(widget).toHaveAttribute("type", "custom");
-    await expect(widget).not.toHaveAttribute("results-url");
-    await expect(page.getByTestId("hospitable-search-marker")).toHaveAttribute(
-      "data-results-url",
-      "",
-    );
+    await expect(page.getByTestId("check-dates-fallback")).toBeVisible();
+    await expect(page.locator("hospitable-direct-mps")).toHaveCount(0);
 
-    expect(searchLoads).toHaveLength(2);
-    // The booking loader has no business on either page.
+    expect(searchLoads).toEqual([]);
     expect(loaderLoads).toEqual([]);
   });
 });

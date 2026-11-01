@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SearchWidget } from "@/components/hospitable";
+import { Suspense } from "react";
+
+import { CheckDates, SearchFallback, SearchResults } from "@/components/search";
 import { Eyebrow, Prose, Section } from "@/components/ui";
 import { getAllProperties } from "@/content";
+import { hospitableConfigured } from "@/lib/booking/client";
+import {
+  parseSearchParams,
+  type SearchParams,
+  searchQueryString,
+} from "@/lib/booking/search";
+import { searchLimits } from "@/lib/booking/search-server";
 import { canonicalUrl } from "@/lib/seo";
 
 /*
- * Results page for Hospitable's property search. The hero bar on the home
- * page submits here with the dates and guests in the query string, and the
- * widget below lists the houses that are free. Its content is client-rendered
- * by Hospitable, so the page is kept out of the index; the three house links
- * are the no-script fallback and the first thing on screen while it loads.
+ * Results page for the "check dates" search. The home hero's form submits
+ * here with the stay in the query string (checkin, checkout, adults,
+ * children, infants, pets); the form at the top starts from it and the
+ * houses free for that stay are listed below, read on the server.
+ *
+ * The query is request-time data, so under Cache Components everything that
+ * reads it sits in a Suspense boundary: the prerendered shell carries the
+ * heading and the house links, and the form and results stream in. The
+ * page is kept out of the index; its content depends on the query.
  */
 export const metadata: Metadata = {
   title: "Check dates",
@@ -20,7 +33,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default function SearchPage() {
+export default function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const properties = getAllProperties();
   return (
     <Section className="flex-1" aria-labelledby="search-heading">
@@ -33,13 +50,18 @@ export default function SearchPage() {
       </h1>
       <Prose className="mt-[1.4rem] text-[clamp(1.02rem,1.6vw,1.18rem)]">
         <p>
-          Pick your dates and the houses with those nights open are listed
-          below, with the same calendar the listings use. Choose one to book it
-          direct.
+          Pick your dates and guests, and the houses with those nights open are
+          listed below. Choose one to book it direct.
         </p>
       </Prose>
-      <div className="mt-[clamp(2rem,4vw,3rem)]">
-        <SearchWidget variant="results" />
+      <div
+        role="search"
+        aria-label="Check dates"
+        className="mt-[clamp(2rem,4vw,3rem)]"
+      >
+        <Suspense fallback={<FormFallback />}>
+          <SearchArea searchParams={searchParams} />
+        </Suspense>
       </div>
       <nav
         aria-label="The houses"
@@ -62,5 +84,40 @@ export default function SearchPage() {
         </ul>
       </nav>
     </Section>
+  );
+}
+
+async function SearchArea({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+  if (!hospitableConfigured()) return <SearchFallback />;
+  const parsed = parseSearchParams(params, searchLimits());
+  return (
+    <>
+      <CheckDates
+        key={parsed.status === "ok" ? searchQueryString(parsed.query) : "empty"}
+        variant="page"
+        initial={parsed.status === "ok" ? parsed.query : null}
+      />
+      {parsed.status === "invalid" ? (
+        <p role="alert" className="mt-[1rem] text-ink">
+          {parsed.message}
+        </p>
+      ) : null}
+      {parsed.status === "ok" ? <SearchResults query={parsed.query} /> : null}
+    </>
+  );
+}
+
+/** Same footprint as the form, so the page doesn't jump when it streams in. */
+function FormFallback() {
+  return (
+    <div
+      aria-hidden="true"
+      className="min-h-[5.5rem] border border-hairline bg-paper-2"
+    />
   );
 }

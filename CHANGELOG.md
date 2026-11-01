@@ -4,6 +4,30 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
+## Unreleased — the site's own "check dates" search
+
+- **Replaces Hospitable's property search widget** on the home hero and
+  `/search`. The embed's location, date and guest pickers could not be
+  operated by keyboard, it had no labels for screen readers, failed colour
+  contrast, stayed white in dark mode, showed the street addresses, and its
+  results linked back to `/search` instead of the house pages.
+- **The new search** is site markup in theme colours: Dates and Guests
+  buttons open panels with the booking widget's accessible calendar (every
+  house's calendar merged, `GET /api/search/calendar`) and guest steppers.
+  Escape and click-outside close them and focus returns to the field;
+  searching without dates explains what is missing.
+- **Results on `/search`** are read on the server: a card per free house
+  with a preview total and "Book these dates", which opens the house page on
+  that stay (the native widget seeds it from the URL; the embed's loader
+  reads the same parameters). Houses that don't fit say why (booked, minimum
+  stay, too many guests, no pets). The results heading takes focus after a
+  search.
+- **Airbnb listing titles** appear as a subtitle under each house name on
+  the home cards, house bands, house pages and search results.
+- Needs only `HOSPITABLE_PERSONAL_ACCESS_TOKEN`; without it the search
+  shows links to the three houses. The `hospitable.b-cdn.net` entries are
+  gone from the CSP and `site.hospitable.searchWidgetId` from content.
+
 ## Unreleased — direct-booking widget, checkpoint 5: hardening and docs
 
 - **First paint from the server.** In native mode the house page now reads

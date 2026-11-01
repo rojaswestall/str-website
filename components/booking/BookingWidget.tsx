@@ -15,6 +15,8 @@ import {
 import { isTrustedCheckoutUrl } from "@/lib/booking/normalize";
 import { normalizePhone } from "@/lib/booking/phone";
 import {
+  canCheckIn,
+  checkOutVerdict,
   clampGuests,
   DEFAULT_GUESTS,
   EMPTY_SELECTION,
@@ -24,6 +26,7 @@ import {
   toDayMap,
 } from "@/lib/booking/rules";
 import { fieldErrors, GuestDetailsSchema } from "@/lib/booking/schema";
+import { parseSearchParams } from "@/lib/booking/search";
 import type {
   BookingProperty,
   CalendarDay,
@@ -220,6 +223,41 @@ export function BookingWidget({
         petsAllowed: property.petsAllowed,
       })
     : guests;
+
+  // A guest arriving from the "check dates" results carries the stay in the
+  // URL (checkin, checkout and the guest counts, the names Hospitable's
+  // embed reads too). Applied once, when this house's calendar is in, and
+  // only if the calendar still allows it; otherwise the widget starts empty.
+  const urlStayApplied = useRef(false);
+  // Remounts the calendar after the seed so it opens on the seeded month.
+  const [calendarKey, setCalendarKey] = useState(0);
+  useEffect(() => {
+    if (urlStayApplied.current || calendar.status !== "ready" || !property) {
+      return;
+    }
+    urlStayApplied.current = true;
+    const params = Object.fromEntries(
+      new URLSearchParams(window.location.search),
+    );
+    const parsed = parseSearchParams(params, limits);
+    if (parsed.status !== "ok") return;
+    const { checkIn, checkOut, guests: fromUrl } = parsed.query;
+    if (
+      !canCheckIn(checkIn, dayMap, limits) ||
+      !checkOutVerdict(checkIn, checkOut, dayMap, limits).ok
+    ) {
+      return;
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time seed from the URL, which the server render cannot see
+    setSelection({ checkIn, checkOut });
+    setCalendarKey(1);
+    setGuests(
+      clampGuests(fromUrl, {
+        maxGuests: property.maxGuests,
+        petsAllowed: property.petsAllowed,
+      }),
+    );
+  }, [calendar.status, property, dayMap, limits]);
 
   const quote = useQuote({
     propertyId: property?.id,
@@ -452,7 +490,7 @@ export function BookingWidget({
             ) : (
               <>
                 <Calendar
-                  key={property.id}
+                  key={`${property.id}:${calendarKey}`}
                   days={dayMap}
                   limits={limits}
                   windowEnd={calendar.data.end}

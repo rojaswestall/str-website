@@ -92,6 +92,8 @@ export const PropertySchema = z
     name: nonEmpty,
     /** Short label for nav, map legend, and tight layouts. */
     shortName: nonEmpty,
+    /** The listing's title on Airbnb, shown as a subtitle under `name`. */
+    airbnbTitle: nonEmpty,
     neighborhood: nonEmpty,
     /** The mono line above the name, e.g. "Oak Hill, Austin · off Hwy 290 & 71". */
     locationLine: nonEmpty,
@@ -231,12 +233,6 @@ export const SiteConfigSchema = z.object({
     siteUuid: z.uuid().nullable(),
     /** `data-theme` from the dashboard snippet (the widget style configured there). */
     theme: nonEmpty,
-    /**
-     * `identifier` of the property search widget (Direct → Property Search),
-     * a different script from the per-property loader. Null renders the
-     * search stub on the home hero and on /search.
-     */
-    searchWidgetId: z.uuid().nullable(),
   }),
   /**
    * TikTok clips at the top of the area guide, in display order. An empty

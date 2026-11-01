@@ -44,23 +44,23 @@ last 24 hours resolves to the previous one; that is intended.
 
 ## Routes
 
-| Path                                 | File                                                  | Render     | Notes                                                                |
-| ------------------------------------ | ----------------------------------------------------- | ---------- | -------------------------------------------------------------------- |
-| `/`                                  | `app/page.tsx`                                        | static     | Hero, stays, area (TikToks), why book direct + form, reviews, hosts  |
-| `/stays/[slug]`                      | `app/stays/[slug]/page.tsx`                           | static × 3 | `oak-hill`, `south-austin`, `fire-side`; unknown slugs 404 via proxy |
-| `/area`                              | `app/area/page.tsx`                                   | static     | Area picks with drive times from every house                         |
-| `/search`                            | `app/search/page.tsx`                                 | static     | Hospitable search results; `noindex`, not in the sitemap             |
-| `/api/contact`                       | `app/api/contact/route.ts`                            | dynamic    | POST only (other methods 405)                                        |
-| `/api/properties`                    | `app/api/properties/route.ts`                         | dynamic    | Booking API: the bookable houses (see Booking API)                   |
-| `/api/calendar/[propertyId]`         | `app/api/calendar/[propertyId]/route.ts`              | dynamic    | Booking API: availability and nightly prices                         |
-| `/api/quote`                         | `app/api/quote/route.ts`                              | dynamic    | Booking API: POST, prices a stay and returns the checkout URL        |
-| `/sitemap.xml`                       | `app/sitemap.ts`                                      | static     | `/`, the three stays, `/area`                                        |
-| `/robots.txt`                        | `app/robots.ts`                                       | static     | Disallows `/kitchen-sink`, `/api/`, `/_404/`                         |
-| `/opengraph-image`                   | `app/opengraph-image.tsx`                             | static     | Placeholder share card                                               |
-| `/stays/[slug]/opengraph-image`      | `app/stays/[slug]/opengraph-image.tsx`                | static     | Per-house share card                                                 |
-| `/icon.svg`, `/icon1`, `/apple-icon` | `app/icon.svg`, `app/icon1.tsx`, `app/apple-icon.tsx` | static     | Placeholder "AC" monogram                                            |
-| `/kitchen-sink`                      | `app/(dev)/kitchen-sink/`                             | dev only   | Every primitive in forced light and dark; 404 in production          |
-| 404                                  | `app/not-found.tsx`                                   | —          | Branded 404 inside the site shell                                    |
+| Path                                 | File                                                  | Render     | Notes                                                                  |
+| ------------------------------------ | ----------------------------------------------------- | ---------- | ---------------------------------------------------------------------- |
+| `/`                                  | `app/page.tsx`                                        | static     | Hero, stays, area (TikToks), why book direct + form, reviews, hosts    |
+| `/stays/[slug]`                      | `app/stays/[slug]/page.tsx`                           | static × 3 | `oak-hill`, `south-austin`, `fire-side`; unknown slugs 404 via proxy   |
+| `/area`                              | `app/area/page.tsx`                                   | static     | Area picks with drive times from every house                           |
+| `/search`                            | `app/search/page.tsx`                                 | partial    | "Check dates" results across the houses; `noindex`, not in the sitemap |
+| `/api/contact`                       | `app/api/contact/route.ts`                            | dynamic    | POST only (other methods 405)                                          |
+| `/api/properties`                    | `app/api/properties/route.ts`                         | dynamic    | Booking API: the bookable houses (see Booking API)                     |
+| `/api/calendar/[propertyId]`         | `app/api/calendar/[propertyId]/route.ts`              | dynamic    | Booking API: availability and nightly prices                           |
+| `/api/quote`                         | `app/api/quote/route.ts`                              | dynamic    | Booking API: POST, prices a stay and returns the checkout URL          |
+| `/sitemap.xml`                       | `app/sitemap.ts`                                      | static     | `/`, the three stays, `/area`                                          |
+| `/robots.txt`                        | `app/robots.ts`                                       | static     | Disallows `/kitchen-sink`, `/api/`, `/_404/`                           |
+| `/opengraph-image`                   | `app/opengraph-image.tsx`                             | static     | Placeholder share card                                                 |
+| `/stays/[slug]/opengraph-image`      | `app/stays/[slug]/opengraph-image.tsx`                | static     | Per-house share card                                                   |
+| `/icon.svg`, `/icon1`, `/apple-icon` | `app/icon.svg`, `app/icon1.tsx`, `app/apple-icon.tsx` | static     | Placeholder "AC" monogram                                              |
+| `/kitchen-sink`                      | `app/(dev)/kitchen-sink/`                             | dev only   | Every primitive in forced light and dark; 404 in production            |
+| 404                                  | `app/not-found.tsx`                                   | —          | Branded 404 inside the site shell                                      |
 
 `app/layout.tsx` composes `SkipLink`, `SiteHeader`, `<main id="main">`, and
 `SiteFooter` inside `ThemeProvider`, with `<Analytics />` last. Pages never
@@ -75,7 +75,7 @@ three STR license numbers.
 ### Home page sections, in order
 
 1. `components/home/Hero.tsx` — h1 from `site.tagline`, lede naming the
-   hosts, 21:9 hero collage, the Hospitable search bar, and `CityMap`.
+   hosts, 21:9 hero collage, the "check dates" search form, and `CityMap`.
 2. `components/home/Stays.tsx` (`#stays`) — one `PropertyBand` per house
    (rooms only; rate, minimum nights, and amenities are on the house page).
 3. `components/area/AreaGuide.tsx` (`#area`) — the TikTok row from
@@ -131,9 +131,11 @@ the dev-mode path. Keep the `stays.spec.ts` status assertion.
     `GuestForm`, `StickySummary` (the pinned total and Reserve footer),
     `useQuote` (debounced quoting), `BookingAnalytics` (DOM events →
     Vercel). See "Booking widget and API".
-  - `hospitable/` — `PropertyWidget` and `SearchWidget` (Server Components to
-    mount) and their client cores `HospitableWidget` / `HospitableSearch`,
-    plus the stubs.
+  - `search/` — the "check dates" search: `CheckDates` (Server Component;
+    the form, or `SearchFallback` without a booking token), `SearchForm`
+    (client), `SearchResults` (Server Component). See "Check dates search".
+  - `hospitable/` — `PropertyWidget` (Server Component to mount) and its
+    client core `HospitableWidget`, plus the stub.
   - `embeds/TikTokEmbed.tsx`, `contact/ContactForm.tsx`, `seo/`
     (`JsonLd`, `MonogramIcon`).
 - `content/` — typed site content (below).
@@ -181,7 +183,7 @@ fails `next build` and `pnpm check:content`. **Always import from
   `content/properties.ts` (author and month optional). Ratings and review
   counts were refreshed from the listings on 2026-10-12.
 - **Hospitable ids**: `site.hospitable` holds `mode` (default `stub`),
-  `siteUuid`, `theme` (`boutique`), and `searchWidgetId`. Each property has
+  `siteUuid`, and `theme` (`boutique`). Each property has
   `hospitable.propertyId`: Oak Hill `2338067` ("Parkwood A" in Hospitable),
   South Austin `2338069` ("Dan Jean Unit A"), Fire Side `2338068` ("Dan Jean
   B"), and `hospitable.uuid`, its Public API id used by the booking routes
@@ -237,13 +239,6 @@ The dashboard snippets the code is built against (ids are in `content/`):
   data-property-id="2338068"
   data-theme="boutique"
 ></script>
-
-<!-- Direct → Property Search: library script plus the custom element -->
-<script src="https://hospitable.b-cdn.net/direct-property-search-widget/hospitable-search-widget.prod.js"></script>
-<hospitable-direct-mps
-  identifier="178e46fc-3dbb-4433-ac2d-3ebe9d9cca07"
-  type="custom"
-></hospitable-direct-mps>
 ```
 
 **Booking widget** (house pages). The loader pings
@@ -257,19 +252,53 @@ script and empties the container, so client-side navigation between houses
 remounts cleanly. Do not use `next/script` for it (it dedupes by src). The
 iframe is light-only and styled only from the Hospitable dashboard.
 
-**Search widget** (home hero bar and `/search`). A library from
-`hospitable.b-cdn.net` registers `<hospitable-direct-mps identifier="…"
-type="custom">`. The hero carries `results-url="/search"`; `/search` renders
-the results variant. It loads once per page through `next/script` (dedupe is
-correct here). `HospitableSearch.tsx` appends a small stylesheet into the
-widget's shadow root so it fits the hairline frame and uses the site font.
 The booking loader reads `checkin`, `checkout`, guest counts, locale, and
-`utm_*` from the page URL itself, so search terms carry into the booking
-iframe with no extra code.
+`utm_*` from the page URL itself, so a stay chosen in the "check dates"
+search carries into the booking iframe with no extra code.
 
-**Stubs.** In stub mode, or in live mode when an id is null, the widgets
-render `HospitableStub` / `HospitableSearchStub` (disabled fields and an
-Airbnb link) and, in live mode, `console.warn` once.
+Hospitable's property search widget (`<hospitable-direct-mps>`) is no
+longer used: its pickers were not keyboard-operable, it could not follow the
+site theme, and its results linked back to `/search`. The site's own search
+replaced it (below).
+
+**Stubs.** In stub mode, or in live mode when an id is null, the booking
+widget renders `HospitableStub` (disabled fields and an Airbnb link) and, in
+live mode, `console.warn` once.
+
+## Check dates search
+
+The search on the home hero and `/search` is the site's own
+(`components/search/`, `lib/booking/search.ts`, `lib/booking/search-server.ts`).
+It needs only `HOSPITABLE_PERSONAL_ACCESS_TOKEN`, not native booking mode, so
+Production can run it while the house pages still embed Hospitable's widget.
+Without the token `CheckDates` renders `SearchFallback`: links to each
+house's calendar.
+
+- **Form** (`SearchForm`, client). A GET form to `/search` (`next/form`),
+  with the stay in the query string under the names Hospitable's loader
+  reads: `checkin`, `checkout`, `adults`, `children`, `infants`, `pets`.
+  Dates and Guests are buttons with `aria-expanded` that open non-modal
+  panels: the booking widget's `Calendar` over every house's calendar merged,
+  and the shared `GuestRows` steppers. Escape closes a panel and returns
+  focus to its field; a click outside or tabbing away closes it. Searching
+  without dates says so and opens the calendar. Everything uses the theme
+  tokens, so it follows the site's light/dark setting.
+- **Merged calendar** (`GET /api/search/calendar`, `mergeCalendars`). A
+  night is open when any house has it open; arrival and departure follow the
+  most permissive open house; the minimum stay is the shortest; the price is
+  the lowest direct nightly rate with the markup applied (so the calendar
+  shows it with a 0% markup). Built from the same 5-minute calendar cache.
+- **Results** (`SearchResults`, Server Component in a Suspense boundary on
+  `/search`). `parseSearchParams` validates the query; `searchHouses` runs
+  `evaluateStay` per house (capacity, pets, arrival, every night free,
+  minimum stay, departure, stay cap). Free houses are cards (short name,
+  Airbnb title, rooms, preview total) linking to
+  `/stays/<slug>?<stay>#book`; the rest are listed with the reason. After a
+  submit the results heading takes focus (`results-focus.ts`) so screen
+  readers announce it.
+- **House page.** The native `BookingWidget` seeds its selection and guests
+  from the same parameters once its calendar is in, if the calendar still
+  allows the stay; the embed's loader reads them itself.
 
 ## Contact
 
@@ -407,8 +436,8 @@ The ★ on the card is inline SVG because Newsreader has no star glyph.
 ## Content Security Policy
 
 `lib/csp.ts` defines the policy; `next.config.ts` sends it on every path as
-`Content-Security-Policy-Report-Only`. It allows the Hospitable loader,
-search library, and iframes, Vercel Analytics, and TikTok's embed and CDN.
+`Content-Security-Policy-Report-Only`. It allows the Hospitable loader and
+iframes, Vercel Analytics, and TikTok's embed and CDN.
 `script-src` keeps `'unsafe-inline'` because Next's static pages and
 next-themes' pre-paint script are inline and a nonce would force dynamic
 rendering. Switching to enforcing is a go-live item in [`plan.md`](plan.md).

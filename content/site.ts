@@ -24,8 +24,6 @@ export const site: SiteConfig = {
     // From the dashboard snippet (docs/architecture.md, "Hospitable integration").
     siteUuid: "a2dd8e69-2e7b-4a23-a07e-718ab1e46afb",
     theme: "boutique",
-    // `identifier` from Direct → Property Search (step 14).
-    searchWidgetId: "178e46fc-3dbb-4433-ac2d-3ebe9d9cca07",
   },
   tiktoks: [
     {

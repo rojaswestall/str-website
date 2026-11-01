@@ -30,7 +30,7 @@ const UPSTREAM =
 /** Turns anything thrown while talking to Hospitable into a response, logging the cause. */
 export function errorResponse(
   error: unknown,
-  context: "properties" | "calendar" | "quote",
+  context: "properties" | "calendar" | "quote" | "search",
 ): NextResponse<BookingErrorBody> {
   if (error instanceof HospitableNotConfiguredError) {
     console.error(`[booking:${context}] ${error.message}`);
