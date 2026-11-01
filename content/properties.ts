@@ -4,13 +4,13 @@ import type { Property } from "./types";
 /*
  * The three houses, seeded from design/artifact.html.
  *
- * Still unconfirmed (docs/plan.md, "Needed before step 3"):
- * - final names for South Austin Stay and Fire Side Home
+ * Still unconfirmed (docs/plan.md, "Content still marked [TBC]"):
+ * - final house names, if these are not final
  * - nightly rate and minimum nights (null here; render as "t.b.c.")
- * - Hospitable property ids for Oak Hill and South Austin Stay (`data-property-id`
- *   in each house's dashboard snippet; null renders the stub). Fire Side Home
- *   is "Dan Jean B" in Hospitable, property 2338068, from the snippet in
- *   docs/plan.md.
+ *
+ * `hospitable.propertyId` is the `data-property-id` from each house's
+ * dashboard snippet (see docs/architecture.md, "Hospitable integration");
+ * the comment beside each names the listing in Hospitable.
  *
  * Photos live in content/photos.ts. Guest quotes, names, and months are from
  * the Airbnb reviews (whitespace and stray typos tidied; the month is when
@@ -53,7 +53,10 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598934202273477463",
     strLicense: "OL2026086598",
-    hospitable: { propertyId: "2338067" }, // "Parkwood A" in Hospitable
+    hospitable: {
+      propertyId: "2338067", // "Parkwood A" in Hospitable
+      uuid: "2bfb62de-2f47-409f-b276-a47d5b405043",
+    },
     photos: photos["oak-hill"],
     quotes: [
       {
@@ -104,7 +107,10 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1655329029936239948",
     strLicense: "OL2026040319",
-    hospitable: { propertyId: "2338069" }, // "Dan Jean Unit A" in Hospitable
+    hospitable: {
+      propertyId: "2338069", // "Dan Jean Unit A" in Hospitable
+      uuid: "02f700e5-a510-4c4f-b9f6-9d4bebdf499a",
+    },
     photos: photos["south-austin"],
     quotes: [
       {
@@ -157,7 +163,10 @@ export const properties: Property[] = [
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598953749522814358",
     strLicense: "OL2026031718",
-    hospitable: { propertyId: "2338068" }, // "Dan Jean B" in Hospitable
+    hospitable: {
+      propertyId: "2338068", // "Dan Jean B" in Hospitable
+      uuid: "cb8bcbdd-75f6-49f4-b9a5-cea0b8df861d",
+    },
     photos: photos["fire-side"],
     quotes: [
       {

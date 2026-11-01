@@ -2,8 +2,8 @@ import type { FaqRow, PolicyRow } from "./types";
 
 /*
  * Practicals rows from design/artifact.html. Every policy is still marked
- * `tbc` because the hosts have not confirmed them (docs/plan.md, "Needed
- * before step 3"). Flip `tbc` to false once confirmed.
+ * `tbc` because the hosts have not confirmed them (docs/plan.md,
+ * "Content still marked [TBC]"). Flip `tbc` to false once confirmed.
  */
 export const policies: PolicyRow[] = [
   {

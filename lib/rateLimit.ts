@@ -1,11 +1,13 @@
 /*
- * In-memory sliding-window limiter for the contact route.
+ * In-memory sliding-window limiter, shared by the contact and quote routes.
+ * Each route passes its own limit and prefixes its keys so the buckets never
+ * meet.
  *
  * Scope: this map lives in the module, so the window is per server instance.
  * On Vercel that means per function instance; a cold start or a second
  * instance starts from zero, so it bounds abuse rather than enforcing an exact
- * global quota. That is enough for a contact form. If a shared limit is ever
- * needed, replace `consume` with an Upstash Ratelimit call (`@upstash/ratelimit`
+ * global quota. That is enough here. If a shared limit is ever needed,
+ * replace `consume` with an Upstash Ratelimit call (`@upstash/ratelimit`
  * with `Ratelimit.slidingWindow(5, "10 m")`) keyed the same way.
  */
 

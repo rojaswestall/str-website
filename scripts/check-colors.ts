@@ -6,8 +6,8 @@
  * surface follows the theme switch. This script fails when a hex literal,
  * `rgb(` / `hsl(` / `oklch(` call, or a bare `white` / `black` appears in
  * `components/` or `app/`, except in the files below, which cannot read CSS
- * variables and carry a comment saying so (see the step 11 notes in
- * docs/plan.md). If a token value changes, those files are updated by hand.
+ * variables and carry a comment saying so (see "Design tokens and theming" in
+ * docs/architecture.md). If a token value changes, those files are updated by hand.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";

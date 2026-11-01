@@ -1,0 +1,4 @@
+{
+  "status_code": 422,
+  "reason_phrase": "One or more dates within this period have been marked as unavailable. Oct 30, 2026, Oct 31, 2026"
+}

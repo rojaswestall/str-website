@@ -1,10 +1,10 @@
 /*
  * Shared Hospitable constants and the mode switch.
  *
- * The dashboard snippet (docs/plan.md, step 6) is a single script tag:
+ * The dashboard snippet (docs/architecture.md) is a single script tag:
  *
  *   <script src="https://cdn.hsptb.com/direct-booking-widget/widget-loader.prod.js"
- *           data-site-uuid="…" data-property-id="…" data-theme="multi"></script>
+ *           data-site-uuid="…" data-property-id="…" data-theme="…"></script>
  *
  * The loader reads its own data-* attributes, pings api.hospitable.com, and
  * inserts an <iframe id="booking-iframe"> from booking.hospitable.com directly
@@ -15,16 +15,21 @@
 export const HOSPITABLE_LOADER_SRC =
   "https://cdn.hsptb.com/direct-booking-widget/widget-loader.prod.js";
 
-export type HospitableMode = "stub" | "live";
+/**
+ * "stub": placeholder panels. "live": Hospitable's embedded widget.
+ * "native": the site's own booking widget (components/booking), which talks
+ * to /api/* and hands off to Hospitable's hosted checkout.
+ */
+export type HospitableMode = "stub" | "live" | "native";
 
 function isMode(value: string | undefined): value is HospitableMode {
-  return value === "stub" || value === "live";
+  return value === "stub" || value === "live" || value === "native";
 }
 
 /**
  * `NEXT_PUBLIC_HOSPITABLE_MODE` wins when it is set to a valid value; otherwise
  * the mode from `content/site.ts` applies. The env var is inlined at build
- * time, so a Vercel environment flips the whole deployment to live.
+ * time, so a Vercel environment flips the whole deployment.
  */
 export function resolveHospitableMode(
   contentMode: HospitableMode,
