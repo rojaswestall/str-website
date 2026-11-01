@@ -30,9 +30,10 @@ import { defineConfig, devices } from "@playwright/test";
  * never fetched.
  *
  * `chromium-native` (port 3002, a third build with
- * NEXT_PUBLIC_HOSPITABLE_MODE=native into .next-native) runs only
- * booking.native.spec.ts: the site's own booking widget and the /api/*
- * routes behind it, end to end. The build is pointed at the stand-in
+ * NEXT_PUBLIC_HOSPITABLE_MODE=native into .next-native) runs
+ * booking.native.spec.ts (the site's own booking widget and the /api/*
+ * routes behind it) and search.native.spec.ts (the "check dates" search),
+ * end to end. The build is pointed at the stand-in
  * Hospitable API in e2e/mock-hospitable/server.mjs (port 3999) with a
  * throwaway token, so nothing reaches Hospitable and no secret is needed.
  */
@@ -100,6 +101,9 @@ export default defineConfig({
         NEXT_PUBLIC_HOSPITABLE_MODE: "stub",
         NEXT_PUBLIC_SITE_URL: "",
         NEXT_PUBLIC_MAPKIT_TOKEN: "",
+        // No booking token, so the "check dates" search is its fallback.
+        HOSPITABLE_PERSONAL_ACCESS_TOKEN: "",
+        HOSPITABLE_PAT: "",
       },
       reuseExistingServer: !isCI,
       // CI has no separate build step, so the build log must be visible when
@@ -116,6 +120,8 @@ export default defineConfig({
         NEXT_PUBLIC_SITE_URL: "",
         NEXT_PUBLIC_MAPKIT_TOKEN: "e2e-mapkit-token",
         NEXT_DIST_DIR: ".next-live",
+        HOSPITABLE_PERSONAL_ACCESS_TOKEN: "",
+        HOSPITABLE_PAT: "",
       },
       reuseExistingServer: !isCI,
       stdout: isCI ? "pipe" : "ignore",

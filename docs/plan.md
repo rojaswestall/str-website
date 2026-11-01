@@ -2,8 +2,8 @@
 
 Steps 1–13 of the original plan (scaffold through test suite and CI) are
 merged, as are the code parts of step 14 that did not need a live domain: all
-three Hospitable property ids, the property search widget on the home hero and
-`/search`, real house photos, guest quotes, and the `/area` guide. What the
+three Hospitable property ids, the "check dates" search on the home hero and
+`/search` (the site's own, see architecture.md), real house photos, guest quotes, and the `/area` guide. What the
 site looks like today is in [`architecture.md`](architecture.md); how to run
 and test it is in [`development.md`](development.md).
 
@@ -32,9 +32,15 @@ later item depends on the earlier ones.
   | `CONTACT_FROM`                | `Name <addr@<domain>>`  | same as prod if key set    |
   | `CONTACT_TO`                  | comma-separated inboxes | same as prod if key set    |
 
-  | `HOSPITABLE_PERSONAL_ACCESS_TOKEN` | Public API token | same (the native widget needs it) |
+  | `HOSPITABLE_PERSONAL_ACCESS_TOKEN` | Public API token | same (the search and the native widget need it) |
   | `HOSPITABLE_CUSTOM_SITE_ID`   | the widget's site uuid  | same                       |
   | `BOOKING_ADMIN_TOKEN`         | `openssl rand -hex 24`  | same or unset              |
+
+  `HOSPITABLE_PERSONAL_ACCESS_TOKEN` is needed on Production now, before
+  the switch to the native booking widget (1b): without it the "check dates"
+  search on the home hero and `/search` shows only links to the three
+  houses. It is read at build time for the home page, so redeploy after
+  setting it.
 
   `NEXT_PUBLIC_*` values are inlined at build time: redeploy after changing
   them. Without `NEXT_PUBLIC_SITE_URL` every canonical, sitemap, OG, and
@@ -47,9 +53,6 @@ later item depends on the earlier ones.
 - [ ] **Hospitable dashboard.**
   - [ ] Confirm the plan includes Direct with self-hosted widgets, and that
         Stripe/payments are set up in Hospitable Direct.
-  - [ ] Set each house's property URL (where a search result links) to
-        `https://<domain>/stays/oak-hill`, `/stays/south-austin`, and
-        `/stays/fire-side`.
   - [ ] Style the widgets to match the paper palette (the booking iframe is
         styled only from the dashboard).
   - [ ] The loader's ping checks that the property's Hospitable name appears
@@ -75,8 +78,8 @@ later item depends on the earlier ones.
 - [ ] **Verify on the production domain.**
   - [ ] A test booking reaches Hospitable checkout on all three house pages
         (with the native widget, see 1b; with the embed, through the iframe).
-  - [ ] The hero search bar submits to `/search` and results link to the
-        right house pages.
+  - [ ] The hero "check dates" search lists the free houses on `/search`,
+        and "Book these dates" opens each house page on that stay.
   - [ ] One real inquiry through the contact form arrives with the guest as
         Reply-To and subject `Inquiry: <house> — <name>`
         (`[contact] send failed:` in the function log names a Resend error).

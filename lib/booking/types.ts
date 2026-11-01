@@ -164,3 +164,18 @@ export type InitialBookingData = {
     days: CalendarDay[];
   } | null;
 };
+
+/**
+ * GET /api/search/calendar: every house's calendar merged for the search
+ * form's date picker (lib/booking/search.ts, `mergeCalendars`). Prices are
+ * the lowest direct nightly rate, in cents, markup already applied.
+ */
+export type SearchCalendarResponse =
+  | {
+      ok: true;
+      start: string;
+      end: string;
+      days: CalendarDay[];
+      maxNights: number;
+    }
+  | BookingErrorBody;

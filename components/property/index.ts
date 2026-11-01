@@ -1,3 +1,4 @@
+export { AirbnbTitle } from "./AirbnbTitle";
 export { AmenityList } from "./AmenityList";
 export { BookingPanel } from "./BookingPanel";
 export { Gallery } from "./Gallery";

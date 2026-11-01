@@ -83,11 +83,16 @@ test.describe("home page", () => {
     await page.goto("/");
 
     await expect(page.getByText("Check dates across all three")).toBeVisible();
-    const search = page.getByTestId("hospitable-search-stub");
-    await expect(search).toContainText("Search all 3 houses");
+    // No booking API token in this build: the search falls back to links
+    // to each house's own calendar.
+    const search = page.getByRole("search", {
+      name: "Check dates across all three",
+    });
+    const fallback = search.getByTestId("check-dates-fallback");
+    await expect(fallback).toBeVisible();
     await expect(
-      search.getByRole("link", { name: "See the houses" }),
-    ).toHaveAttribute("href", "/#stays");
+      fallback.getByRole("link", { name: "An Oak Hill Home" }),
+    ).toHaveAttribute("href", "/stays/oak-hill#book");
 
     const feature = page.getByTestId("video-feature");
     const clips = feature.getByTestId("video-clip");

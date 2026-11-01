@@ -28,6 +28,7 @@ export const properties: Property[] = [
     slug: "oak-hill",
     name: "An Oak Hill Home",
     shortName: "Oak Hill",
+    airbnbTitle: "Cozy 3BR Oak Hill Retreat • Fireplace • Fast Wi-Fi",
     neighborhood: "Oak Hill",
     locationLine: "Oak Hill, Austin · off Hwy 290 & 71",
     summary:
@@ -82,6 +83,7 @@ export const properties: Property[] = [
     slug: "south-austin",
     name: "South Austin Stay",
     shortName: "South Austin",
+    airbnbTitle: "Fast WiFi |Garage| Yard | 3BR • 5 Beds • Sleeps 8+",
     neighborhood: "South Austin",
     locationLine: "South Austin · garage and yard",
     summary:
@@ -137,6 +139,7 @@ export const properties: Property[] = [
     slug: "fire-side",
     name: "Fire Side Home",
     shortName: "Fire Side",
+    airbnbTitle: "Spacious 3BR Home • Near Radio Coffee • Fast Wi-Fi",
     neighborhood: "South Austin",
     locationLine: "South Austin · near Radio Coffee & Beer",
     summary:
