@@ -51,7 +51,7 @@ export type Quote = z.infer<typeof QuoteSchema>;
  *
  * The dashboard snippet (Hospitable → Direct → self-hosted site) is a single
  * `<script>` tag whose `data-property-id` names the house; there is no
- * separate "widget id". The real snippet is recorded in docs/plan.md, step 6.
+ * separate "widget id". The real snippet is recorded in docs/architecture.md.
  */
 export const HospitableConfigSchema = z.object({
   /** `data-property-id` from the snippet. Null until the house is matched to one (open item, step 6 / 14). */
@@ -59,6 +59,8 @@ export const HospitableConfigSchema = z.object({
     .string()
     .regex(/^\d+$/, { message: "propertyId is the numeric data-property-id" })
     .nullable(),
+  /** Public API property id (`GET /v2/properties`), used by the booking routes. Null keeps the house out of them. */
+  uuid: z.uuid().nullable(),
 });
 export type HospitableConfig = z.infer<typeof HospitableConfigSchema>;
 
@@ -211,7 +213,7 @@ export const SiteConfigSchema = z.object({
   domain: nonEmpty,
   hospitable: z.object({
     /** "stub" renders the placeholder panels; "live" injects the loader. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
-    mode: z.enum(["stub", "live"]),
+    mode: z.enum(["stub", "live", "native"]),
     /** `data-site-uuid` from the dashboard snippet; shared by every widget on the site. */
     siteUuid: z.uuid().nullable(),
     /** `data-theme` from the dashboard snippet (the widget style configured there). */

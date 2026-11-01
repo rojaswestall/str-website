@@ -1,296 +1,107 @@
 # The Austin Collection
 
 Direct-booking website for three short-term rental houses in Austin, Texas,
-run by Alexis, Gabe, and Aaron. Guests book through Hospitable's embeddable
-widgets; Airbnb stays available as a secondary link.
+run by Alexis, Gabe, and Aaron. Guests pick dates and see a price on the
+site's own booking widget, then pay on Hospitable's hosted checkout; Airbnb
+stays available as a secondary link.
+
+**Status:** built and green in CI, with the Vercel project and domain set
+up. The native widget runs on Vercel Preview; Production still embeds
+Hospitable's widget until the go-live steps in [`docs/plan.md`](docs/plan.md)
+are done. Resend (contact email), the enforcing CSP, and the content still to
+confirm are there too. Changes are listed in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Stack
 
-Next.js (App Router), TypeScript strict, Tailwind v4, pnpm, ESLint, Prettier,
-Playwright. Deployed on Vercel with Vercel Web Analytics.
+Next.js 16 (App Router, Cache Components), React 19, TypeScript strict,
+Tailwind v4, zod content, pnpm, ESLint, Prettier, Playwright with axe-core.
+Deploys to Vercel with Vercel Web Analytics.
 
-## Requirements
+## Quick start
 
-- Node 24 LTS (see `.nvmrc`; `nvm use` picks it up)
-- pnpm 12 (exact version pinned in `package.json`; install it with
-  `npm i -g pnpm@<pinned version>` or let `corepack` pick it up)
-
-## Run
+Requires Node 24 (`nvm use`) and pnpm 12 (pinned in `package.json`).
 
 ```bash
 pnpm install
-pnpm dev
+pnpm dev                                   # http://localhost:3000
 ```
 
-Then open http://localhost:3000.
-
-| Script               | What it does                                                |
-| -------------------- | ----------------------------------------------------------- |
-| `pnpm dev`           | Development server                                          |
-| `pnpm build`         | Production build                                            |
-| `pnpm start`         | Serve the production build                                  |
-| `pnpm lint`          | ESLint                                                      |
-| `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                          |
-| `pnpm check:content` | Parse `content/*.ts` through zod, check slugs and photos    |
-| `pnpm check:colors`  | Fail on raw colours in `components/` and `app/` (see below) |
-| `pnpm format`        | Prettier, write mode (`format:check` for CI)                |
-| `pnpm test`          | Playwright against fresh production builds (see below)      |
-| `pnpm test:e2e`      | Same as `pnpm test`                                         |
-
-Before the first e2e run, install the browser once:
+No environment variables are needed locally: the Hospitable widgets render
+placeholder panels and the contact form runs dry. To run the full test suite:
 
 ```bash
-pnpm exec playwright install chromium
+pnpm exec playwright install chromium     # once
+pnpm test:unit                             # 76 unit tests, no server
+pnpm test                                  # builds three times, runs 90 e2e tests
 ```
 
-`pnpm test` builds the site twice (`.next` in stub mode on port 3000,
-`.next-live` in live mode on port 3001), starts both, and runs the specs in
-`e2e/` (65 tests, roughly 15 seconds once the servers are up).
-Locally it reuses any server already listening on those ports, so stop a
-stale one first (`pkill -f next-server`) or the suite tests an old build. The
-config pins `NEXT_PUBLIC_HOSPITABLE_MODE=stub` and `NEXT_PUBLIC_SITE_URL=""`
-on the default server so a `.env.local` cannot change what the tests see.
-
-CI (`.github/workflows/ci.yml`) runs install, content check, colour check,
-lint, format check, typecheck, and `pnpm test` on every pull request and on
-pushes to `main`; the Playwright web servers do the builds, so there is no
-separate build step. Every run uploads two artifacts: `screenshots` (the
-`e2e/__screenshots__/` review aids, which are gitignored) and
-`playwright-report` (the HTML report, with a trace for any test that needed
-its one retry). The whole job takes about two minutes.
-
-## Where things live
-
-- `app/` — routes (`/`, `/stays/[slug]` for each house, `/area` for the
-  area guide, `/api/contact`),
-  root layout, and `globals.css` (design tokens: light on `:root`, dark on
-  `[data-theme="dark"]`, mapped to Tailwind utilities).
-- `components/` — reusable UI, grouped by area (`theme`, `ui`, `layout`,
-  `hospitable`, `embeds`, `property`, `home`). `theme/` holds the next-themes
-  provider and toggle; `ui/` holds the primitives (import from
-  `@/components/ui`); `layout/` holds the site shell (`SkipLink`,
-  `SiteHeader`, `SiteFooter`) composed in `app/layout.tsx`; `hospitable/`
-  holds the booking and search widgets (`PropertyWidget`, `SearchWidget`,
-  their client cores, and the stubs); `embeds/` holds `TikTokEmbed`;
-  `home/` holds the landing-page sections composed by `app/page.tsx`;
-  `map/` holds the `CityMap` SVG; `area/` the area guide (the home-page
-  TikTok row, the `/area` pick cards with per-house `DriveTimes`, and the
-  property page's `NearbyPicks`); `practicals/`
-  the policies list; `property/` the home-page `PropertyBand` and the pieces
-  of a house page (`PropertyHeader`, `Gallery`, `AmenityList`, `Quotes`,
-  `BookingPanel`, `PropertyCard`, `OtherHouses`). `/kitchen-sink` renders
-  every primitive in light and dark side by side in `pnpm dev` only (404 in
-  production).
-- `lib/` — shared code that is not a component (`fonts.ts` loads Newsreader
-  and IBM Plex through `next/font`; `site-url.ts` resolves the canonical
-  origin from `NEXT_PUBLIC_SITE_URL`; `cx.ts` joins class names;
-  `hospitable.ts` holds the loader URL and the stub/live mode switch;
-  `csp.ts` is the Content Security Policy that `next.config.ts` sends as
-  report-only; `hooks/useInjectedScript.ts` mounts third-party scripts).
-- SEO — `lib/seo.ts` builds every absolute URL from `getSiteUrl()`
-  (`canonicalUrl`), holds the shared Open Graph defaults and site
-  description, and builds the `VacationRental` and `Organization` JSON-LD that
-  `components/seo/JsonLd.tsx` renders on each house page and the home page.
-  Per-page metadata is `generateMetadata` in `app/stays/[slug]/page.tsx` and
-  `metadata` in `app/page.tsx`. `app/sitemap.ts` and `app/robots.ts` generate
-  `/sitemap.xml` and `/robots.txt`; `app/opengraph-image.tsx` and
-  `app/stays/[slug]/opengraph-image.tsx` render the share cards with
-  `ImageResponse` (`lib/og-font.ts` reads the Newsreader TTFs vendored under
-  `assets/fonts/`); `app/icon.svg`, `app/icon1.tsx`, and `app/apple-icon.tsx`
-  are the placeholder "AC" monogram icons (`components/seo/MonogramIcon.tsx`)
-  until real brand assets exist. Set `NEXT_PUBLIC_SITE_URL` to the real
-  origin on Vercel, or every canonical, sitemap, and OG URL points at
-  localhost.
-- `content/` — typed site content. `types.ts` holds the zod schemas; the
-  data files (`properties.ts`, `hosts.ts`, `area.ts`, `policies.ts`,
-  `site.ts`) are plain objects; `index.ts` parses them at import and exposes
-  `getAllProperties()`, `getProperty(slug)`, `getSite()`, and friends. Import
-  from `@/content`, never from a data file. Unconfirmed values are `null` or
-  strings starting with `[TBC]`. Property copy is never hardcoded in
-  components.
-- `scripts/` — `check-content.ts` (`pnpm check:content`) and
-  `check-colors.ts` (`pnpm check:colors`); CI runs both first, before
-  anything builds.
-- `public/photos/` — photos referenced from `content/`, one folder per house
-  plus `area/` and `home/`. Each house folder holds `hero.jpg` (the
-  listing's cover photo) and `gallery-NN.jpg` in walk-through order, listed
-  with alt text and real pixel sizes in `content/photos.ts`. They are resized
-  from the hosts' originals (2400px long edge for heroes, 1600px for the
-  gallery, JPEG quality 80, metadata stripped); frames crop to 3:2 with
-  `object-cover`. `home/hero-collage.jpg` is the real 21:9 collage. The 1:1
-  area-pick photos under `area/` are still striped placeholders.
-- `e2e/` — Playwright specs. Two projects: `chromium` runs every spec except
-  `*.live.spec.ts` against the default build on port 3000 (`home`, `stays`,
-  `theme`, `contact-api`, `contact-form`, `hospitable`, `seo`,
-  `kitchen-sink`, `a11y`, `visual`), and `chromium-live` runs
-  `hospitable.live.spec.ts` against
-  a second build made with `NEXT_PUBLIC_HOSPITABLE_MODE=live` into
-  `.next-live` on port 3001. The comment at the top of `playwright.config.ts`
-  says what each file covers.
-- `docs/plan.md` — the full implementation plan with per-step prompts and the
-  open-items checklist.
-- `design/artifact.html` — the static visual reference. Open it in a browser;
-  do not edit it.
-
-## Accessibility and visual checks
-
-`e2e/a11y.spec.ts` runs axe-core (`@axe-core/playwright`) on `/`,
-`/stays/oak-hill`, and `/does-not-exist` in light and dark; `serious` and
-`critical` violations fail, `moderate` and `minor` findings are printed and
-attached to the report. Run it alone with
-`pnpm test:e2e e2e/a11y.spec.ts --project=chromium`. `e2e/visual.spec.ts`
-writes full-page screenshots of `/` and `/stays/oak-hill` in both themes at
-1400px to `e2e/__screenshots__/<route>-<theme>.png`; they are review aids
-regenerated on every run, not a pixel comparison, so the folder is gitignored
-and CI publishes it as the `screenshots` artifact on every run. Both specs
-block requests to `tiktok.com` so the third-party player is never audited.
-`pnpm check:colors`
-(`scripts/check-colors.ts`) fails on any hex, `rgb(`/`hsl(`/`oklch(`, or bare
-`white`/`black` under `components/` and `app/`; it exempts `app/globals.css`
-(the token blocks) and the four files that render outside the page's CSS and
-copy the light values by hand: `app/opengraph-image.tsx`,
-`app/stays/[slug]/opengraph-image.tsx`, `components/seo/MonogramIcon.tsx`,
-and `app/icon.svg`.
-
-## Dependency policy
-
-Everything is on the latest stable release that its peers support. pnpm's
-default one-day `minimumReleaseAge` means a version published in the last 24
-hours resolves to the previous one until it ages; that is intended. TypeScript
-stays on 6.x until typescript-eslint supports 7.
-
-## Environment
-
-Copy `.env.example` to `.env.local`. Nothing is required locally:
-`NEXT_PUBLIC_SITE_URL` (the canonical origin used for absolute metadata URLs)
-falls back to `http://localhost:3000` when unset.
-
-`NEXT_PUBLIC_HOSPITABLE_MODE` switches the Hospitable widgets between `stub`
-(placeholder panels, the default from `content/site.ts`) and `live` (the
-loader from `cdn.hsptb.com`). It is inlined at build time. A house whose
-`hospitable.propertyId` is still null renders the stub in either mode.
-
-The contact route (`POST /api/contact`) emails inquiries through Resend using
-`RESEND_API_KEY`, `CONTACT_FROM`, and `CONTACT_TO` (comma-separated
-recipients). With no API key it runs dry: the message is written to the server
-log and the request still succeeds, so local dev and CI need no secrets. The home
-page's form (`components/contact/ContactForm.tsx`, mounted in "Why book
-direct") posts to that route and shows the same success state in dry run as
-after a real send.
-
-## Deploying on Vercel
-
-The site runs in two Vercel environments, and the difference between them is
-mostly one variable, `NEXT_PUBLIC_HOSPITABLE_MODE`:
-
-| Environment           | Built from                      | Hospitable widgets              | Contact form                     |
-| --------------------- | ------------------------------- | ------------------------------- | -------------------------------- |
-| **Production** (live) | `main`                          | `live`: real calendar, checkout | Sends through Resend             |
-| **Preview** (sandbox) | every other branch and every PR | `stub`: placeholder panels      | Dry run, or a test inbox (below) |
-| Local (`pnpm dev`)    | your working tree               | `stub` unless `.env.local` says | Dry run                          |
-
-A preview is the safe place to look at a change on a real URL: guests cannot
-book from it, and no inquiry reaches the hosts unless you point it at them.
-
-### One-time setup
-
-1. Install the CLI and sign in: `npm i -g vercel`, then `vercel login`.
-2. From the repo root, run `vercel link` and create (or pick) the project
-   under the right team. The framework preset is Next.js; leave the build and
-   output settings at their defaults.
-3. In Project → Settings → Git, connect `rojaswestall/str-website` and set the
-   production branch to `main`. From then on every push to `main` deploys to
-   Production and every other push or PR gets its own Preview URL.
-4. In Project → Settings → General, set the Node.js version to 24.x (matches
-   `.nvmrc`).
-5. Add `ENABLE_EXPERIMENTAL_COREPACK=1` for all environments so Vercel
-   installs the exact pnpm pinned in `package.json` rather than its default.
-6. Enable Web Analytics in the project's Analytics tab (`app/layout.tsx`
-   already renders `<Analytics />`).
-7. Add the custom domain under Settings → Domains and set the DNS records
-   Vercel shows.
-
-### Environment variables
-
-`NEXT_PUBLIC_*` values are inlined at build time, so changing one only takes
-effect on the next deployment (use Redeploy in the dashboard, or push).
-
-| Variable                       | Production                    | Preview                              |
-| ------------------------------ | ----------------------------- | ------------------------------------ |
-| `NEXT_PUBLIC_HOSPITABLE_MODE`  | `live`                        | `stub`                               |
-| `NEXT_PUBLIC_SITE_URL`         | `https://<domain>` (required) | leave unset                          |
-| `RESEND_API_KEY`               | the Resend key                | unset for dry run, or the same key   |
-| `CONTACT_FROM`                 | sender on the verified domain | same as Production if the key is set |
-| `CONTACT_TO`                   | the hosts' inbox(es)          | a test inbox if the key is set       |
-| `ENABLE_EXPERIMENTAL_COREPACK` | `1`                           | `1`                                  |
-
-Set them in Project → Settings → Environment Variables, or from the CLI, which
-prompts for the value:
+What CI runs, in order:
 
 ```bash
-vercel env add NEXT_PUBLIC_HOSPITABLE_MODE production   # enter: live
-vercel env add NEXT_PUBLIC_HOSPITABLE_MODE preview      # enter: stub
-vercel env ls                                           # check what is set where
+pnpm check:content && pnpm check:colors && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:unit && pnpm test
 ```
 
-Notes:
+## The booking widget
 
-- Without `NEXT_PUBLIC_SITE_URL`, canonical links, the sitemap, and Open Graph
-  URLs point at `http://localhost:3000`. That is acceptable on previews (Vercel
-  sends `noindex` for preview URLs) but would break SEO and share cards in
-  Production.
-- If `RESEND_API_KEY` is set, `CONTACT_FROM` and `CONTACT_TO` must be set too,
-  or `/api/contact` returns 500. With no key, inquiries are written to the
-  function log (Deployment → Logs) instead of sent.
+`components/booking/` is a self-hosted booking widget over the Hospitable
+Public API v2. Hospitable still takes the payment: the widget prices a stay
+and hands the guest to `booking.hospitable.com`.
 
-### Run it live (Production)
+**How pricing flows.** `GET /api/calendar/:propertyId` returns Hospitable's
+base nightly rates; the calendar shows each night at the _direct_ price,
+`round(base × (1 + direct markup))`, so the guest sees what they would pay
+before choosing. Once check-in and check-out are set, `POST /api/quote`
+asks Hospitable for a quote; **that quote is the only source of truth for
+anything the guest pays** — nights, cleaning fee, taxes, total, and the
+checkout URL all come from it, and the widget never adds or adjusts an
+amount. Reserve re-quotes with the guest's details (so checkout is
+pre-filled), asks for a second click if the total moved, and then redirects.
+The Airbnb line is an estimate from the same base rates and the house's
+_Airbnb_ markup, `floor(base × (1 + airbnb markup))` per night as Airbnb
+displays it; it is shown only when direct is cheaper, labelled as an
+estimate, and linked to the listing so a guest can check.
 
-Merge to `main`. Vercel builds and promotes the deployment to the production
-domain. To deploy the current working tree straight to Production instead
-(rarely needed):
+**Markups** come from Hospitable (each property's `listing_markups`, per
+channel). To change what guests pay, change the direct markup in
+Hospitable; to change the comparison, change the Airbnb markup there.
+`DIRECT_MARKUP_PCT` / `AIRBNB_MARKUP_PCT` are only fallbacks for a house
+whose markups Hospitable has not set. Verify the Airbnb estimate against the
+real host calendar for a date with:
 
 ```bash
-vercel --prod
+curl -H "Authorization: Bearer $BOOKING_ADMIN_TOKEN" "https://<domain>/api/admin/comparison-check?propertyId=<uuid>&date=2027-03-12"
 ```
 
-After a production deploy, open each `/stays/<slug>` page and check that the
-booking calendar loads, and send one inquiry through the contact form. To undo
-a bad release, `vercel rollback` (or Instant Rollback in the dashboard) puts
-the previous production deployment back without a rebuild.
+**Mounting.** `NEXT_PUBLIC_HOSPITABLE_MODE=native` makes `BookingPanel`
+render `<BookingWidget propertyId={uuid} />` on each house page, seeded with
+the catalog and calendar read on the server so the first HTML already holds
+the priced calendar. `<BookingWidget />` with no `propertyId` renders a
+switcher over every bookable house. It emits bubbling DOM `CustomEvent`s
+(`widget_loaded`, `dates_selected`, `quote_shown`, `comparison_shown`,
+`reserve_clicked`) that `BookingAnalytics` forwards to Vercel Web Analytics.
 
-### Run it in the sandbox (Preview)
+**Rules the code keeps.** The access token is read in `lib/booking/client.ts`
+only (`server-only`), never logged, never sent to the browser, never in git
+(`.env*` is ignored). The routes read and quote only: no reservation,
+calendar, or message is ever written. Redirects go only to
+`https://booking.hospitable.com`. Guest details are forwarded to Hospitable
+in the quote and never logged or stored. Environment variables are listed
+in [`.env.example`](.env.example) and explained in
+[`docs/development.md`](docs/development.md).
 
-Push a branch or open a PR. Vercel comments the Preview URL on the PR; the
-deployment uses the Preview variables above, so booking panels show the stub
-and nothing is booked or emailed. To deploy the working tree without pushing:
+## Documentation
 
-```bash
-vercel          # prints a unique Preview URL
-```
-
-Preview URLs sit behind Vercel Authentication by default (Settings →
-Deployment Protection), so only signed-in members of the Vercel team can open
-them. Turn on a shareable link there if someone outside the team needs to look.
-
-To exercise the **real** Hospitable widget on a preview before it goes to
-Production, add a branch-specific override: in Environment Variables, add
-`NEXT_PUBLIC_HOSPITABLE_MODE=live` for Preview and choose your branch, then
-redeploy that branch. Bear in mind the live widget is Hospitable's real
-checkout: a booking completed there is a real booking, so stop at the
-checkout page. Remove the override when you are done.
-
-### Run locally with Vercel's settings
-
-To reproduce an environment on your machine, pull its variables into
-`.env.local` (gitignored) and run the normal scripts:
-
-```bash
-vercel env pull .env.local --environment=preview      # sandbox settings
-vercel env pull .env.local --environment=production   # live settings
-pnpm build && pnpm start                              # or: pnpm dev
-```
-
-With the production variables, the booking widgets are live and the contact
-form sends real email, so treat that copy of `.env.local` with care. Delete
-or re-pull it before running `pnpm test`; the Playwright config pins its own
-values, but a stale server on port 3000 will still be reused.
+- [`docs/development.md`](docs/development.md) — setup, environment
+  variables, scripts, the test suite and its gotchas, CI, and how to edit
+  content.
+- [`docs/architecture.md`](docs/architecture.md) — what is built: routes,
+  components, the content model, theming, the Hospitable integration, the
+  contact API, the booking widget and API, SEO, and the CSP.
+- [`docs/hospitable-discovery.md`](docs/hospitable-discovery.md) — what the
+  Hospitable Public API returns, verified against the live account.
+- [`docs/plan.md`](docs/plan.md) — remaining work only: go-live checklist,
+  `[TBC]` content, open decisions, engineering follow-ups.
+- `design/artifact.html` — the static visual reference. Open it in a
+  browser; do not edit it.
+- `AGENTS.md` — pointer for coding agents to the Next 16 docs bundled in
+  `node_modules/next/dist/docs/`.

@@ -1,0 +1,1169 @@
+{
+  "data": {
+    "listing_id": "1598934202273477463",
+    "provider": "airbnb-official",
+    "start_date": "2026-10-25",
+    "end_date": "2026-12-24",
+    "days": [
+      {
+        "date": "2026-10-25",
+        "day": "SUNDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 30500,
+          "currency": "USD",
+          "formatted": "$305.00"
+        }
+      },
+      {
+        "date": "2026-10-26",
+        "day": "MONDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 13800,
+          "currency": "USD",
+          "formatted": "$138.00"
+        }
+      },
+      {
+        "date": "2026-10-27",
+        "day": "TUESDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 14000,
+          "currency": "USD",
+          "formatted": "$140.00"
+        }
+      },
+      {
+        "date": "2026-10-28",
+        "day": "WEDNESDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 14200,
+          "currency": "USD",
+          "formatted": "$142.00"
+        }
+      },
+      {
+        "date": "2026-10-29",
+        "day": "THURSDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 16300,
+          "currency": "USD",
+          "formatted": "$163.00"
+        }
+      },
+      {
+        "date": "2026-10-30",
+        "day": "FRIDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 24700,
+          "currency": "USD",
+          "formatted": "$247.00"
+        }
+      },
+      {
+        "date": "2026-10-31",
+        "day": "SATURDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 26100,
+          "currency": "USD",
+          "formatted": "$261.00"
+        }
+      },
+      {
+        "date": "2026-11-01",
+        "day": "SUNDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 16500,
+          "currency": "USD",
+          "formatted": "$165.00"
+        }
+      },
+      {
+        "date": "2026-11-02",
+        "day": "MONDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 13000,
+          "currency": "USD",
+          "formatted": "$130.00"
+        }
+      },
+      {
+        "date": "2026-11-03",
+        "day": "TUESDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 13300,
+          "currency": "USD",
+          "formatted": "$133.00"
+        }
+      },
+      {
+        "date": "2026-11-04",
+        "day": "WEDNESDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 15000,
+          "currency": "USD",
+          "formatted": "$150.00"
+        }
+      },
+      {
+        "date": "2026-11-05",
+        "day": "THURSDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 18500,
+          "currency": "USD",
+          "formatted": "$185.00"
+        }
+      },
+      {
+        "date": "2026-11-06",
+        "day": "FRIDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 23600,
+          "currency": "USD",
+          "formatted": "$236.00"
+        }
+      },
+      {
+        "date": "2026-11-07",
+        "day": "SATURDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 24300,
+          "currency": "USD",
+          "formatted": "$243.00"
+        }
+      },
+      {
+        "date": "2026-11-08",
+        "day": "SUNDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": true
+        },
+        "price": {
+          "amount": 19100,
+          "currency": "USD",
+          "formatted": "$191.00"
+        }
+      },
+      {
+        "date": "2026-11-09",
+        "day": "MONDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 14300,
+          "currency": "USD",
+          "formatted": "$143.00"
+        }
+      },
+      {
+        "date": "2026-11-10",
+        "day": "TUESDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 17000,
+          "currency": "USD",
+          "formatted": "$170.00"
+        }
+      },
+      {
+        "date": "2026-11-11",
+        "day": "WEDNESDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 17700,
+          "currency": "USD",
+          "formatted": "$177.00"
+        }
+      },
+      {
+        "date": "2026-11-12",
+        "day": "THURSDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 20700,
+          "currency": "USD",
+          "formatted": "$207.00"
+        }
+      },
+      {
+        "date": "2026-11-13",
+        "day": "FRIDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 24400,
+          "currency": "USD",
+          "formatted": "$244.00"
+        }
+      },
+      {
+        "date": "2026-11-14",
+        "day": "SATURDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 25500,
+          "currency": "USD",
+          "formatted": "$255.00"
+        }
+      },
+      {
+        "date": "2026-11-15",
+        "day": "SUNDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 17500,
+          "currency": "USD",
+          "formatted": "$175.00"
+        }
+      },
+      {
+        "date": "2026-11-16",
+        "day": "MONDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 15000,
+          "currency": "USD",
+          "formatted": "$150.00"
+        }
+      },
+      {
+        "date": "2026-11-17",
+        "day": "TUESDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 14800,
+          "currency": "USD",
+          "formatted": "$148.00"
+        }
+      },
+      {
+        "date": "2026-11-18",
+        "day": "WEDNESDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 16100,
+          "currency": "USD",
+          "formatted": "$161.00"
+        }
+      },
+      {
+        "date": "2026-11-19",
+        "day": "THURSDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 18900,
+          "currency": "USD",
+          "formatted": "$189.00"
+        }
+      },
+      {
+        "date": "2026-11-20",
+        "day": "FRIDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 24400,
+          "currency": "USD",
+          "formatted": "$244.00"
+        }
+      },
+      {
+        "date": "2026-11-21",
+        "day": "SATURDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 26500,
+          "currency": "USD",
+          "formatted": "$265.00"
+        }
+      },
+      {
+        "date": "2026-11-22",
+        "day": "SUNDAY",
+        "min_stay": 1,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 18700,
+          "currency": "USD",
+          "formatted": "$187.00"
+        }
+      },
+      {
+        "date": "2026-11-23",
+        "day": "MONDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 20100,
+          "currency": "USD",
+          "formatted": "$201.00"
+        }
+      },
+      {
+        "date": "2026-11-24",
+        "day": "TUESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 23400,
+          "currency": "USD",
+          "formatted": "$234.00"
+        }
+      },
+      {
+        "date": "2026-11-25",
+        "day": "WEDNESDAY",
+        "min_stay": 4,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 29000,
+          "currency": "USD",
+          "formatted": "$290.00"
+        }
+      },
+      {
+        "date": "2026-11-26",
+        "day": "THURSDAY",
+        "min_stay": 4,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 31000,
+          "currency": "USD",
+          "formatted": "$310.00"
+        }
+      },
+      {
+        "date": "2026-11-27",
+        "day": "FRIDAY",
+        "min_stay": 4,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 32000,
+          "currency": "USD",
+          "formatted": "$320.00"
+        }
+      },
+      {
+        "date": "2026-11-28",
+        "day": "SATURDAY",
+        "min_stay": 4,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 28600,
+          "currency": "USD",
+          "formatted": "$286.00"
+        }
+      },
+      {
+        "date": "2026-11-29",
+        "day": "SUNDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 15400,
+          "currency": "USD",
+          "formatted": "$154.00"
+        }
+      },
+      {
+        "date": "2026-11-30",
+        "day": "MONDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 13900,
+          "currency": "USD",
+          "formatted": "$139.00"
+        }
+      },
+      {
+        "date": "2026-12-01",
+        "day": "TUESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 14000,
+          "currency": "USD",
+          "formatted": "$140.00"
+        }
+      },
+      {
+        "date": "2026-12-02",
+        "day": "WEDNESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 13600,
+          "currency": "USD",
+          "formatted": "$136.00"
+        }
+      },
+      {
+        "date": "2026-12-03",
+        "day": "THURSDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 16000,
+          "currency": "USD",
+          "formatted": "$160.00"
+        }
+      },
+      {
+        "date": "2026-12-04",
+        "day": "FRIDAY",
+        "min_stay": 3,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 19400,
+          "currency": "USD",
+          "formatted": "$194.00"
+        }
+      },
+      {
+        "date": "2026-12-05",
+        "day": "SATURDAY",
+        "min_stay": 3,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 20200,
+          "currency": "USD",
+          "formatted": "$202.00"
+        }
+      },
+      {
+        "date": "2026-12-06",
+        "day": "SUNDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 14200,
+          "currency": "USD",
+          "formatted": "$142.00"
+        }
+      },
+      {
+        "date": "2026-12-07",
+        "day": "MONDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 12400,
+          "currency": "USD",
+          "formatted": "$124.00"
+        }
+      },
+      {
+        "date": "2026-12-08",
+        "day": "TUESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 12800,
+          "currency": "USD",
+          "formatted": "$128.00"
+        }
+      },
+      {
+        "date": "2026-12-09",
+        "day": "WEDNESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 13200,
+          "currency": "USD",
+          "formatted": "$132.00"
+        }
+      },
+      {
+        "date": "2026-12-10",
+        "day": "THURSDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 15200,
+          "currency": "USD",
+          "formatted": "$152.00"
+        }
+      },
+      {
+        "date": "2026-12-11",
+        "day": "FRIDAY",
+        "min_stay": 3,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 17800,
+          "currency": "USD",
+          "formatted": "$178.00"
+        }
+      },
+      {
+        "date": "2026-12-12",
+        "day": "SATURDAY",
+        "min_stay": 3,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 17700,
+          "currency": "USD",
+          "formatted": "$177.00"
+        }
+      },
+      {
+        "date": "2026-12-13",
+        "day": "SUNDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 14700,
+          "currency": "USD",
+          "formatted": "$147.00"
+        }
+      },
+      {
+        "date": "2026-12-14",
+        "day": "MONDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 13100,
+          "currency": "USD",
+          "formatted": "$131.00"
+        }
+      },
+      {
+        "date": "2026-12-15",
+        "day": "TUESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 13800,
+          "currency": "USD",
+          "formatted": "$138.00"
+        }
+      },
+      {
+        "date": "2026-12-16",
+        "day": "WEDNESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "RESERVED",
+          "source": null,
+          "source_type": "RESERVATION",
+          "available": false
+        },
+        "price": {
+          "amount": 14600,
+          "currency": "USD",
+          "formatted": "$146.00"
+        }
+      },
+      {
+        "date": "2026-12-17",
+        "day": "THURSDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 16900,
+          "currency": "USD",
+          "formatted": "$169.00"
+        }
+      },
+      {
+        "date": "2026-12-18",
+        "day": "FRIDAY",
+        "min_stay": 3,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 19800,
+          "currency": "USD",
+          "formatted": "$198.00"
+        }
+      },
+      {
+        "date": "2026-12-19",
+        "day": "SATURDAY",
+        "min_stay": 3,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 19800,
+          "currency": "USD",
+          "formatted": "$198.00"
+        }
+      },
+      {
+        "date": "2026-12-20",
+        "day": "SUNDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 20900,
+          "currency": "USD",
+          "formatted": "$209.00"
+        }
+      },
+      {
+        "date": "2026-12-21",
+        "day": "MONDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 21600,
+          "currency": "USD",
+          "formatted": "$216.00"
+        }
+      },
+      {
+        "date": "2026-12-22",
+        "day": "TUESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 22000,
+          "currency": "USD",
+          "formatted": "$220.00"
+        }
+      },
+      {
+        "date": "2026-12-23",
+        "day": "WEDNESDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 23500,
+          "currency": "USD",
+          "formatted": "$235.00"
+        }
+      },
+      {
+        "date": "2026-12-24",
+        "day": "THURSDAY",
+        "min_stay": 2,
+        "note": null,
+        "closed_for_checkin": false,
+        "closed_for_checkout": false,
+        "status": {
+          "reason": "AVAILABLE",
+          "source": "airbnb",
+          "source_type": "PLATFORM",
+          "available": true
+        },
+        "price": {
+          "amount": 26400,
+          "currency": "USD",
+          "formatted": "$264.00"
+        }
+      }
+    ]
+  }
+}
