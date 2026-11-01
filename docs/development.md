@@ -56,7 +56,6 @@ variable is optional locally.
 | `MAX_NIGHTS`                             | `90`                            | Longest stay `/api/quote` will price.                                                                   |
 | `BOOKING_ADMIN_TOKEN`                    | unset → route is a 404          | Bearer token (16+ chars) for `GET /api/admin/comparison-check`.                                         |
 | `HOSPITABLE_API_BASE_URL`                | the real Public API             | Only the e2e suite sets it, to the stand-in in `e2e/mock-hospitable/`.                                  |
-| `NEXT_PUBLIC_MAPKIT_TOKEN`               | unset → drawn SVG map           | Apple MapKit JS token (domain-restricted, public by design). Set: the city map is a live Apple map.     |
 
 `NEXT_PUBLIC_*` values are inlined at build time; restart `pnpm dev` or
 rebuild after changing them.
@@ -125,15 +124,12 @@ Hospitable API for the native one.
 | Project           | Port | Build                                                | Runs                                      |
 | ----------------- | ---- | ---------------------------------------------------- | ----------------------------------------- |
 | `chromium`        | 3000 | `.next`, `NEXT_PUBLIC_HOSPITABLE_MODE=stub`          | every spec except `*.live.*`/`*.native.*` |
-| `chromium-live`   | 3001 | `.next-live`, `NEXT_PUBLIC_HOSPITABLE_MODE=live`     | `hospitable.live.spec.ts`, `mapkit.live…` |
+| `chromium-live`   | 3001 | `.next-live`, `NEXT_PUBLIC_HOSPITABLE_MODE=live`     | `hospitable.live.spec.ts`                 |
 | `chromium-native` | 3002 | `.next-native`, `NEXT_PUBLIC_HOSPITABLE_MODE=native` | `booking.native.spec.ts`                  |
 | (stand-in)        | 3999 | `node e2e/mock-hospitable/server.mjs`                | —                                         |
 
 Every server pins `NEXT_PUBLIC_SITE_URL=""` so a `.env.local` cannot change
-the URLs the SEO spec checks, and each pins its mode. The live build pins a
-dummy `NEXT_PUBLIC_MAPKIT_TOKEN` (so `mapkit.live.spec.ts` sees the Apple map,
-with MapKit JS replaced by a stand-in) and the other two pin it empty (so
-every other spec sees the drawn SVG). The native build also
+the URLs the SEO spec checks, and each pins its mode. The native build also
 pins every booking variable — a throwaway token, `HOSPITABLE_API_BASE_URL`
 pointing at the stand-in, the admin token — so a developer's real token in
 `.env.local` is never used by the suite and nothing reaches Hospitable. The
