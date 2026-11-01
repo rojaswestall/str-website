@@ -86,7 +86,19 @@ function nextReservedDay(today: string): string {
   throw new Error("unreachable");
 }
 
+/*
+ * The widget streams in after `load`, and React holds a streamed boundary in
+ * a hidden container for a few hundred milliseconds before revealing it. Until
+ * then every day cell reports not visible, so a bare `isVisible()` check would
+ * read "not this month" and page forward (on the 1st of a month that skipped
+ * straight past the target). Wait for the calendar to be on screen first.
+ */
+async function waitForCalendar(widget: Locator) {
+  await expect(widget.locator('[role="gridcell"]').first()).toBeVisible();
+}
+
 async function clickDate(widget: Locator, date: string) {
+  await waitForCalendar(widget);
   const cell = widget.locator(`[role="gridcell"][data-date="${date}"]`);
   for (let i = 0; i < 4 && !(await cell.isVisible()); i++) {
     await widget.getByRole("button", { name: "Next month" }).click();
@@ -213,6 +225,7 @@ test.describe("native booking widget", () => {
     const reserved = widget.locator(
       `[role="gridcell"][data-date="${nextReservedDay(today)}"]`,
     );
+    await waitForCalendar(widget);
     for (let i = 0; i < 3 && !(await reserved.isVisible()); i++) {
       await widget.getByRole("button", { name: "Next month" }).click();
     }
