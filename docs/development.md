@@ -227,6 +227,64 @@ Every run uploads two artifacts, kept 7 days: `playwright-report` (the HTML
 report, with traces for retried tests) and `screenshots`
 (`e2e/__screenshots__/`). The job takes about three minutes.
 
+## Deploying (Vercel)
+
+The Vercel project is connected to this repo with `main` as the production
+branch. Which variables each environment needs, and the go-live order, are in
+[`plan.md`](plan.md) (sections 1 and 1b); this section is how deploys work day
+to day.
+
+| Push to                  | Deploys to | Notes                                                                   |
+| ------------------------ | ---------- | ----------------------------------------------------------------------- |
+| `main` (a merged PR)     | Production | The custom domain. Its env decides the widget mode (`live` today).      |
+| any other branch, any PR | Preview    | A unique URL, commented on the PR. Preview env (`native` widget today). |
+
+**Preview is not a sandbox for bookings.** It runs the native widget against
+the real Hospitable account: quotes are real, and Reserve hands off to the
+real Hospitable checkout, so completing it books (and charges) for real. Stop
+at the checkout page unless you mean to book, as in the test booking in
+`plan.md` 1b. The contact form on Preview runs dry unless the Resend values
+are set for Preview. To look at a change with no live booking at all, set
+`NEXT_PUBLIC_HOSPITABLE_MODE=stub` for your branch only (Settings →
+Environment Variables → Preview → choose the branch) and redeploy it; remove
+the override afterwards.
+
+Preview URLs sit behind Vercel Authentication (Settings → Deployment
+Protection), so only members of the Vercel team can open them; create a
+shareable link there for anyone else.
+
+With the Vercel CLI (`npm i -g vercel`, `vercel login`, then `vercel link`
+once in the repo root):
+
+```bash
+vercel                       # deploy the working tree to a new Preview URL
+vercel --prod                # deploy the working tree straight to Production (rarely needed; prefer merging)
+vercel env ls                # which variables are set in which environment
+vercel env add NAME preview  # add one (prompts for the value); production / development likewise
+vercel rollback              # put the previous Production deployment back, no rebuild
+```
+
+`NEXT_PUBLIC_*` values are inlined at build time, so changing one only takes
+effect on the next deployment (push, or Redeploy in the dashboard). Instant
+Rollback in the dashboard does the same as `vercel rollback`; to undo only
+the booking widget, use the mode rollback in `plan.md` 1b instead.
+
+To run locally with an environment's real settings, pull them into
+`.env.local` (gitignored) and use the usual scripts:
+
+```bash
+vercel env pull .env.local --environment=preview
+pnpm build && pnpm start
+```
+
+A pulled file holds real secrets (`HOSPITABLE_PERSONAL_ACCESS_TOKEN`,
+`RESEND_API_KEY`, `BOOKING_ADMIN_TOKEN`): the widget then quotes against
+Hospitable and the contact form sends real email. Never commit or share it,
+and delete it (or switch back to your own `.env.local`) when done. `pnpm
+test` is unaffected, since every Playwright server pins its own values (see
+"End-to-end" above), but stop any server you started on ports 3000–3002
+first so the suite does not reuse it.
+
 ## Editing content
 
 All copy, photos, and ids live in `content/`; components never hardcode
