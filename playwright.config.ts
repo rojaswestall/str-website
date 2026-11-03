@@ -6,7 +6,7 @@ import { defineConfig, devices } from "@playwright/test";
  * (see the 404 status note in docs/architecture.md).
  *
  * `chromium` (port 3000, default build, NEXT_PUBLIC_HOSPITABLE_MODE=stub)
- * runs every spec except `*.live.spec.ts` and `*.native.spec.ts`:
+ * runs every spec except `*.hospitable.spec.ts` and `*.native.spec.ts`:
  *   home.spec.ts          the landing page, its sections, and the site shell
  *   stays.spec.ts         the three house pages, the stub per house, both 404s
  *   area.spec.ts          /area: every pick with its drive time from each house
@@ -22,9 +22,9 @@ import { defineConfig, devices } from "@playwright/test";
  *                         into e2e/__screenshots__/
  *                         (gitignored; CI uploads them as an artifact)
  *
- * `chromium-live` (port 3001, a second build with
- * NEXT_PUBLIC_HOSPITABLE_MODE=live into .next-live) runs only
- * hospitable.live.spec.ts: the one place the real loader shape is covered
+ * `chromium-hospitable` (port 3001, a second build with
+ * NEXT_PUBLIC_HOSPITABLE_MODE=hospitable into .next-hospitable) runs only
+ * embed.hospitable.spec.ts: the one place the real loader shape is covered
  * (script attributes, remount on client-side navigation, no missing-id
  * warnings, the search bar and /search). The real loaders are intercepted,
  * never fetched.
@@ -38,11 +38,11 @@ import { defineConfig, devices } from "@playwright/test";
  */
 
 const port = 3000;
-const livePort = 3001;
+const hospitablePort = 3001;
 const nativePort = 3002;
 const mockHospitablePort = 3999;
 const baseURL = `http://localhost:${port}`;
-const liveBaseURL = `http://localhost:${livePort}`;
+const hospitableBaseURL = `http://localhost:${hospitablePort}`;
 const nativeBaseURL = `http://localhost:${nativePort}`;
 const mockHospitableURL = `http://127.0.0.1:${mockHospitablePort}`;
 const isCI = !!process.env.CI;
@@ -74,12 +74,12 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      testIgnore: /\.(live|native)\.spec\.ts$/,
+      testIgnore: /\.(hospitable|native)\.spec\.ts$/,
     },
     {
-      name: "chromium-live",
-      use: { ...devices["Desktop Chrome"], baseURL: liveBaseURL },
-      testMatch: /\.live\.spec\.ts$/,
+      name: "chromium-hospitable",
+      use: { ...devices["Desktop Chrome"], baseURL: hospitableBaseURL },
+      testMatch: /\.hospitable\.spec\.ts$/,
     },
     {
       name: "chromium-native",
@@ -103,14 +103,14 @@ export default defineConfig({
       stdout: isCI ? "pipe" : "ignore",
       timeout: 300_000,
     },
-    // Live build into .next-live (next.config.ts reads NEXT_DIST_DIR).
+    // Hospitable build into .next-hospitable (next.config.ts reads NEXT_DIST_DIR).
     {
-      command: `pnpm build && pnpm start --port ${livePort}`,
-      url: liveBaseURL,
+      command: `pnpm build && pnpm start --port ${hospitablePort}`,
+      url: hospitableBaseURL,
       env: {
-        NEXT_PUBLIC_HOSPITABLE_MODE: "live",
+        NEXT_PUBLIC_HOSPITABLE_MODE: "hospitable",
         NEXT_PUBLIC_SITE_URL: "",
-        NEXT_DIST_DIR: ".next-live",
+        NEXT_DIST_DIR: ".next-hospitable",
       },
       reuseExistingServer: !isCI,
       stdout: isCI ? "pipe" : "ignore",

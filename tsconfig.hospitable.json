@@ -4,8 +4,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next-live/types/**/*.ts",
-    ".next-live/dev/types/**/*.ts",
+    ".next-hospitable/types/**/*.ts",
+    ".next-hospitable/dev/types/**/*.ts",
     "**/*.mts"
   ]
 }

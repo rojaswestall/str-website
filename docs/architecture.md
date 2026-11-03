@@ -18,7 +18,7 @@ Sans body, IBM Plex Mono labels, plus a dark mode.
 domain are set up. Not yet live for guests: Resend is not set up (the contact
 form runs dry and delivers nothing), the CSP is still report-only, and some
 copy is still `[TBC]` (rates, policies, host bios, area picks). The repo
-default for Hospitable is `stub` mode; production turns on `live` through
+default for Hospitable is `stub` mode; production turns on `hospitable` through
 `NEXT_PUBLIC_HOSPITABLE_MODE`. See [`plan.md`](plan.md).
 
 ## Stack and key decisions
@@ -219,8 +219,10 @@ axe reports zero violations on every audited page in both themes.
 
 ## Hospitable integration
 
-`NEXT_PUBLIC_HOSPITABLE_MODE` (`stub` | `live`) overrides `site.hospitable.mode`
-(`resolveHospitableMode` in `lib/hospitable.ts`). It is inlined at build time.
+`NEXT_PUBLIC_HOSPITABLE_MODE` (`stub` | `hospitable` | `native`) overrides
+`site.hospitable.mode` (`resolveHospitableMode` in `lib/hospitable.ts`). It is
+inlined at build time. `live`, the old name of `hospitable`, still resolves to
+it so an un-updated Vercel environment keeps the embedded widget.
 
 The dashboard snippets the code is built against (ids are in `content/`):
 
@@ -262,9 +264,9 @@ The booking loader reads `checkin`, `checkout`, guest counts, locale, and
 `utm_*` from the page URL itself, so search terms carry into the booking
 iframe with no extra code.
 
-**Stubs.** In stub mode, or in live mode when an id is null, the widgets
+**Stubs.** In stub mode, or in hospitable mode when an id is null, the widgets
 render `HospitableStub` / `HospitableSearchStub` (disabled fields and an
-Airbnb link) and, in live mode, `console.warn` once.
+Airbnb link) and, in hospitable mode, `console.warn` once.
 
 ## Contact
 

@@ -22,6 +22,12 @@ checkpoints, each its own PR, so a reader can see what each one added.
 - **Docs.** README section on the widget, `docs/architecture.md` and
   `docs/development.md` brought up to date, go-live steps for switching
   Production to the native widget in `docs/plan.md`.
+- **Mode renamed.** `NEXT_PUBLIC_HOSPITABLE_MODE=live` is now `hospitable`,
+  so the three values name what renders: `stub`, `hospitable` (the embedded
+  widget) or `native` (the site's own). `live` still resolves to
+  `hospitable`, so an un-updated Vercel environment is unaffected. The
+  matching Playwright project is `chromium-hospitable`
+  (`e2e/embed.hospitable.spec.ts`, `.next-hospitable`).
 
 ## 2026-10-31 — checkpoint 4: Airbnb price comparison (#39)
 

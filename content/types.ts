@@ -212,8 +212,8 @@ export const SiteConfigSchema = z.object({
   /** Bare host name, no scheme. Placeholder until the domain is chosen. */
   domain: nonEmpty,
   hospitable: z.object({
-    /** "stub" renders the placeholder panels; "live" injects the loader. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
-    mode: z.enum(["stub", "live", "native"]),
+    /** "stub" renders the placeholder panels; "hospitable" injects the loader; "native" renders the site's own widget. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
+    mode: z.enum(["stub", "hospitable", "native"]),
     /** `data-site-uuid` from the dashboard snippet; shared by every widget on the site. */
     siteUuid: z.uuid().nullable(),
     /** `data-theme` from the dashboard snippet (the widget style configured there). */

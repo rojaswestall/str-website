@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 import { contentSecurityPolicy, CSP_REPORT_ONLY_HEADER } from "./lib/csp";
 
-// Playwright builds live-mode and native-mode copies of the site next to the
+// Playwright builds hospitable-mode and native-mode copies of the site next to the
 // default one; each type-checks against its own generated types so a stale
 // extra build directory cannot break the default build or `pnpm typecheck`.
 const distDir = process.env.NEXT_DIST_DIR ?? ".next";
 const TSCONFIG_BY_DIST: Record<string, string> = {
-  ".next-live": "tsconfig.live.json",
+  ".next-hospitable": "tsconfig.hospitable.json",
   ".next-native": "tsconfig.native.json",
 };
 

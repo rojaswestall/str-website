@@ -27,7 +27,7 @@ later item depends on the earlier ones.
   | Variable                      | Production              | Preview                    |
   | ----------------------------- | ----------------------- | -------------------------- |
   | `NEXT_PUBLIC_SITE_URL`        | `https://<domain>`      | the preview origin or prod |
-  | `NEXT_PUBLIC_HOSPITABLE_MODE` | `live` → `native` (1b)  | `native`                   |
+  | `NEXT_PUBLIC_HOSPITABLE_MODE` | `hospitable` → `native` (1b)  | `native`                   |
   | `RESEND_API_KEY`              | Resend key              | optional (dry run without) |
   | `CONTACT_FROM`                | `Name <addr@<domain>>`  | same as prod if key set    |
   | `CONTACT_TO`                  | comma-separated inboxes | same as prod if key set    |
@@ -94,10 +94,10 @@ already runs `NEXT_PUBLIC_HOSPITABLE_MODE=native`. Production still embeds
 Hospitable's widget; flipping it is a deliberate step, in this order, and
 only with a go from the hosts.
 
-- [ ] **Hospitable (human).** Set per-channel markups on Parkwood A
-      (Oak Hill) and Dan Jean B (Fire Side); only Dan Jean Unit A (South
-      Austin) has them, so it is the only house the price comparison is
-      right for today (the other two show no comparison line, correctly).
+- [x] **Hospitable markups.** All three houses are listed on the Direct
+      site with direct 11% / Airbnb 15.5% markups (checked 2026-11-03), so
+      the price comparison is right for every house.
+- [ ] **Hospitable (human).**
       Check the Direct site's booking settings: the checkout currently says
       "This booking is non-refundable once accepted" while the API reports
       a refund-within-24-hours policy, and bookings are "Request to book"
@@ -114,7 +114,10 @@ only with a go from the hosts.
       and Feb 25 2027.
 - [ ] **Vercel Production env.** `HOSPITABLE_PERSONAL_ACCESS_TOKEN`,
       `HOSPITABLE_CUSTOM_SITE_ID` and `BOOKING_ADMIN_TOKEN` present;
-      `COMPARISON_ENABLED` unset or `true`. Then set
+      `COMPARISON_ENABLED` unset or `true`. Production's
+      `NEXT_PUBLIC_HOSPITABLE_MODE` is still the old value `live`, which the
+      code treats as `hospitable`; change it to `hospitable` whenever
+      convenient (no behaviour change). Then set
       `NEXT_PUBLIC_HOSPITABLE_MODE=native` for Production and redeploy
       (`NEXT_PUBLIC_*` is inlined at build time).
 - [ ] **After the deploy.** On the production domain: pick dates on each
@@ -123,7 +126,7 @@ only with a go from the hosts.
       Vercel Web Analytics; the function log shows `[hospitable] GET …`
       lines and no `[booking:*]` errors. Keep the Airbnb link under the
       widget.
-- [ ] **Rollback.** Set `NEXT_PUBLIC_HOSPITABLE_MODE=live` on Production and
+- [ ] **Rollback.** Set `NEXT_PUBLIC_HOSPITABLE_MODE=hospitable` on Production and
       redeploy; the embedded widget returns and nothing else changes. The
       routes keep working either way.
 - [ ] CSP: add `public.api.hospitable.com` only if the browser ever calls it

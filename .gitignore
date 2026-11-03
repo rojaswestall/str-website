@@ -20,7 +20,7 @@
 
 # next.js
 /.next/
-/.next-live/
+/.next-hospitable/
 /.next-native/
 /out/
 

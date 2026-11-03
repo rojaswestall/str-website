@@ -16,25 +16,30 @@ export const HOSPITABLE_LOADER_SRC =
   "https://cdn.hsptb.com/direct-booking-widget/widget-loader.prod.js";
 
 /**
- * "stub": placeholder panels. "live": Hospitable's embedded widget.
+ * "stub": placeholder panels. "hospitable": Hospitable's embedded widget.
  * "native": the site's own booking widget (components/booking), which talks
  * to /api/* and hands off to Hospitable's hosted checkout.
  */
-export type HospitableMode = "stub" | "live" | "native";
+export type HospitableMode = "stub" | "hospitable" | "native";
 
 function isMode(value: string | undefined): value is HospitableMode {
-  return value === "stub" || value === "live" || value === "native";
+  return value === "stub" || value === "hospitable" || value === "native";
 }
 
 /**
  * `NEXT_PUBLIC_HOSPITABLE_MODE` wins when it is set to a valid value; otherwise
  * the mode from `content/site.ts` applies. The env var is inlined at build
  * time, so a Vercel environment flips the whole deployment.
+ *
+ * `live` is the old name of `hospitable` and still resolves to it, so a
+ * Vercel environment that has not been updated keeps embedding the widget
+ * instead of silently falling back to the stubs.
  */
 export function resolveHospitableMode(
   contentMode: HospitableMode,
 ): HospitableMode {
   const fromEnv = process.env.NEXT_PUBLIC_HOSPITABLE_MODE;
+  if (fromEnv === "live") return "hospitable";
   return isMode(fromEnv) ? fromEnv : contentMode;
 }
 

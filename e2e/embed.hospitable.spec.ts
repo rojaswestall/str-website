@@ -1,14 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /*
- * Runs in the "chromium-live" project only, against the second build made
- * with NEXT_PUBLIC_HOSPITABLE_MODE=live. The real loader is never fetched: the
+ * Runs in the "chromium-hospitable" project only, against the second build made
+ * with NEXT_PUBLIC_HOSPITABLE_MODE=hospitable. The real loader is never fetched: the
  * route below answers for cdn.hsptb.com with a tiny stand-in that behaves like
  * the real one (reads its own data-* attributes, inserts its output right
  * after the script element).
  *
  * All three houses have a Hospitable property id in content (step 14), so
- * every house page is a live mount; client-side navigation between two of
+ * every house page is an embedded mount; client-side navigation between two of
  * them covers the tear-down and fresh injection. The stub fallback for a
  * house without an id (HospitableWidget.tsx) has no house left to exercise
  * it and is not covered here.
@@ -22,7 +22,7 @@ const FAKE_LOADER = `
   (() => {
     const script = document.currentScript;
     const marker = document.createElement("div");
-    marker.dataset.testid = "hospitable-live-marker";
+    marker.dataset.testid = "hospitable-embed-marker";
     marker.dataset.siteUuid = script.dataset.siteUuid;
     marker.dataset.propertyId = script.dataset.propertyId;
     marker.dataset.theme = script.dataset.theme;
@@ -85,14 +85,14 @@ const SEARCH_WIDGET_ID = "178e46fc-3dbb-4433-ac2d-3ebe9d9cca07";
 const SEARCH_SCRIPT_SRC =
   "https://hospitable.b-cdn.net/direct-property-search-widget/hospitable-search-widget.prod.js";
 
-test.describe("hospitable widgets (live mode)", () => {
+test.describe("hospitable widgets (hospitable mode)", () => {
   test("mounts the loader once and re-mounts after client-side navigation away and back", async ({
     page,
   }) => {
     const loads = await interceptLoader(page);
     await page.goto("/stays/fire-side");
 
-    const marker = page.getByTestId("hospitable-live-marker");
+    const marker = page.getByTestId("hospitable-embed-marker");
     await expect(marker).toHaveCount(1);
     await expect(marker).toHaveAttribute("data-site-uuid", SITE_UUID);
     await expect(marker).toHaveAttribute(
@@ -148,7 +148,7 @@ test.describe("hospitable widgets (live mode)", () => {
     expect(loads).toHaveLength(3);
   });
 
-  test("no house warns about missing Hospitable config in live mode", async ({
+  test("no house warns about missing Hospitable config in hospitable mode", async ({
     page,
   }) => {
     await interceptLoader(page);
@@ -158,10 +158,10 @@ test.describe("hospitable widgets (live mode)", () => {
     });
     for (const slug of ["oak-hill", "south-austin", "fire-side"]) {
       await page.goto(`/stays/${slug}`);
-      await expect(page.getByTestId("hospitable-live-marker")).toHaveCount(1);
+      await expect(page.getByTestId("hospitable-embed-marker")).toHaveCount(1);
     }
     expect(
-      warnings.filter((text) => text.includes("[Hospitable] live mode")),
+      warnings.filter((text) => text.includes("[Hospitable] hospitable mode")),
     ).toEqual([]);
   });
 
