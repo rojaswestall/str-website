@@ -40,37 +40,37 @@ from React's dev tooling (production does not use eval).
 Copy `.env.example` to `.env.local` if you want to change anything; every
 variable is optional locally.
 
-| Variable                                 | Default / unset                 | Effect                                                                                                  |
-| ---------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`                   | `http://localhost:3000`         | Origin for canonical, sitemap, OG, and JSON-LD URLs. Empty counts as unset.                             |
-| `NEXT_PUBLIC_HOSPITABLE_MODE`            | `site.hospitable.mode` (`stub`) | `stub` shows placeholder panels; `live` embeds Hospitable's widget; `native` renders the site's own.    |
-| `RESEND_API_KEY`                         | unset → dry run                 | Without it, `/api/contact` logs the message and returns success.                                        |
-| `CONTACT_FROM`                           | —                               | Sender on the Resend-verified domain. Required once a key is set.                                       |
-| `CONTACT_TO`                             | —                               | Comma-separated recipients. Required once a key is set.                                                 |
-| `NEXT_DIST_DIR`                          | `.next`                         | Build directory; Playwright uses `.next-live` and `.next-native` for its other two builds.              |
-| `HOSPITABLE_PERSONAL_ACCESS_TOKEN`       | unset → booking routes 503      | Public API v2 token (read access). Server-only; never prefix it `NEXT_PUBLIC_`. Alias `HOSPITABLE_PAT`. |
-| `HOSPITABLE_CUSTOM_SITE_ID`              | `site.hospitable.siteUuid`      | Sent with every quote so checkout is attributed to this site.                                           |
-| `AIRBNB_MARKUP_PCT`, `DIRECT_MARKUP_PCT` | `15.5`, `11`                    | Fallback markups for a house whose Hospitable markups are missing.                                      |
-| `AIRBNB_LISTING_URLS`                    | `airbnbUrl` from content        | JSON map of property id → Airbnb URL for the price comparison link.                                     |
-| `COMPARISON_ENABLED`                     | `true`                          | `false` hides the Airbnb price comparison.                                                              |
-| `MAX_NIGHTS`                             | `90`                            | Longest stay `/api/quote` will price.                                                                   |
-| `BOOKING_ADMIN_TOKEN`                    | unset → route is a 404          | Bearer token (16+ chars) for `GET /api/admin/comparison-check`.                                         |
-| `HOSPITABLE_API_BASE_URL`                | the real Public API             | Only the e2e suite sets it, to the stand-in in `e2e/mock-hospitable/`.                                  |
-| `NEXT_PUBLIC_MAPKIT_TOKEN`               | unset → drawn SVG map           | Apple MapKit JS token (domain-restricted, public by design). Set: the city map is a live Apple map.     |
+| Variable                                 | Default / unset                 | Effect                                                                                                                                              |
+| ---------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                   | `http://localhost:3000`         | Origin for canonical, sitemap, OG, and JSON-LD URLs. Empty counts as unset.                                                                         |
+| `NEXT_PUBLIC_HOSPITABLE_MODE`            | `site.hospitable.mode` (`stub`) | `stub` shows placeholder panels; `hospitable` embeds Hospitable's widget (`live` is its old name and still works); `native` renders the site's own. |
+| `RESEND_API_KEY`                         | unset → dry run                 | Without it, `/api/contact` logs the message and returns success.                                                                                    |
+| `CONTACT_FROM`                           | —                               | Sender on the Resend-verified domain. Required once a key is set.                                                                                   |
+| `CONTACT_TO`                             | —                               | Comma-separated recipients. Required once a key is set.                                                                                             |
+| `NEXT_DIST_DIR`                          | `.next`                         | Build directory; Playwright uses `.next-live` and `.next-native` for its other two builds.                                                          |
+| `HOSPITABLE_PERSONAL_ACCESS_TOKEN`       | unset → booking routes 503      | Public API v2 token (read access). Server-only; never prefix it `NEXT_PUBLIC_`. Alias `HOSPITABLE_PAT`.                                             |
+| `HOSPITABLE_CUSTOM_SITE_ID`              | `site.hospitable.siteUuid`      | Sent with every quote so checkout is attributed to this site.                                                                                       |
+| `AIRBNB_MARKUP_PCT`, `DIRECT_MARKUP_PCT` | `15.5`, `11`                    | Fallback markups for a house whose Hospitable markups are missing.                                                                                  |
+| `AIRBNB_LISTING_URLS`                    | `airbnbUrl` from content        | JSON map of property id → Airbnb URL for the price comparison link.                                                                                 |
+| `COMPARISON_ENABLED`                     | `true`                          | `false` hides the Airbnb price comparison.                                                                                                          |
+| `MAX_NIGHTS`                             | `90`                            | Longest stay `/api/quote` will price.                                                                                                               |
+| `BOOKING_ADMIN_TOKEN`                    | unset → route is a 404          | Bearer token (16+ chars) for `GET /api/admin/comparison-check`.                                                                                     |
+| `HOSPITABLE_API_BASE_URL`                | the real Public API             | Only the e2e suite sets it, to the stand-in in `e2e/mock-hospitable/`.                                                                              |
+| `NEXT_PUBLIC_MAPKIT_TOKEN`               | unset → drawn SVG map           | Apple MapKit JS token (domain-restricted, public by design). Set: the city map is a live Apple map.                                                 |
 
 `NEXT_PUBLIC_*` values are inlined at build time; restart `pnpm dev` or
 rebuild after changing them.
 
 **Seeing Hospitable's embedded widgets locally:** set
-`NEXT_PUBLIC_HOSPITABLE_MODE=live` in `.env.local` and open any
+`NEXT_PUBLIC_HOSPITABLE_MODE=hospitable` in `.env.local` and open any
 `/stays/<slug>` (all three houses have property ids) or the home hero search.
 The widgets talk to Hospitable's production services.
 
 **Running the site's own booking widget locally:** set
 `NEXT_PUBLIC_HOSPITABLE_MODE=native` and `HOSPITABLE_PERSONAL_ACCESS_TOKEN`
 in `.env.local` (`HOSPITABLE_CUSTOM_SITE_ID` too if it differs from
-`content/site.ts`), run `pnpm dev`, and open `/stays/south-austin`, the one
-house with markups set in Hospitable. The routes hit the live Hospitable
+`content/site.ts`), run `pnpm dev`, and open any `/stays/<slug>` (all three
+houses have markups set in Hospitable). The routes hit the real Hospitable
 account: every quote creates a quote record there (no reservation, no
 charge), and Reserve really does go to Hospitable's checkout. Without the
 token the widget says online booking is unavailable.
@@ -122,12 +122,12 @@ Two kinds, plus the content rules in `pnpm check:content`:
 three production builds of the site, one per booking mode, and a stand-in
 Hospitable API for the native one.
 
-| Project           | Port | Build                                                | Runs                                      |
-| ----------------- | ---- | ---------------------------------------------------- | ----------------------------------------- |
-| `chromium`        | 3000 | `.next`, `NEXT_PUBLIC_HOSPITABLE_MODE=stub`          | every spec except `*.live.*`/`*.native.*` |
-| `chromium-live`   | 3001 | `.next-live`, `NEXT_PUBLIC_HOSPITABLE_MODE=live`     | `hospitable.live.spec.ts`, `mapkit.live…` |
-| `chromium-native` | 3002 | `.next-native`, `NEXT_PUBLIC_HOSPITABLE_MODE=native` | `booking.native.spec.ts`                  |
-| (stand-in)        | 3999 | `node e2e/mock-hospitable/server.mjs`                | —                                         |
+| Project           | Port | Build                                                  | Runs                                      |
+| ----------------- | ---- | ------------------------------------------------------ | ----------------------------------------- |
+| `chromium`        | 3000 | `.next`, `NEXT_PUBLIC_HOSPITABLE_MODE=stub`            | every spec except `*.live.*`/`*.native.*` |
+| `chromium-live`   | 3001 | `.next-live`, `NEXT_PUBLIC_HOSPITABLE_MODE=hospitable` | `hospitable.live.spec.ts`, `mapkit.live…` |
+| `chromium-native` | 3002 | `.next-native`, `NEXT_PUBLIC_HOSPITABLE_MODE=native`   | `booking.native.spec.ts`                  |
+| (stand-in)        | 3999 | `node e2e/mock-hospitable/server.mjs`                  | —                                         |
 
 Every server pins `NEXT_PUBLIC_SITE_URL=""` so a `.env.local` cannot change
 the URLs the SEO spec checks, and each pins its mode. The live build pins a
