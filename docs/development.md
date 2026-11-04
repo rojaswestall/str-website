@@ -104,10 +104,11 @@ other file, including these docs, is formatted by Prettier.
 
 Two kinds, plus the content rules in `pnpm check:content`:
 
-- **Unit tests** (`pnpm test:unit`, 76 tests, about a second): Node's built-in
+- **Unit tests** (`pnpm test:unit`, 101 tests, about a second): Node's built-in
   test runner via `tsx` over `lib/**/*.test.ts`. They cover the booking
   code (`lib/booking/*.test.ts`: cache, config, dates, normalizers, calendar
-  rules, quote state, the Airbnb comparison, phone normalisation, retry)
+  rules, search, quote state, the Airbnb comparison, phone normalisation,
+  retry)
   against recorded Hospitable responses in `lib/booking/__fixtures__/`
   (addresses, coordinates, and host names redacted; the repo is public). No
   server, no network, no token.
@@ -126,7 +127,7 @@ Hospitable API for the native one.
 | ----------------- | ---- | ------------------------------------------------------ | ----------------------------------------- |
 | `chromium`        | 3000 | `.next`, `NEXT_PUBLIC_HOSPITABLE_MODE=stub`            | every spec except `*.live.*`/`*.native.*` |
 | `chromium-live`   | 3001 | `.next-live`, `NEXT_PUBLIC_HOSPITABLE_MODE=hospitable` | `hospitable.live.spec.ts`, `mapkit.live…` |
-| `chromium-native` | 3002 | `.next-native`, `NEXT_PUBLIC_HOSPITABLE_MODE=native`   | `booking.native.spec.ts`                  |
+| `chromium-native` | 3002 | `.next-native`, `NEXT_PUBLIC_HOSPITABLE_MODE=native`   | `booking.native…`, `search.native…`       |
 | (stand-in)        | 3999 | `node e2e/mock-hospitable/server.mjs`                  | —                                         |
 
 Every server pins `NEXT_PUBLIC_SITE_URL=""` so a `.env.local` cannot change
@@ -140,33 +141,39 @@ pointing at the stand-in, the admin token — so a developer's real token in
 extra builds type-check with `tsconfig.live.json` / `tsconfig.native.json`,
 so a stale `.next-live` or `.next-native` cannot break `pnpm typecheck`.
 
-The stand-in (`e2e/mock-hospitable/server.mjs`, plain Node) serves the
-recorded Dan Jean Unit A property and generates calendars so the tests
-never age: weekdays $112 base, Fridays and Saturdays $150, a 2-night
-minimum, the 10th–12th of each month reserved, the 20th closed to check-in.
-Quotes are priced the way Hospitable prices them. The guest's last name on
-the final quote drives the paths the calendar cannot (`Unavailable`,
-`Changed`, `Upstream`), and the first calendar read of each run answers 503
-so the server's retry is exercised for real. The header comment lists all
-of it.
+The stand-in (`e2e/mock-hospitable/server.mjs`, plain Node) serves all
+three houses, each built from the recorded Dan Jean Unit A property with
+its own id and rules, plus a fourth property content does not list (which
+the server must filter out), and generates calendars so the tests never
+age. South Austin: weekdays $112 base, Fridays and Saturdays $150, a
+2-night minimum, the 10th–12th of each month reserved, the 20th closed to
+check-in. Oak Hill: $130 / $175, a 2-night minimum that is 3 from a Friday
+or Saturday check-in, no markups set (so the configured fallbacks apply).
+Fire Side: $98 / $140, no minimum, pets not allowed, sleeps 4. Quotes are
+priced the way Hospitable prices them. The guest's last name on the final
+quote drives the paths the calendar cannot (`Unavailable`, `Changed`,
+`Upstream`), and the first calendar read of each run answers 503 so the
+server's retry is exercised for real. The header comment lists all of it;
+`e2e/mock-hospitable/stays.ts` has the date helpers the native specs share.
 
 90 tests (75 + 3 + 12); about two minutes locally including the builds.
 
-| Spec                      | Covers                                                                                                                                                                                                                                                                                                                                                         |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `home.spec.ts`            | Title and hero, anchored sections, band links, search stub, both TikTok fallbacks, CityMap pins and recolour, guest reviews and slideshow under reduced motion, hosts, direct section; site shell (header, nav, footer, STR licenses, skip link)                                                                                                               |
-| `stays.spec.ts`           | Each of the three houses (title, h1, booking panel, stub naming the house, Airbnb link attributes, other houses), gallery carousel and pop-up, spec strip, practicals and FAQ, highlighted map, sticky panel by viewport, "Near this house", 404 status for `/stays/nope` and `/does-not-exist`                                                                |
-| `area.spec.ts`            | Every pick with the drive time from each house; linked from the header and home page                                                                                                                                                                                                                                                                           |
-| `theme.spec.ts`           | System preference, live preference flip, toggle cycle and persistence, Newsreader on `font-display`                                                                                                                                                                                                                                                            |
-| `contact-api.spec.ts`     | `POST /api/contact`: 200, honeypot, invalid email, checkout before check-in, unknown slug, non-JSON, 429 with `Retry-After`, GET 405                                                                                                                                                                                                                           |
-| `contact-form.spec.ts`    | Mount and honeypot, full submit against the real route, inline 400 errors, pending + 429, 500, aborted request                                                                                                                                                                                                                                                 |
-| `hospitable.spec.ts`      | Stub mode makes no Hospitable request; report-only CSP header on `/`, a stay, and the 404                                                                                                                                                                                                                                                                      |
-| `hospitable.live.spec.ts` | Live mode with the loaders intercepted: one script and marker, remount across client-side navigation, no missing-id warnings, search bar → `/search`                                                                                                                                                                                                           |
-| `booking.native.spec.ts`  | Native mode against the stand-in: server-rendered calendar with no client fetch, min-stay and blocked nights, quote + Airbnb saving in the footer, hand-off to checkout (intercepted), changed total, just-booked nights, unlisted house, axe in both themes; `/api/properties`, `/api/calendar`, `/api/quote` validation and mapped refusals, the admin check |
-| `seo.spec.ts`             | Sitemap, robots, OG and icon PNG routes, `VacationRental` per stay, `Organization`, canonical and OG tags                                                                                                                                                                                                                                                      |
-| `kitchen-sink.spec.ts`    | `/kitchen-sink` is a 404 in production                                                                                                                                                                                                                                                                                                                         |
-| `a11y.spec.ts`            | axe on `/`, `/stays/oak-hill`, `/area`, `/search`, `/does-not-exist` in light and dark; serious/critical fail, moderate/minor are attached to the report                                                                                                                                                                                                       |
-| `visual.spec.ts`          | Full-page screenshots of `/`, `/stays/oak-hill`, `/search` in both themes into `e2e/__screenshots__/` (review aids, gitignored, no pixel comparison)                                                                                                                                                                                                           |
+| Spec                      | Covers                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `home.spec.ts`            | Title and hero, anchored sections, band links, search stub, both TikTok fallbacks, CityMap pins and recolour, guest reviews and slideshow under reduced motion, hosts, direct section; site shell (header, nav, footer, STR licenses, skip link)                                                                                                                                         |
+| `stays.spec.ts`           | Each of the three houses (title, h1, booking panel, stub naming the house, Airbnb link attributes, other houses), gallery carousel and pop-up, spec strip, practicals and FAQ, highlighted map, sticky panel by viewport, "Near this house", 404 status for `/stays/nope` and `/does-not-exist`                                                                                          |
+| `area.spec.ts`            | Every pick with the drive time from each house; linked from the header and home page                                                                                                                                                                                                                                                                                                     |
+| `theme.spec.ts`           | System preference, live preference flip, toggle cycle and persistence, Newsreader on `font-display`                                                                                                                                                                                                                                                                                      |
+| `contact-api.spec.ts`     | `POST /api/contact`: 200, honeypot, invalid email, checkout before check-in, unknown slug, non-JSON, 429 with `Retry-After`, GET 405                                                                                                                                                                                                                                                     |
+| `contact-form.spec.ts`    | Mount and honeypot, full submit against the real route, inline 400 errors, pending + 429, 500, aborted request                                                                                                                                                                                                                                                                           |
+| `hospitable.spec.ts`      | Stub mode makes no Hospitable request; report-only CSP header on `/`, a stay, and the 404                                                                                                                                                                                                                                                                                                |
+| `hospitable.live.spec.ts` | Live mode with the loaders intercepted: one script and marker, remount across client-side navigation, no missing-id warnings, search bar → `/search`                                                                                                                                                                                                                                     |
+| `booking.native.spec.ts`  | Native mode against the stand-in: server-rendered calendar with no client fetch, min-stay and blocked nights, quote + Airbnb saving in the footer, hand-off to checkout (intercepted), changed total, just-booked nights, axe in both themes; `/api/properties` (three houses, the stranger filtered out), `/api/calendar`, `/api/quote` validation and mapped refusals, the admin check |
+| `search.native.spec.ts`   | `GET /api/availability`: three results with calendar estimates and `no-store`, every refusal reason over the three generated calendars, field errors, 405, the 60-a-minute limit; a house page prefilled from the URL quotes the stay without a click, drops a check-out it cannot use (bad format, or refused by the calendar), ignores a past check-in, clamps the guests              |
+| `seo.spec.ts`             | Sitemap, robots, OG and icon PNG routes, `VacationRental` per stay, `Organization`, canonical and OG tags                                                                                                                                                                                                                                                                                |
+| `kitchen-sink.spec.ts`    | `/kitchen-sink` is a 404 in production                                                                                                                                                                                                                                                                                                                                                   |
+| `a11y.spec.ts`            | axe on `/`, `/stays/oak-hill`, `/area`, `/search`, `/does-not-exist` in light and dark; serious/critical fail, moderate/minor are attached to the report                                                                                                                                                                                                                                 |
+| `visual.spec.ts`          | Full-page screenshots of `/`, `/stays/oak-hill`, `/search` in both themes into `e2e/__screenshots__/` (review aids, gitignored, no pixel comparison)                                                                                                                                                                                                                                     |
 
 No test ever loads a real third party: TikTok requests are aborted, the
 Hospitable loaders are intercepted with stand-ins, the native build talks to

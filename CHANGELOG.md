@@ -4,6 +4,32 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
+## Unreleased — native search, checkpoint 1: availability API and house-page prefill
+
+The first of three checkpoints replacing Hospitable's embedded search with
+the site's own, in `native` mode only (`docs/prompts/native-search.md` is
+the brief). `stub` and `hospitable` modes are unchanged.
+
+- **`GET /api/availability?checkin&checkout&adults&children&infants&pets`.**
+  Which of the three houses are free for a stay, judged from the cached
+  calendars by the widget's own rules (`lib/booking/search.ts` imports them
+  from `rules.ts`, so search and calendar cannot disagree) plus capacity and
+  pets, with an estimate of the nights at the calendar's direct preview,
+  labelled as such and never presented as the price. Hospitable has no
+  search endpoint and none is called; no quote is created by a search. A
+  house whose calendar could not be read is reported `unknown`, never free.
+  60 per minute per client, `no-store`.
+- **House pages accept the same parameters.** `/stays/<slug>?checkin=…&checkout=…&adults=…`
+  prefills the widget: a stay the calendar allows is quoted on arrival, a
+  check-out the calendar refuses is dropped and the check-in kept, a bad or
+  past value is ignored. In `hospitable` mode nothing changes; the embed
+  reads these parameters itself.
+- **Test bed.** The stand-in Hospitable API now serves all three houses with
+  calendars that differ (a monthly blocked range, a weekend 3-night minimum,
+  a no-pets house that sleeps four) plus a property content does not list,
+  which the server filters out. `search.native.spec.ts` covers the route and
+  the prefill; `search.test.ts` the rules and the URL parsing.
+
 ## Unreleased — direct-booking widget, checkpoint 5: hardening and docs
 
 - **First paint from the server.** In native mode the house page now reads

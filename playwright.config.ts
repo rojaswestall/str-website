@@ -30,11 +30,13 @@ import { defineConfig, devices } from "@playwright/test";
  * never fetched.
  *
  * `chromium-native` (port 3002, a third build with
- * NEXT_PUBLIC_HOSPITABLE_MODE=native into .next-native) runs only
- * booking.native.spec.ts: the site's own booking widget and the /api/*
- * routes behind it, end to end. The build is pointed at the stand-in
- * Hospitable API in e2e/mock-hospitable/server.mjs (port 3999) with a
- * throwaway token, so nothing reaches Hospitable and no secret is needed.
+ * NEXT_PUBLIC_HOSPITABLE_MODE=native into .next-native) runs
+ * booking.native.spec.ts (the site's own booking widget and the /api/*
+ * routes behind it, end to end) and search.native.spec.ts (the
+ * availability route and the house page prefilled from the URL). The build
+ * is pointed at the stand-in Hospitable API in e2e/mock-hospitable/server.mjs
+ * (port 3999) with a throwaway token, so nothing reaches Hospitable and no
+ * secret is needed.
  */
 
 const port = 3000;
