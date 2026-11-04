@@ -68,7 +68,11 @@ calendar (labelled as such; nights only, before fees and taxes). Hospitable
 has no search endpoint and none is called, and no quote is created by a
 search. A house page accepts the same parameters
 (`/stays/<slug>?checkin=…&checkout=…&adults=…`) and quotes the stay on
-arrival when the calendar allows it; whatever does not hold is dropped.
+arrival when the calendar allows it; whatever does not hold is dropped. In
+`native` mode the home hero's bar is the site's own form
+(`components/search/SearchBar.tsx`), a plain GET to `/search` with those
+parameters that works without JavaScript and, hydrated, picks the dates
+and guests with the widget's own calendar and picker.
 
 **Markups** come from Hospitable (each property's `listing_markups`, per
 channel). To change what guests pay, change the direct markup in
@@ -87,7 +91,9 @@ the catalog and calendar read on the server so the first HTML already holds
 the priced calendar. `<BookingWidget />` with no `propertyId` renders a
 switcher over every bookable house. It emits bubbling DOM `CustomEvent`s
 (`widget_loaded`, `dates_selected`, `quote_shown`, `comparison_shown`,
-`reserve_clicked`) that `BookingAnalytics` forwards to Vercel Web Analytics.
+`reserve_clicked`) that `BookingAnalytics` forwards to Vercel Web Analytics
+as `booking_<event>`; the home-page search bar's `search_submitted` travels
+the same way.
 
 **Rules the code keeps.** The access token is read in `lib/booking/client.ts`
 only (`server-only`), never logged, never sent to the browser, never in git

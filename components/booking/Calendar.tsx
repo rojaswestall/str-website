@@ -31,6 +31,11 @@ export type CalendarProps = {
   selection: Selection;
   directMarkupPct: number;
   currency: string;
+  /**
+   * False hides the nightly preview under each day: the search bar's picker,
+   * where prices are per house and the calendar is only the rules of dates.
+   */
+  showPrices?: boolean;
   onSelect: (selection: Selection, via: SelectVia) => void;
 };
 
@@ -51,6 +56,7 @@ export function Calendar({
   selection,
   directMarkupPct,
   currency,
+  showPrices = true,
   onSelect,
 }: CalendarProps) {
   const firstMonth = monthStart(limits.today);
@@ -203,7 +209,7 @@ export function Calendar({
                       key={date}
                       date={date}
                       view={dayView(date, selection, preview, days, limits)}
-                      price={days.get(date)?.price}
+                      price={showPrices ? days.get(date)?.price : undefined}
                       directMarkupPct={directMarkupPct}
                       currency={currency}
                       today={date === limits.today}
@@ -314,21 +320,23 @@ function Day({
       )}
     >
       <span>{Number(date.slice(8, 10))}</span>
-      <span
-        aria-hidden="true"
-        className={cx(
-          "font-mono text-[0.58rem] tracking-[0.02em]",
-          // Each pair clears 4.5:1 in both themes (muted on slot-b did not).
-          selected
-            ? "text-paper/70"
-            : view.role === "between"
-              ? "text-ink-soft"
-              : "text-muted",
-          !nightly && "invisible",
-        )}
-      >
-        {nightly ?? "—"}
-      </span>
+      {price === undefined ? null : (
+        <span
+          aria-hidden="true"
+          className={cx(
+            "font-mono text-[0.58rem] tracking-[0.02em]",
+            // Each pair clears 4.5:1 in both themes (muted on slot-b did not).
+            selected
+              ? "text-paper/70"
+              : view.role === "between"
+                ? "text-ink-soft"
+                : "text-muted",
+            !nightly && "invisible",
+          )}
+        >
+          {nightly ?? "—"}
+        </span>
+      )}
     </button>
   );
 }

@@ -6,6 +6,12 @@
 
 export const BOOKING_TIME_ZONE = "America/Chicago";
 
+/**
+ * How far ahead a calendar is read (the booking routes' window and the cap
+ * on any requested range); the search bar's date picker reaches as far.
+ */
+export const CALENDAR_WINDOW_MONTHS = 18;
+
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** True for a real calendar date written as YYYY-MM-DD. */

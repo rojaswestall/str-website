@@ -2,7 +2,15 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { addDays } from "./dates";
-import { evaluateStay, parsePrefill, parseSearchQuery } from "./search";
+import {
+  evaluateStay,
+  guestSummary,
+  openDays,
+  parsePrefill,
+  parseSearchQuery,
+  searchHref,
+  searchQueryString,
+} from "./search";
 import type { CalendarDay, SearchQuery } from "./types";
 
 /*
@@ -373,5 +381,66 @@ describe("parsePrefill", () => {
       selection: { checkIn: null, checkOut: null },
       guests: { adults: 2, children: 0, infants: 0, pets: 0 },
     });
+  });
+});
+
+describe("guestSummary", () => {
+  it("names each kind of guest that is present, adults first", () => {
+    assert.equal(
+      guestSummary({ adults: 2, children: 0, infants: 0, pets: 0 }),
+      "2 adults",
+    );
+    assert.equal(
+      guestSummary({ adults: 1, children: 1, infants: 0, pets: 0 }),
+      "1 adult, 1 child",
+    );
+    assert.equal(
+      guestSummary({ adults: 2, children: 3, infants: 1, pets: 2 }),
+      "2 adults, 3 children, 1 infant, 2 pets",
+    );
+  });
+});
+
+describe("searchHref", () => {
+  it("writes every parameter of the URL contract, in field order", () => {
+    const query = stay("2027-03-05", "2027-03-08", { adults: 3 });
+    assert.equal(
+      searchQueryString(query),
+      "checkin=2027-03-05&checkout=2027-03-08&adults=3&children=0&infants=0&pets=0",
+    );
+    assert.equal(
+      searchHref(query),
+      "/search?checkin=2027-03-05&checkout=2027-03-08&adults=3&children=0&infants=0&pets=0",
+    );
+  });
+
+  it("round-trips through the strict parser", () => {
+    const query = stay("2027-03-05", "2027-03-08", { children: 2, pets: 1 });
+    const parsed = parseSearchQuery(
+      new URLSearchParams(searchQueryString(query)),
+      limits,
+    );
+    assert.deepEqual(parsed, { ok: true, query });
+  });
+});
+
+describe("openDays", () => {
+  it("is every day from today through the end, free and unpriced", () => {
+    const open = openDays("2027-03-30", "2027-04-02");
+    assert.deepEqual(
+      open.map((d) => d.date),
+      ["2027-03-30", "2027-03-31", "2027-04-01", "2027-04-02"],
+    );
+    for (const d of open) {
+      assert.deepEqual(d, {
+        date: d.date,
+        available: true,
+        price: 0,
+        minStay: 1,
+        closedToArrival: false,
+        closedToDeparture: false,
+      });
+    }
+    assert.deepEqual(openDays("2027-03-30", "2027-03-29"), []);
   });
 });

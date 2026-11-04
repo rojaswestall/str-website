@@ -76,7 +76,9 @@ three STR license numbers.
 ### Home page sections, in order
 
 1. `components/home/Hero.tsx` — h1 from `site.tagline`, lede naming the
-   hosts, 21:9 hero collage, the Hospitable search bar, and `CityMap`.
+   hosts, 21:9 hero collage, the search bar (`SearchWidget`: the site's own
+   `SearchBar` in `native` mode, Hospitable's bar or the stub otherwise),
+   and `CityMap`.
 2. `components/home/Stays.tsx` (`#stays`) — one `PropertyBand` per house
    (rooms only; rate, minimum nights, and amenities are on the house page).
 3. `components/area/AreaGuide.tsx` (`#area`) — the TikTok row from
@@ -135,6 +137,8 @@ the dev-mode path. Keep the `stays.spec.ts` status assertion.
   - `hospitable/` — `PropertyWidget` and `SearchWidget` (Server Components to
     mount) and their client cores `HospitableWidget` / `HospitableSearch`,
     plus the stubs.
+  - `search/` — the site's own search: `SearchBar` (client; the GET form
+    with the `Calendar` and `GuestPicker` popovers). See "Search".
   - `embeds/TikTokEmbed.tsx`, `contact/ContactForm.tsx`, `seo/`
     (`JsonLd`, `MonogramIcon`).
 - `content/` — typed site content (below).
@@ -260,7 +264,8 @@ script and empties the container, so client-side navigation between houses
 remounts cleanly. Do not use `next/script` for it (it dedupes by src). The
 iframe is light-only and styled only from the Hospitable dashboard.
 
-**Search widget** (home hero bar and `/search`). A library from
+**Search widget** (home hero bar in `stub` and `hospitable` modes, and
+`/search`). A library from
 `hospitable.b-cdn.net` registers `<hospitable-direct-mps identifier="…"
 type="custom">`. The hero carries `results-url="/search"`; `/search` renders
 the results variant. It loads once per page through `next/script` (dedupe is
@@ -369,7 +374,8 @@ formula; `rules.ts` the calendar rules; `search.ts` the search (a stay
 against one house's calendar, and the URL contract, strict for the route
 and lenient for a page); `quote-state.ts` the quote reducer; `server.ts`
 ties it together, including `loadInitialBookingData` for the first paint
-and `searchAvailability` over every house. Without `HOSPITABLE_PERSONAL_ACCESS_TOKEN` every route answers
+and `searchAvailability` over every house; `today.ts` is the cached date the
+home-page search bar is prerendered with. Without `HOSPITABLE_PERSONAL_ACCESS_TOKEN` every route answers
 `503 NOT_CONFIGURED`. Upstream calls log method, path, status, and duration
 only. What the Public API actually returns (prices in integer cents,
 check-in-day `min_stay`, no nightly breakdown or expiry on quotes, markups
@@ -420,7 +426,7 @@ redirect uses `window.location.assign` in the same tab and only to
 `widget_loaded`, `dates_selected`, `quote_shown`, `comparison_shown`, and
 `reserve_clicked` as bubbling `CustomEvent`s without guest details;
 `BookingAnalytics` forwards them to Vercel Web Analytics as
-`booking_<event>`.
+`booking_<event>`, along with the search bar's `search_submitted`.
 
 ### Airbnb comparison
 
@@ -438,10 +444,32 @@ comparison is right for (see [`plan.md`](plan.md)).
 
 The site's own search replaces Hospitable's embedded bar and results page in
 `native` mode only. The availability route and the house-page prefill
-(above) are built; the hero bar and `/search` still mount the embed in
-every mode. The decisions (URL contract, one set of rules, estimates vs.
-the quote, server-rendered results, mode switch), what is built, and the
-remaining checkpoints are all in [`search.md`](search.md).
+(above) and the home-page bar (below) are built; `/search` still mounts the
+embed in every mode. The decisions (URL contract, one set of rules,
+estimates vs. the quote, server-rendered results, mode switch), what is
+built, and the remaining checkpoint are all in [`search.md`](search.md).
+
+**The bar.** In `native` mode `SearchWidget` renders `SearchBar`
+(`components/search/`) for the hero instead of the embed, wrapped in
+`BookingAnalytics`, in the prerendered HTML. The bar needs today's date in
+the booking zone (the floor of its picker and the `min` of its inputs),
+which is request-time data under Cache Components; it is read through
+`cachedToday` (`lib/booking/today.ts`, `"use cache"` with the `hours`
+profile, part of the static shell and revalidated in the background) rather
+than `connection()`, because a streamed Suspense boundary is only revealed
+by a script and the form has to work without JavaScript. The home page stays
+static; the floor can trail by up to an hour after midnight in Austin, and
+`/search` and the house pages judge the dates again. It is a real `<form role="search"
+method="get" action="/search">` in the URL contract's parameter names, so
+it works before hydration and without JavaScript (`<input type="date">`
+fields, a `<details>` of number inputs for the guests); hydrated, the same
+form keeps the values in hidden inputs behind three fields that open the
+widget's own `Calendar` (no prices, every night open: `showPrices={false}`
+over `openDays`, with only today-forward and `MAX_NIGHTS` left to enforce)
+and `GuestPicker` (`alwaysOpen`) in a non-modal dialog, and submits with a
+client-side navigation to the identical URL (`searchHref`). It emits a
+bubbling `search_submitted` event with the six parameters, forwarded to
+Vercel as `booking_search_submitted`. `Hero.tsx` is unchanged.
 
 ## SEO
 

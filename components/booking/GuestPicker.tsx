@@ -15,6 +15,12 @@ export type GuestPickerProps = {
   guests: Guests;
   maxGuests: number;
   petsAllowed: boolean;
+  /**
+   * Render the stepper rows alone, always open, without the summary row:
+   * for a host that already shows the summary and opens the picker itself
+   * (the search bar's guests popover).
+   */
+  alwaysOpen?: boolean;
   onChange: (guests: Guests) => void;
 };
 
@@ -36,6 +42,7 @@ export function GuestPicker({
   guests,
   maxGuests,
   petsAllowed,
+  alwaysOpen = false,
   onChange,
 }: GuestPickerProps) {
   const id = useId();
@@ -90,6 +97,58 @@ export function GuestPicker({
     );
   }
 
+  const rowList = (
+    <ul
+      id={`${id}-rows`}
+      hidden={!open && !alwaysOpen}
+      className={cx(
+        "divide-y divide-hairline",
+        !alwaysOpen && "border-t border-hairline",
+      )}
+    >
+      {rows.map((row) => {
+        const value = guests[row.key];
+        return (
+          <li
+            key={row.key}
+            className="flex items-center justify-between gap-3 py-[0.6rem]"
+          >
+            <div className="min-w-0">
+              <p className="text-[0.92rem] text-ink">{row.label}</p>
+              <p className="font-mono text-[0.64rem] tracking-[0.04em] text-muted">
+                {row.hint}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Step
+                label={`Remove one of ${row.label.toLowerCase()}`}
+                disabled={value <= row.min}
+                onClick={() => set(row.key, value - 1)}
+              >
+                −
+              </Step>
+              <output
+                aria-label={row.label}
+                className="w-6 text-center text-[0.95rem] text-ink tabular-nums"
+              >
+                {value}
+              </output>
+              <Step
+                label={`Add one of ${row.label.toLowerCase()}`}
+                disabled={value >= row.max}
+                onClick={() => set(row.key, value + 1)}
+              >
+                +
+              </Step>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
+
+  if (alwaysOpen) return rowList;
+
   return (
     <div className="border-y border-hairline">
       <button
@@ -120,50 +179,7 @@ export function GuestPicker({
           </span>
         </span>
       </button>
-      <ul
-        id={`${id}-rows`}
-        hidden={!open}
-        className="divide-y divide-hairline border-t border-hairline"
-      >
-        {rows.map((row) => {
-          const value = guests[row.key];
-          return (
-            <li
-              key={row.key}
-              className="flex items-center justify-between gap-3 py-[0.6rem]"
-            >
-              <div className="min-w-0">
-                <p className="text-[0.92rem] text-ink">{row.label}</p>
-                <p className="font-mono text-[0.64rem] tracking-[0.04em] text-muted">
-                  {row.hint}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Step
-                  label={`Remove one of ${row.label.toLowerCase()}`}
-                  disabled={value <= row.min}
-                  onClick={() => set(row.key, value - 1)}
-                >
-                  −
-                </Step>
-                <output
-                  aria-label={row.label}
-                  className="w-6 text-center text-[0.95rem] text-ink tabular-nums"
-                >
-                  {value}
-                </output>
-                <Step
-                  label={`Add one of ${row.label.toLowerCase()}`}
-                  disabled={value >= row.max}
-                  onClick={() => set(row.key, value + 1)}
-                >
-                  +
-                </Step>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      {rowList}
     </div>
   );
 }
