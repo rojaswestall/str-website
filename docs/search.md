@@ -77,52 +77,39 @@ three houses with calendars that differ, `search.test.ts` and
 stand-in and the specs under "End-to-end" in
 [`development.md`](development.md).
 
-The hero bar and `/search` still mount the embed in every mode until the
-checkpoints below ship.
+**Checkpoint 2.** The home-page search bar: `components/search/SearchBar.tsx`
+(client) and `index.ts`, mounted by `SearchWidget` for the bar variant in
+`native` mode inside `BookingAnalytics`, in the prerendered HTML. Today's
+date comes from `cachedToday` (`lib/booking/today.ts`, a `"use cache"`
+function with the `hours` profile) rather than `connection()`: a streamed
+Suspense boundary is only revealed by a script, so a form inside one would
+never show without JavaScript, and the cached date keeps `/` static (the
+floor can trail by up to an hour after midnight in Austin; `/search` and the
+house pages judge the dates again). It is a real
+`<form role="search" method="get" action="/search">`
+with Hospitable's parameter names, so it works before hydration and without
+JavaScript: `<input type="date">` fields with `min` set to today, and a
+`<details>` of number inputs for the guests. Hydrated, the same form swaps
+those for hidden inputs behind three fields that open the widget's own
+`Calendar` (no prices and no availability, `showPrices={false}` over
+`openDays`, only today-forward and `MAX_NIGHTS`) and `GuestPicker`
+(`alwaysOpen`) in a non-modal dialog: Escape or picking the check-out closes
+it and returns focus to the field, a click or Tab outside closes it in
+place; submit is a client-side navigation to the identical URL
+(`searchHref`), after a bubbling `search_submitted` event that
+`BookingAnalytics` forwards as `booking_search_submitted`. One row from
+32rem of container width, two columns from 24rem, stacked below, in the
+stub's hairline frame; the popovers are grid children, inline on a narrow
+container and floated under the row on a wide one. `guestSummary`,
+`searchQueryString`/`searchHref` and `openDays` in `lib/booking/search.ts`
+are unit-tested; the bar's e2e tests are the "home-page search bar" block of
+`search.native.spec.ts` (no request to Hospitable's hosts, the hydrated and
+the no-JavaScript submit landing on the same URL, axe in both themes with
+the picker open). `visual.spec.ts` runs in the stub project only, so `/` in
+native mode was not added to it. `Hero.tsx` is unchanged.
 
-## Checkpoint 2 — the home-page search bar
-
-Goal: replace the embedded bar in the hero (the "Check dates across all
-three" block) with the site's own, in `native` mode only.
-
-- [ ] `components/search/SearchBar.tsx` (client) and `components/search/index.ts`.
-      A real `<form method="get" action="/search">` so it works before
-      hydration and without JavaScript: `checkin` and `checkout` as
-      `<input type="date">` with `min` set to today and `checkout`'s `min`
-      following `checkin`; guests as the existing `GuestPicker` (adults,
-      children, infants, pets) collapsed into one field that reads
-      "2 adults" / "2 adults, 1 child" with the picker in a popover; a Search
-      button. After hydration, enhance the date inputs with the existing
-      `Calendar` in a popover, with no prices (prices are per house) and no
-      availability (that is what the search answers), only today-forward
-      and the `MAX_NIGHTS` cap. Keyboard and screen-reader complete:
-      `role="search"` on the form, visible labels (the mono eyebrow style),
-      the popover is a dialog that returns focus, Escape closes.
-- [ ] Layout: one row on wide screens (dates, guests, button), stacked on
-      phones, inside the same hairline frame as the stub so the hero's grid
-      does not move. Nothing may wrap mid-field; the button never clips its
-      label. Both themes. Match the house-page widget's type and spacing and
-      reuse its primitives rather than inventing new ones.
-- [ ] Behaviour: submit navigates to `/search?…` with the URL contract
-      (client-side navigation when hydrated, a normal GET otherwise). Emit a
-      bubbling `search_submitted` DOM event carrying `checkin`, `checkout`
-      and the four guest counts, and add it to `BookingAnalytics`'s event
-      list so it reaches Vercel as `booking_search_submitted`; wrap the bar
-      in `BookingAnalytics` where it mounts.
-- [ ] Mount: `SearchWidget` picks `SearchBar` in `native` mode for the bar
-      variant; `Hero.tsx` keeps its mount and labels and its copy as it is.
-- [ ] Tests. Unit for any pure helpers (query building, guest summary
-      text). E2E in `chromium-native`: the hero shows the bar and makes no
-      request to Hospitable's search hosts; submitting with dates and 3
-      adults navigates to `/search` with exactly those parameters; the
-      no-JS path (`javaScriptEnabled: false` context) submits the same URL;
-      axe on `/` in both themes. Add `/` in native mode to `visual.spec.ts`
-      only if that spec already runs per project (check first; do not add
-      a new build).
-- [ ] Docs, in the same PR: this file (move the checkpoint to "Built"), the
-      home-page section and components list in `architecture.md`, the
-      events list in `README.md`, the tests table in `development.md`,
-      `CHANGELOG.md`.
+`/search` still mounts the embed (or the stub) in every mode until the
+checkpoint below ships.
 
 ## Checkpoint 3 — the `/search` page
 

@@ -1,6 +1,9 @@
 import { z } from "zod";
 
+import { SEARCH_RESULTS_PATH } from "@/lib/hospitable";
+
 import { addDays, isIsoDate, nightsBetween } from "./dates";
+import { plural } from "./format";
 import {
   canCheckIn,
   checkOutVerdict,
@@ -278,4 +281,63 @@ export function parsePrefill(
       pets: pick(raw.pets, 0, MAX_PETS) ?? DEFAULT_GUESTS.pets,
     },
   };
+}
+
+/* ------------------------------------------------------------------------ */
+/* The search bar                                                           */
+/* ------------------------------------------------------------------------ */
+
+/** "2 adults", "2 adults, 1 child, 1 infant, 1 pet": the bar's guests field. */
+export function guestSummary(guests: Guests): string {
+  const parts = [plural(guests.adults, "adult")];
+  if (guests.children > 0) {
+    parts.push(
+      guests.children === 1 ? "1 child" : `${guests.children} children`,
+    );
+  }
+  if (guests.infants > 0) parts.push(plural(guests.infants, "infant"));
+  if (guests.pets > 0) parts.push(plural(guests.pets, "pet"));
+  return parts.join(", ");
+}
+
+/**
+ * The URL contract as a query string, every parameter present and in the
+ * bar's field order, so a hydrated submit (`router.push`) and the plain GET
+ * the same form makes without JavaScript land on the identical URL.
+ */
+export function searchQueryString(query: SearchQuery): string {
+  return new URLSearchParams({
+    checkin: query.checkIn,
+    checkout: query.checkOut,
+    adults: String(query.adults),
+    children: String(query.children),
+    infants: String(query.infants),
+    pets: String(query.pets),
+  }).toString();
+}
+
+/** `/search?checkin=…&checkout=…&adults=…&children=…&infants=…&pets=…` */
+export function searchHref(query: SearchQuery): string {
+  return `${SEARCH_RESULTS_PATH}?${searchQueryString(query)}`;
+}
+
+/**
+ * The search bar's calendar: every night from `today` through `through`
+ * open, with no price. Prices are per house and availability is what the
+ * search answers, so the only rules left for the picker are today-forward
+ * and the longest stay, which `Calendar` applies from its `limits`.
+ */
+export function openDays(today: string, through: string): CalendarDay[] {
+  const days: CalendarDay[] = [];
+  for (let date = today; date <= through; date = addDays(date, 1)) {
+    days.push({
+      date,
+      available: true,
+      price: 0,
+      minStay: 1,
+      closedToArrival: false,
+      closedToDeparture: false,
+    });
+  }
+  return days;
 }

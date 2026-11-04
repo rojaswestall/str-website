@@ -4,6 +4,39 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
+## Unreleased — native search, checkpoint 2: the home-page search bar
+
+The second of three checkpoints replacing Hospitable's embedded search with
+the site's own, in `native` mode only (`docs/search.md`). `stub` and
+`hospitable` modes are unchanged; `/search` still mounts the embed until
+checkpoint 3.
+
+- **The hero's search bar is the site's own in `native` mode.**
+  `components/search/SearchBar.tsx`, mounted by `SearchWidget` in place of
+  `<hospitable-direct-mps>`: a real GET form to `/search` in the URL
+  contract's parameter names, so it works before hydration and without
+  JavaScript (date inputs with `min` set to today, a disclosure of number
+  inputs for the guests). Hydrated, the fields open the booking widget's own
+  `Calendar` (dates only: no prices, no availability, today-forward and
+  `MAX_NIGHTS`) and `GuestPicker` in a non-modal dialog that closes on
+  Escape and returns focus, and submit is a client-side navigation to the
+  identical URL. One row on a wide container, stacked on a phone, in the
+  stub's hairline frame; both themes; axe-clean with the picker open.
+- **`search_submitted`** joins the booking events `BookingAnalytics`
+  forwards to Vercel, as `booking_search_submitted`, with the six
+  parameters and nothing else.
+- **Prerendered, not streamed.** The bar's floor, today's date, is a
+  `"use cache"` value with the `hours` profile (`lib/booking/today.ts`)
+  rather than a `connection()` read: a streamed Suspense boundary is only
+  revealed by a script, so the form has to be in the static HTML to work
+  without JavaScript. `/` stays static in every mode.
+- **Widget pieces grew small options** for the bar: `Calendar`'s
+  `showPrices`, `GuestPicker`'s `alwaysOpen`; `CALENDAR_WINDOW_MONTHS` moved
+  to `lib/booking/dates.ts` (still exported from `server.ts`).
+- **Tests.** `guestSummary`, `searchQueryString`/`searchHref` and `openDays`
+  in `search.test.ts`; the bar end to end in `search.native.spec.ts`,
+  including a `javaScriptEnabled: false` context.
+
 ## Unreleased — the docs are the brief
 
 - The native-search brief moved out of `docs/prompts/` into

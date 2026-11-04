@@ -1,4 +1,11 @@
-import { type APIRequestContext, expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import {
+  type APIRequestContext,
+  expect,
+  type Locator,
+  type Page,
+  test,
+} from "@playwright/test";
 
 import {
   addDays,
@@ -17,7 +24,9 @@ import {
  * the stand-in Hospitable API. Covers the search's server side: the
  * availability route's contract over the three generated calendars, and
  * the house page adopting a stay from its URL (the hand-off a search result
- * makes) and quoting it without a click.
+ * makes) and quoting it without a click. Then the home-page search bar: the
+ * site's own form in place of Hospitable's, submitting the URL contract
+ * with and without JavaScript.
  *
  * Stand-in numbers (e2e/mock-hospitable/server.mjs): a weekday night is
  * $112 base at South Austin (direct preview $124), $130 at Oak Hill ($144,
@@ -325,5 +334,218 @@ test.describe("house page prefilled from the URL", () => {
     // 12 adults is more than the house sleeps, so the party is clamped to
     // its capacity the way any change in the picker would be.
     await expect(widget.getByText("8 guests · 1 pet")).toBeVisible();
+  });
+});
+
+/* ------------------------------------------------------------------------ */
+/* The home-page search bar                                                 */
+/* ------------------------------------------------------------------------ */
+
+/** Hospitable's hosts: the embed's library, loader, API and checkout. */
+const HOSPITABLE_HOSTS = /hospitable\.com|hsptb\.com|hospitable\.b-cdn\.net/;
+
+/** The URL the bar must land on for a stay with three adults. */
+function searchUrl(stay: { checkIn: string; checkOut: string }, adults = 3) {
+  return `/search?checkin=${stay.checkIn}&checkout=${stay.checkOut}&adults=${adults}&children=0&infants=0&pets=0`;
+}
+
+/**
+ * The hero bar, hydrated: the stub's frame is gone and the form has swapped
+ * its no-script inputs for the popover fields. TikTok stays off the network
+ * like every spec that loads `/`.
+ */
+async function openHome(page: Page): Promise<Locator> {
+  await page.route(/tiktok(cdn-us)?\.com/, (route) => route.abort());
+  await page.goto("/");
+  const bar = page.getByTestId("search-bar");
+  await expect(bar).toHaveAttribute("data-hydrated", "true");
+  return bar;
+}
+
+async function pickDate(dialog: Locator, date: string) {
+  const cell = dialog.locator(`[role="gridcell"][data-date="${date}"]`);
+  for (let i = 0; i < 4 && !(await cell.isVisible()); i++) {
+    await dialog.getByRole("button", { name: "Next month" }).click();
+  }
+  await expect(cell).toBeVisible();
+  await cell.click();
+}
+
+test.describe("home-page search bar", () => {
+  test("replaces Hospitable's bar in the hero and never calls its hosts", async ({
+    page,
+  }) => {
+    const hospitable: string[] = [];
+    page.on("request", (request) => {
+      if (HOSPITABLE_HOSTS.test(request.url())) hospitable.push(request.url());
+    });
+
+    const bar = await openHome(page);
+    await expect(bar).toHaveRole("search");
+    await expect(bar).toHaveAttribute("action", "/search");
+    await expect(bar).toHaveAttribute("method", "get");
+    await expect(bar).toContainText("Search all 3 houses");
+    for (const name of ["Check-in", "Checkout", "Guests"]) {
+      await expect(bar.getByRole("button", { name })).toBeVisible();
+    }
+    await expect(bar.getByRole("button", { name: "Search" })).toBeVisible();
+    // The frame sits under the hero's label, where the embed and stub were.
+    await expect(page.getByText("Check dates across all three")).toBeVisible();
+    await expect(page.getByTestId("hospitable-search")).toHaveCount(0);
+    await expect(page.getByTestId("hospitable-search-stub")).toHaveCount(0);
+    await expect(
+      page.locator('script[src*="hospitable-search-widget"]'),
+    ).toHaveCount(0);
+    expect(hospitable).toEqual([]);
+  });
+
+  test("submits dates and three adults to /search with exactly those parameters", async ({
+    page,
+  }) => {
+    const stay = pickWeekdayStay(todayInAustin());
+    const events: { type: string; detail: unknown }[] = [];
+    await page.exposeFunction(
+      "__recordSearchEvent",
+      (event: { type: string; detail: unknown }) => {
+        events.push(event);
+      },
+    );
+    await page.addInitScript(() => {
+      document.addEventListener("search_submitted", (event) => {
+        (
+          window as unknown as {
+            __recordSearchEvent: (e: { type: string; detail: unknown }) => void;
+          }
+        ).__recordSearchEvent({
+          type: event.type,
+          detail: (event as CustomEvent).detail,
+        });
+      });
+    });
+
+    const bar = await openHome(page);
+
+    // An empty submit opens the calendar and says why, instead of navigating.
+    await bar.getByRole("button", { name: "Search" }).click();
+    const dates = bar.getByRole("dialog", { name: "Choose your dates" });
+    await expect(dates).toBeVisible();
+    await expect(bar.getByRole("status")).toHaveText("Choose your dates first");
+    await expect(page).toHaveURL("/");
+
+    // No prices in this calendar: the nights are only numbered.
+    await expect(
+      dates.locator('[role="gridcell"][data-date]').first(),
+    ).not.toContainText("$");
+    await pickDate(dates, stay.checkIn);
+    await expect(dates).toBeVisible();
+    await pickDate(dates, stay.checkOut);
+    // Picking the check-out closes the dialog and returns focus to the field.
+    await expect(dates).toHaveCount(0);
+    await expect(bar.getByRole("button", { name: /Check-in/ })).toBeFocused();
+    await expect(bar.getByRole("button", { name: /Check-in/ })).toContainText(
+      /[A-Z][a-z]{2} \d{1,2}/,
+    );
+
+    const guestsField = bar.getByRole("button", { name: /Guests/ });
+    await guestsField.click();
+    const guests = bar.getByRole("dialog", { name: "Guests" });
+    await expect(guests).toBeVisible();
+    await guests.getByRole("button", { name: "Add one of adults" }).click();
+    await expect(guestsField).toContainText("3 adults");
+    await page.keyboard.press("Escape");
+    await expect(guests).toHaveCount(0);
+    await expect(guestsField).toBeFocused();
+
+    await bar.getByRole("button", { name: "Search" }).click();
+    await expect(page).toHaveURL(searchUrl(stay));
+    // /search is still the embed's page until its own checkpoint; it loads.
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Which house is free?" }),
+    ).toBeVisible();
+
+    expect(events).toEqual([
+      {
+        type: "search_submitted",
+        detail: {
+          checkin: stay.checkIn,
+          checkout: stay.checkOut,
+          adults: 3,
+          children: 0,
+          infants: 0,
+          pets: 0,
+        },
+      },
+    ]);
+  });
+
+  test("submits the same URL without JavaScript", async ({
+    browser,
+  }, testInfo) => {
+    const stay = pickWeekdayStay(todayInAustin());
+    const context = await browser.newContext({
+      baseURL: testInfo.project.use.baseURL,
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+    try {
+      await page.route(/tiktok(cdn-us)?\.com/, (route) => route.abort());
+      await page.goto("/");
+      const bar = page.getByTestId("search-bar");
+      await expect(bar).toBeVisible();
+      await expect(bar).not.toHaveAttribute("data-hydrated", "true");
+
+      const checkIn = bar.getByLabel("Check-in");
+      await expect(checkIn).toHaveAttribute("min", todayInAustin());
+      await checkIn.fill(stay.checkIn);
+      await bar.getByLabel("Checkout").fill(stay.checkOut);
+      // The guests are a native disclosure of number inputs.
+      await bar.locator("summary").click();
+      await bar.getByLabel("Adults").fill("3");
+      await bar.getByRole("button", { name: "Search" }).click();
+
+      await expect(page).toHaveURL(searchUrl(stay));
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Which house is free?" }),
+      ).toBeVisible();
+    } finally {
+      await context.close();
+    }
+  });
+
+  test("passes axe in both themes, with the date picker open", async ({
+    page,
+  }) => {
+    for (const theme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme: theme });
+      const bar = await openHome(page);
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+      await expect(page.locator("[data-theme-toggle]")).toHaveAttribute(
+        "data-mode",
+        "system",
+      );
+
+      const closed = await new AxeBuilder({ page }).analyze();
+      await bar.getByRole("button", { name: /Check-in/ }).click();
+      await expect(
+        bar.getByRole("dialog", { name: "Choose your dates" }),
+      ).toBeVisible();
+      const open = await new AxeBuilder({ page }).analyze();
+
+      for (const [label, results] of [
+        ["closed", closed],
+        ["open", open],
+      ] as const) {
+        const blocking = results.violations.filter(
+          (v) => v.impact === "serious" || v.impact === "critical",
+        );
+        expect(
+          blocking.map(
+            (v) =>
+              `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
+          ),
+          `axe (${theme}, picker ${label})`,
+        ).toEqual([]);
+      }
+    }
   });
 });
