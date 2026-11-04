@@ -53,7 +53,7 @@ variable is optional locally.
 | `AIRBNB_MARKUP_PCT`, `DIRECT_MARKUP_PCT` | `15.5`, `11`                    | Fallback markups for a house whose Hospitable markups are missing.                                                                                  |
 | `AIRBNB_LISTING_URLS`                    | `airbnbUrl` from content        | JSON map of property id → Airbnb URL for the price comparison link.                                                                                 |
 | `COMPARISON_ENABLED`                     | `true`                          | `false` hides the Airbnb price comparison.                                                                                                          |
-| `MAX_NIGHTS`                             | `90`                            | Longest stay `/api/quote` will price.                                                                                                               |
+| `MAX_NIGHTS`                             | `90`                            | Longest stay `/api/quote` will price and `/api/availability` will search; a longer prefilled stay drops its check-out.                              |
 | `BOOKING_ADMIN_TOKEN`                    | unset → route is a 404          | Bearer token (16+ chars) for `GET /api/admin/comparison-check`.                                                                                     |
 | `HOSPITABLE_API_BASE_URL`                | the real Public API             | Only the e2e suite sets it, to the stand-in in `e2e/mock-hospitable/`.                                                                              |
 | `NEXT_PUBLIC_MAPKIT_TOKEN`               | unset → drawn SVG map           | Apple MapKit JS token (domain-restricted, public by design). Set: the city map is a live Apple map.                                                 |
@@ -73,23 +73,25 @@ in `.env.local` (`HOSPITABLE_CUSTOM_SITE_ID` too if it differs from
 houses have markups set in Hospitable). The routes hit the real Hospitable
 account: every quote creates a quote record there (no reservation, no
 charge), and Reserve really does go to Hospitable's checkout. Without the
-token the widget says online booking is unavailable.
+token the widget says online booking is unavailable. The search route is
+plain `curl` away:
+`curl "http://localhost:3000/api/availability?checkin=2027-03-12&checkout=2027-03-15&adults=2"`.
 
 ## Scripts
 
-| Script               | What it does                                                            |
-| -------------------- | ----------------------------------------------------------------------- |
-| `pnpm dev`           | Development server on port 3000                                         |
-| `pnpm build`         | Production build                                                        |
-| `pnpm start`         | Serve the production build                                              |
-| `pnpm lint`          | ESLint                                                                  |
-| `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                                      |
-| `pnpm check:content` | Parse `content/*.ts` through zod and run the content rules              |
-| `pnpm check:colors`  | Fail on raw colours under `components/` and `app/`                      |
-| `pnpm format`        | Prettier, write mode                                                    |
-| `pnpm format:check`  | Prettier, check only (CI)                                               |
-| `pnpm test:unit`     | `node:test` over `lib/**/*.test.ts`; no server, no network              |
-| `pnpm test`          | Playwright against two fresh production builds (alias: `pnpm test:e2e`) |
+| Script               | What it does                                                                                              |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`           | Development server on port 3000                                                                           |
+| `pnpm build`         | Production build                                                                                          |
+| `pnpm start`         | Serve the production build                                                                                |
+| `pnpm lint`          | ESLint                                                                                                    |
+| `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                                                                        |
+| `pnpm check:content` | Parse `content/*.ts` through zod and run the content rules                                                |
+| `pnpm check:colors`  | Fail on raw colours under `components/` and `app/`                                                        |
+| `pnpm format`        | Prettier, write mode                                                                                      |
+| `pnpm format:check`  | Prettier, check only (CI)                                                                                 |
+| `pnpm test:unit`     | `node:test` over `lib/**/*.test.ts`; no server, no network                                                |
+| `pnpm test`          | Playwright against three fresh production builds and the stand-in Hospitable API (alias: `pnpm test:e2e`) |
 
 Before pushing, run what CI runs:
 
@@ -156,7 +158,7 @@ quote drives the paths the calendar cannot (`Unavailable`, `Changed`,
 server's retry is exercised for real. The header comment lists all of it;
 `e2e/mock-hospitable/stays.ts` has the date helpers the native specs share.
 
-106 tests (75 + 9 + 22); about two minutes locally including the builds.
+106 tests (75 + 9 + 22); a few minutes locally including the three builds.
 
 | Spec                      | Covers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -197,15 +199,22 @@ pnpm exec playwright test --list                    # list without running
 
 - **Stale servers.** Outside CI, Playwright reuses whatever is already
   listening on ports 3000, 3001, 3002 and 3999, including another worktree's
-  `next dev` (then `/kitchen-sink` answers 200 and the suite fails) or an
-  old stand-in whose one-time 503 has already been spent. Before a run that
-  must prove anything: `lsof -iTCP:3000 -sTCP:LISTEN` and
-  `pkill -f next-server` (`next-server` outlives a pkill of the pnpm
-  wrapper).
+  `next dev` (then `/kitchen-sink` answers 200 and the suite fails), another
+  worktree's `next start` (then your branch is never built: a route it adds
+  answers 404 and a prefill it adds is ignored, with no hint why) or an old
+  stand-in whose one-time 503 has already been spent. Before a run that
+  must prove anything: `lsof -iTCP:3000 -sTCP:LISTEN` (and the other three
+  ports) and `pkill -f next-server` (`next-server` outlives a pkill of the
+  pnpm wrapper).
 - **Quote rate limit.** `/api/quote` allows 20 per minute per address and
   `next start` adds no `x-forwarded-for`, so every browser quote in the
   native project shares one bucket. The route tests send their own
   addresses; keep browser-driven quotes in a spec to a handful.
+- **Availability rate limit.** `/api/availability` allows 60 per minute per
+  address in its own bucket. `search.native.spec.ts` sends every request
+  with its own `x-forwarded-for`, and its limit test spends a whole bucket,
+  so rerunning that test within a minute against a reused server fails at
+  the first request; wait a minute or restart the server.
 - **Rate limiter addresses.** `next start` adds no `x-forwarded-for`, so
   browser posts would share one limiter bucket (5 per 10 minutes per server
   process). `contact-api.spec.ts` uses per-process IPv6 documentation
