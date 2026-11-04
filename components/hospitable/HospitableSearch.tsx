@@ -113,7 +113,7 @@ function useShadowAdjustments(host: React.RefObject<HTMLElement | null>) {
 }
 
 /*
- * Property search widget. In live mode it renders Hospitable's
+ * Property search widget. In hospitable mode it renders Hospitable's
  * <hospitable-direct-mps> element inside the hairline frame and loads the
  * library that defines it. Unlike the booking loader (HospitableWidget.tsx),
  * that script registers a custom element once and must not run twice, so
@@ -128,23 +128,25 @@ export function HospitableSearch({
 }: HospitableSearchProps) {
   const resolvedMode = resolveHospitableMode(mode);
 
-  if (resolvedMode === "live" && searchWidgetId === null) {
+  if (resolvedMode === "hospitable" && searchWidgetId === null) {
     warnOnce(
       "search",
-      "[Hospitable] live mode, but site.hospitable.searchWidgetId is null; rendering the search stub.",
+      "[Hospitable] hospitable mode, but site.hospitable.searchWidgetId is null; rendering the search stub.",
     );
   }
 
-  if (resolvedMode !== "live" || searchWidgetId === null) {
+  if (resolvedMode !== "hospitable" || searchWidgetId === null) {
     return (
       <HospitableSearchStub propertyCount={propertyCount} variant={variant} />
     );
   }
 
-  return <LiveSearchWidget searchWidgetId={searchWidgetId} variant={variant} />;
+  return (
+    <EmbeddedSearchWidget searchWidgetId={searchWidgetId} variant={variant} />
+  );
 }
 
-function LiveSearchWidget({
+function EmbeddedSearchWidget({
   searchWidgetId,
   variant,
 }: {

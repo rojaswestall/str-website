@@ -23,7 +23,7 @@ import { defineConfig, devices } from "@playwright/test";
  *                         (gitignored; CI uploads them as an artifact)
  *
  * `chromium-live` (port 3001, a second build with
- * NEXT_PUBLIC_HOSPITABLE_MODE=live into .next-live) runs only
+ * NEXT_PUBLIC_HOSPITABLE_MODE=hospitable into .next-live) runs only
  * hospitable.live.spec.ts: the one place the real loader shape is covered
  * (script attributes, remount on client-side navigation, no missing-id
  * warnings, the search bar and /search). The real loaders are intercepted,
@@ -112,7 +112,7 @@ export default defineConfig({
       command: `pnpm build && pnpm start --port ${livePort}`,
       url: liveBaseURL,
       env: {
-        NEXT_PUBLIC_HOSPITABLE_MODE: "live",
+        NEXT_PUBLIC_HOSPITABLE_MODE: "hospitable",
         NEXT_PUBLIC_SITE_URL: "",
         NEXT_PUBLIC_MAPKIT_TOKEN: "e2e-mapkit-token",
         NEXT_DIST_DIR: ".next-live",
