@@ -105,8 +105,8 @@ three" block) with the site's own, in `native` mode only.
       reuse its primitives rather than inventing new ones.
 - [ ] Behaviour: submit navigates to `/search?…` with the URL contract
       (client-side navigation when hydrated, a normal GET otherwise). Emit a
-      bubbling `search_submitted` DOM event (`{ checkin, checkout, adults,
-    children, infants, pets }`) and add it to `BookingAnalytics`'s event
+      bubbling `search_submitted` DOM event carrying `checkin`, `checkout`
+      and the four guest counts, and add it to `BookingAnalytics`'s event
       list so it reaches Vercel as `booking_search_submitted`; wrap the bar
       in `BookingAnalytics` where it mounts.
 - [ ] Mount: `SearchWidget` picks `SearchBar` in `native` mode for the bar
