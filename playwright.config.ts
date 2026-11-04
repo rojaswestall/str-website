@@ -98,11 +98,7 @@ export default defineConfig({
     {
       command: `pnpm build && pnpm start --port ${port}`,
       url: baseURL,
-      env: {
-        NEXT_PUBLIC_HOSPITABLE_MODE: "stub",
-        NEXT_PUBLIC_SITE_URL: "",
-        NEXT_PUBLIC_MAPKIT_TOKEN: "",
-      },
+      env: { NEXT_PUBLIC_HOSPITABLE_MODE: "stub", NEXT_PUBLIC_SITE_URL: "" },
       reuseExistingServer: !isCI,
       // CI has no separate build step, so the build log must be visible when
       // the server fails to start.
@@ -116,7 +112,6 @@ export default defineConfig({
       env: {
         NEXT_PUBLIC_HOSPITABLE_MODE: "hospitable",
         NEXT_PUBLIC_SITE_URL: "",
-        NEXT_PUBLIC_MAPKIT_TOKEN: "e2e-mapkit-token",
         NEXT_DIST_DIR: ".next-live",
       },
       reuseExistingServer: !isCI,
@@ -144,7 +139,6 @@ export default defineConfig({
       env: {
         NEXT_PUBLIC_HOSPITABLE_MODE: "native",
         NEXT_PUBLIC_SITE_URL: "",
-        NEXT_PUBLIC_MAPKIT_TOKEN: "",
         NEXT_DIST_DIR: ".next-native",
         HOSPITABLE_API_BASE_URL: `${mockHospitableURL}/v2`,
         HOSPITABLE_PERSONAL_ACCESS_TOKEN: E2E_HOSPITABLE_TOKEN,
