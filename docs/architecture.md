@@ -426,45 +426,11 @@ comparison is right for (see [`plan.md`](plan.md)).
 ### Search
 
 The site's own search replaces Hospitable's embedded bar and results page in
-`native` mode only; `hospitable` and `stub` modes keep the embed and the
-stub described under "Hospitable integration". What is built: the
-availability route and the house-page prefill (above). The hero bar and
-`/search` still mount the embed in every mode until the remaining
-checkpoints in [`plan.md`](plan.md) §1c ship.
-
-Decisions the built and planned parts share:
-
-- **URL contract.** `/search?checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&adults=2&children=0&infants=0&pets=0`,
-  and the same parameters on `/stays/<slug>`. They are Hospitable's own
-  parameter names, so links keep working in `hospitable` mode, where the
-  loader reads them from the page URL. Dates are ISO in `America/Chicago`
-  (`BOOKING_TIME_ZONE`). Missing guest counts default to two adults and none
-  of the rest. A page ignores an unknown or invalid value; the route answers
-  `INVALID` with field errors.
-- **One set of rules.** A house is free for a stay when `canCheckIn` holds
-  and `checkOutVerdict` is `ok` under the same `StayLimits` the quote route
-  uses, plus `adults + children ≤ maxGuests` and `pets === 0 || petsAllowed`.
-  `search.ts` imports these from `rules.ts`; nothing re-implements them, so
-  search and the calendar cannot disagree.
-- **Estimates, not prices.** A result's figure is the calendar's direct
-  preview folded over the nights (`round(base × (1 + direct markup))` per
-  night, nights only, before cleaning fee and taxes), always labelled as an
-  estimate. No quote is created by a search; the quote on the house page is
-  the only number presented as the price, and the Airbnb comparison stays
-  there too.
-- **Server-rendered results.** `/search` reads the URL and renders results
-  on the server inside `Suspense` after `await connection()`, the
-  `BookingPanel` pattern; the route exists for in-page updates and tests,
-  not for the first paint.
-- **Rate limit.** The route reads cached calendars only and never reaches
-  Hospitable more than the calendar route would, so it shares
-  `lib/rateLimit.ts` with a looser budget than `/api/quote` (60 a minute per
-  client) and is `no-store`.
-- **Mode switch.** `SearchWidget` (the server wrapper) picks the native
-  bar or results, the embed, or the stub by mode; the embed and stub
-  components and their tests stay as they are.
-- **Hospitable's search is never called.** There is no search endpoint in
-  the Public API v2; availability comes from the three cached calendars.
+`native` mode only. The availability route and the house-page prefill
+(above) are built; the hero bar and `/search` still mount the embed in
+every mode. The decisions (URL contract, one set of rules, estimates vs.
+the quote, server-rendered results, mode switch), what is built, and the
+remaining checkpoints are all in [`search.md`](search.md).
 
 ## SEO
 

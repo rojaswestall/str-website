@@ -100,10 +100,11 @@ in [`.env.example`](.env.example) and explained in
 
 ## Documentation
 
-The docs are the brief: work still to do is specified in `docs/plan.md`,
-and the PR that ships it describes the result in the other docs in the same
-change ("Documentation" in [`docs/development.md`](docs/development.md)
-says which file gets what). There are no prompt files.
+The docs are the brief: work in progress is specified in a feature doc
+(today [`docs/search.md`](docs/search.md)), and the PR that ships a step
+describes the result in the other docs in the same change ("Documentation"
+in [`docs/development.md`](docs/development.md) says which file gets what).
+There are no prompt files.
 
 - [`docs/development.md`](docs/development.md) — setup, environment
   variables, scripts, the test suite and its gotchas, CI, how to edit
@@ -113,9 +114,10 @@ says which file gets what). There are no prompt files.
   contact API, the booking widget and API, SEO, and the CSP.
 - [`docs/hospitable-discovery.md`](docs/hospitable-discovery.md) — what the
   Hospitable Public API returns, verified against the live account.
-- [`docs/plan.md`](docs/plan.md) — remaining work only: go-live checklist,
-  the native search checkpoints still to build, `[TBC]` content, open
-  decisions, engineering follow-ups.
+- [`docs/search.md`](docs/search.md) — the native search: decisions, what
+  is built, the checkpoints still to build.
+- [`docs/plan.md`](docs/plan.md) — the original go-live checklist (Vercel,
+  Hospitable, Resend, `[TBC]` content). No longer maintained.
 - `design/artifact.html` — the static visual reference. Open it in a
   browser; do not edit it.
 - `AGENTS.md` — pointer for coding agents to the Next 16 docs bundled in

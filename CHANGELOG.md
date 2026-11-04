@@ -6,18 +6,19 @@ checkpoints, each its own PR, so a reader can see what each one added.
 
 ## Unreleased — the docs are the brief
 
-- The native-search brief moved out of `docs/prompts/` into the docs it
-  belongs in: the remaining checkpoints and open questions in `docs/plan.md`
-  §1c, the shared decisions under "Search" in `docs/architecture.md`, and
-  the rules for booking code under "Working on the booking code" in
-  `docs/development.md`. A new "Documentation" section there says which
-  file each kind of change is written up in. There are no prompt files.
+- The native-search brief moved out of `docs/prompts/` into
+  `docs/search.md`, the feature's doc: decisions, what is built, the
+  remaining checkpoints and open questions. The rules for booking code are
+  under "Working on the booking code" in `docs/development.md`, and a new
+  "Documentation" section there says which file each kind of change is
+  written up in. `docs/plan.md` is the original go-live checklist and is
+  no longer maintained. There are no prompt files.
 
 ## 2026-11-04 — native search, checkpoint 1: availability API and house-page prefill (#46)
 
 The first of three checkpoints replacing Hospitable's embedded search with
 the site's own, in `native` mode only (the remaining two are specified in
-`docs/plan.md` §1c). `stub` and `hospitable` modes are unchanged.
+`docs/search.md`). `stub` and `hospitable` modes are unchanged.
 
 - **`GET /api/availability?checkin&checkout&adults&children&infants&pets`.**
   Which of the three houses are free for a stay, judged from the cached

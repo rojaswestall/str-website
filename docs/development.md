@@ -305,10 +305,13 @@ session is a pointer at the sections below, not a copy of them.
 
 Where each kind of change is written up:
 
-- [`plan.md`](plan.md) — what is not done yet, including the spec for work
-  that is scoped but not started: steps, decisions already made, open
-  questions with their defaults. The PR that ships an item removes it here
-  and describes the result in the files below.
+- **A feature doc** per area of work in progress, such as
+  [`search.md`](search.md): the decisions, what is built, and the remaining
+  steps as a checklist with decisions already made and open questions with
+  their defaults. Start one when a piece of work spans more than one PR;
+  the PR that ships a step moves it from "remaining" to "built" in the same
+  file and describes the result in the files below. Once the feature is
+  complete, fold the doc into `architecture.md` and delete it.
 - [`architecture.md`](architecture.md) — what is built and why: routes,
   components, data flow, the decisions behind them. New behaviour is
   described here in the PR that adds it.
@@ -319,6 +322,8 @@ Where each kind of change is written up:
 - `CHANGELOG.md` — one entry per PR under "Unreleased", dated when it merges.
 - [`hospitable-discovery.md`](hospitable-discovery.md) — what the Public
   API actually returns; add to it when a new call or field is used.
+- [`plan.md`](plan.md) is the original go-live checklist from building the
+  site and is no longer maintained; do not add work to it.
 
 A PR is not finished while a doc still describes the old behaviour. When
 reviewing one, read the docs diff against the code diff.
