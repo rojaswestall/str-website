@@ -96,6 +96,26 @@ export function latestCheckOut(
   return nights === 0 ? null : addDays(checkIn, nights);
 }
 
+/**
+ * A selection arriving from outside the calendar (a search hand-off in the
+ * URL) checked against it: the check-in stays only if it can be one, the
+ * check-out only if the stay from that check-in is allowed. Whatever fails
+ * is dropped and the rest kept, so the guest lands on the calendar with as
+ * much of their stay as still holds.
+ */
+export function resolveSelection(
+  selection: Selection,
+  map: DayMap,
+  limits: StayLimits,
+): Selection {
+  const { checkIn, checkOut } = selection;
+  if (!checkIn || !canCheckIn(checkIn, map, limits)) return EMPTY_SELECTION;
+  if (checkOut && checkOutVerdict(checkIn, checkOut, map, limits).ok) {
+    return { checkIn, checkOut };
+  }
+  return { checkIn, checkOut: null };
+}
+
 /** What a click or Enter on `date` does to the current selection. */
 export function selectDate(
   selection: Selection,
@@ -220,6 +240,8 @@ export const DEFAULT_GUESTS: Guests = {
   pets: 0,
 };
 
+/** Most occupants (adults + children) any request may name; each house caps lower. */
+export const MAX_GUESTS = 16;
 export const MAX_INFANTS = 5;
 export const MAX_PETS = 2;
 

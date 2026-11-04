@@ -5,14 +5,18 @@ import { getAllProperties, getSite, type Property } from "@/content";
 import { cached } from "./cache";
 import { hospitableFetch } from "./client";
 import { getBookingConfig } from "./config";
-import { addMonths, todayInBookingZone } from "./dates";
+import { addMonths, nightsBetween, todayInBookingZone } from "./dates";
 import { markupPct, normalizeCalendar, normalizeQuote } from "./normalize";
 import type { ParsedQuoteRequest } from "./schema";
+import { evaluateStay } from "./search";
 import type {
   BookingProperty,
   CalendarDay,
   InitialBookingData,
   Quote,
+  SearchAvailability,
+  SearchQuery,
+  SearchResult,
 } from "./types";
 import { UpstreamPropertyListSchema } from "./upstream";
 
@@ -147,6 +151,58 @@ export async function loadInitialBookingData(
 
 function describe(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+/**
+ * Which houses are free for a stay, and roughly what the nights would
+ * cost, from the cached calendars: no call to Hospitable beyond what the
+ * properties and calendar routes already make. Every bookable house is
+ * returned, in content order. A house whose calendar could not be read is
+ * `{ available: false, reason: "unknown" }`, never free. Throws only when
+ * the property list itself cannot be read (not configured, upstream down).
+ */
+export async function searchAvailability(
+  query: SearchQuery,
+): Promise<SearchAvailability> {
+  const properties = await listBookingProperties();
+  const limits = {
+    today: todayInBookingZone(),
+    maxNights: getBookingConfig().maxNights,
+  };
+  const windows = await Promise.allSettled(
+    properties.map((property) => getCalendarWindow(property.id)),
+  );
+  const nights = nightsBetween(query.checkIn, query.checkOut);
+
+  const results: SearchResult[] = properties.map((property, i) => {
+    const window = windows[i]!;
+    const card = {
+      id: property.id,
+      slug: property.slug,
+      name: property.name,
+      bedrooms: property.bedrooms,
+      bathrooms: property.bathrooms,
+      maxGuests: property.maxGuests,
+      petsAllowed: property.petsAllowed,
+      heroImage: property.heroImage,
+      currency: property.currency,
+    };
+    if (window.status === "rejected") {
+      console.warn(
+        `[booking:search] calendar unavailable for ${property.slug}: ${describe(window.reason)}`,
+      );
+      return {
+        ...card,
+        stay: { available: false, reason: "unknown", nights },
+      };
+    }
+    return {
+      ...card,
+      stay: evaluateStay(property, window.value.days, query, limits),
+    };
+  });
+
+  return { checkIn: query.checkIn, checkOut: query.checkOut, nights, results };
 }
 
 export async function createQuote(

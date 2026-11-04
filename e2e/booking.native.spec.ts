@@ -8,6 +8,14 @@ import {
 } from "@playwright/test";
 
 import { E2E_ADMIN_TOKEN } from "../playwright.config";
+import {
+  addDays,
+  DAN_JEAN_A,
+  nextReservedDay,
+  pickWeekdayStay,
+  STRANGER,
+  todayInAustin,
+} from "./mock-hospitable/stays";
 
 /*
  * Runs in the "chromium-native" project only, against the third build made
@@ -29,7 +37,6 @@ import { E2E_ADMIN_TOKEN } from "../playwright.config";
  * the struck-through footer figure is 61304 + 1404 = 62708 → $627.08.
  */
 
-const DAN_JEAN_A = "02f700e5-a510-4c4f-b9f6-9d4bebdf499a";
 const EVENTS = [
   "widget_loaded",
   "dates_selected",
@@ -37,54 +44,6 @@ const EVENTS = [
   "comparison_shown",
   "reserve_clicked",
 ] as const;
-
-function todayInAustin(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Chicago",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
-
-function addDays(iso: string, days: number): string {
-  const [y, m, d] = iso.split("-").map(Number) as [number, number, number];
-  const date = new Date(Date.UTC(y, m - 1, d + days));
-  return date.toISOString().slice(0, 10);
-}
-
-function weekday(iso: string): number {
-  return new Date(`${iso}T12:00:00Z`).getUTCDay();
-}
-
-function dayOfMonth(iso: string): number {
-  return Number(iso.slice(8, 10));
-}
-
-/** Monday → Thursday, all clear of the stand-in's reserved and closed days. */
-function pickWeekdayStay(today: string): { checkIn: string; checkOut: string } {
-  let date = addDays(today, 2);
-  for (let i = 0; i < 60; i++, date = addDays(date, 1)) {
-    if (weekday(date) !== 1) continue;
-    const nights = [date, addDays(date, 1), addDays(date, 2)];
-    const checkOut = addDays(date, 3);
-    const clear = [...nights, checkOut].every((d) => {
-      const dom = dayOfMonth(d);
-      return dom < 10 || dom > 12;
-    });
-    if (clear && dayOfMonth(date) !== 20) return { checkIn: date, checkOut };
-  }
-  throw new Error("no clear weekday stay found");
-}
-
-/** The first of the 10th–12th run that is still ahead of today. */
-function nextReservedDay(today: string): string {
-  let date = addDays(today, 1);
-  for (let i = 0; i < 40; i++, date = addDays(date, 1)) {
-    if (dayOfMonth(date) === 11) return date;
-  }
-  throw new Error("unreachable");
-}
 
 /*
  * The widget streams in after `load`, and React holds a streamed boundary in
@@ -396,20 +355,6 @@ test.describe("native booking widget", () => {
     expect(checkoutUrls).toEqual([]);
   });
 
-  test("a house Hospitable does not list says so instead of breaking", async ({
-    page,
-  }) => {
-    await page.goto("/stays/oak-hill");
-    const panel = page.locator("#book");
-    await expect(panel.getByRole("alert")).toContainText(
-      "This house isn't available to book online.",
-    );
-    await expect(page.getByTestId("booking-footer")).toHaveCount(0);
-    await expect(
-      panel.getByRole("link", { name: /view on Airbnb/i }),
-    ).toBeVisible();
-  });
-
   test("passes axe with a quote on screen, in both themes", async ({
     page,
   }) => {
@@ -448,7 +393,7 @@ test.describe("booking routes behind the widget", () => {
     });
   }
 
-  test("/api/properties lists the one house Hospitable lists, with its markups", async ({
+  test("/api/properties lists our three houses, with their markups, and nothing else", async ({
     request,
   }) => {
     const response = await request.get("/api/properties");
@@ -457,8 +402,14 @@ test.describe("booking routes behind the widget", () => {
     expect(body.ok).toBe(true);
     expect(body.comparisonEnabled).toBe(true);
     expect(body.maxNights).toBe(90);
-    expect(body.properties).toHaveLength(1);
-    expect(body.properties[0]).toMatchObject({
+    // Content order, and never the property the stand-in serves that
+    // content does not list.
+    expect(body.properties.map((p: { slug: string }) => p.slug)).toEqual([
+      "oak-hill",
+      "south-austin",
+      "fire-side",
+    ]);
+    expect(body.properties[1]).toMatchObject({
       id: DAN_JEAN_A,
       slug: "south-austin",
       name: "South Austin Stay",
@@ -468,6 +419,9 @@ test.describe("booking routes behind the widget", () => {
     // No upstream field leaks through: addresses, pictures, summaries.
     expect(body.properties[0]).not.toHaveProperty("address");
     expect(body.properties[0]).not.toHaveProperty("summary");
+
+    const stranger = await request.get(`/api/calendar/${STRANGER}`);
+    expect(stranger.status()).toBe(404);
   });
 
   test("/api/calendar validates and scopes to our houses", async ({

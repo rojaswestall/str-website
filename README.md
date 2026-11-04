@@ -61,6 +61,15 @@ _Airbnb_ markup, `floor(base × (1 + airbnb markup))` per night as Airbnb
 displays it; it is shown only when direct is cheaper, labelled as an
 estimate, and linked to the listing so a guest can check.
 
+**Search** is `GET /api/availability?checkin&checkout&adults&children&infants&pets`:
+which houses are free for a stay, judged from the same cached calendars by
+the same rules the widget uses, with an estimate of the nights from the
+calendar (labelled as such; nights only, before fees and taxes). Hospitable
+has no search endpoint and none is called, and no quote is created by a
+search. A house page accepts the same parameters
+(`/stays/<slug>?checkin=…&checkout=…&adults=…`) and quotes the stay on
+arrival when the calendar allows it; whatever does not hold is dropped.
+
 **Markups** come from Hospitable (each property's `listing_markups`, per
 channel). To change what guests pay, change the direct markup in
 Hospitable; to change the comparison, change the Airbnb markup there.

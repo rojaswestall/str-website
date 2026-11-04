@@ -54,6 +54,7 @@ last 24 hours resolves to the previous one; that is intended.
 | `/api/properties`                    | `app/api/properties/route.ts`                         | dynamic    | Booking API: the bookable houses (see Booking API)                   |
 | `/api/calendar/[propertyId]`         | `app/api/calendar/[propertyId]/route.ts`              | dynamic    | Booking API: availability and nightly prices                         |
 | `/api/quote`                         | `app/api/quote/route.ts`                              | dynamic    | Booking API: POST, prices a stay and returns the checkout URL        |
+| `/api/availability`                  | `app/api/availability/route.ts`                       | dynamic    | Booking API: which houses are free for a stay, with estimates        |
 | `/sitemap.xml`                       | `app/sitemap.ts`                                      | static     | `/`, the three stays, `/area`                                        |
 | `/robots.txt`                        | `app/robots.ts`                                       | static     | Disallows `/kitchen-sink`, `/api/`, `/_404/`                         |
 | `/opengraph-image`                   | `app/opengraph-image.tsx`                             | static     | Placeholder share card                                               |
@@ -139,8 +140,8 @@ the dev-mode path. Keep the `stays.spec.ts` status assertion.
 - `content/` — typed site content (below).
 - `lib/` — non-component code: `fonts.ts` (`next/font`, self-hosted),
   `site-url.ts`, `seo.ts`, `og-font.ts`, `cx.ts`, `csp.ts`, `hospitable.ts`,
-  `hooks/useInjectedScript.ts`, `rateLimit.ts` (shared by the contact and
-  quote routes), `contact/` (schema, email), `booking/` (the Hospitable
+  `hooks/useInjectedScript.ts`, `rateLimit.ts` (shared by the contact,
+  quote and availability routes), `contact/` (schema, email), `booking/` (the Hospitable
   Public API client behind the booking routes, with `*.test.ts` unit tests
   and recorded responses in `__fixtures__/`).
 - `proxy.ts` — the unknown-slug 404 rewrite.
@@ -326,6 +327,23 @@ only read and quote; nothing writes reservations, calendars, or messages.
   `NOT_FOUND`, `UNAVAILABLE`, `MIN_STAY`, `MAX_NIGHTS`, `MAX_GUESTS`,
   `RATE_LIMITED`, `UPSTREAM`, `NOT_CONFIGURED`) and a message a guest can
   be shown. Guest details are forwarded, never logged or stored.
+- `GET /api/availability?checkin&checkout&adults&children&infants&pets` —
+  the site's own search: which houses are free for a stay, with an estimate
+  of the nights. Hospitable has no search endpoint and none is called; the
+  answer comes from the cached property list and calendars, judged by the
+  widget's own rules (`lib/booking/search.ts` imports them from `rules.ts`,
+  so a house called free is one its calendar would let the guest pick),
+  plus `adults + children ≤ maxGuests` and `pets === 0 || petsAllowed`. Each
+  house is `{ available: true, nights, nightly: { min, max },
+estimatedNightlyTotal }` (cents, each night at the calendar's direct
+  preview, nights only: no cleaning fee or taxes; the quote on the house
+  page is the price) or `{ available: false, reason }` with `reason` one of
+  `unavailable`, `min-stay`, `max-nights`, `closed-to-arrival`,
+  `closed-to-departure`, `max-guests`, `pets`, `past`, or `unknown` when
+  that house's calendar could not be read (never reported free). Missing
+  guest counts default to two adults; bad values are `400 INVALID` with
+  `errors` keyed by parameter. 60 per minute per client address,
+  `Cache-Control: no-store`; `502 UPSTREAM` only when every calendar failed.
 - `GET /api/admin/comparison-check?propertyId&date` — `Bearer
 BOOKING_ADMIN_TOKEN`, compared in constant time; a 404 while the token is
   unset. Returns the base rate, the Airbnb estimate and the direct preview
@@ -336,9 +354,11 @@ holds the token (`server-only`), builds URLs from `HOSPITABLE_API_BASE_URL`,
 times out at 12 s, and retries a GET once on a network failure, timeout,
 429 or 5xx (a quote POST is never retried); `normalize.ts` maps Hospitable
 payloads and the checkout-URL allow-list; `comparison.ts` is the Airbnb
-formula; `rules.ts` the calendar rules; `quote-state.ts` the quote reducer;
-`server.ts` ties it together, including `loadInitialBookingData` for the
-first paint. Without `HOSPITABLE_PERSONAL_ACCESS_TOKEN` every route answers
+formula; `rules.ts` the calendar rules; `search.ts` the search (a stay
+against one house's calendar, and the URL contract, strict for the route
+and lenient for a page); `quote-state.ts` the quote reducer; `server.ts`
+ties it together, including `loadInitialBookingData` for the first paint
+and `searchAvailability` over every house. Without `HOSPITABLE_PERSONAL_ACCESS_TOKEN` every route answers
 `503 NOT_CONFIGURED`. Upstream calls log method, path, status, and duration
 only. What the Public API actually returns (prices in integer cents,
 check-in-day `min_stay`, no nightly breakdown or expiry on quotes, markups
@@ -354,6 +374,15 @@ the skeleton; the boundary streams in with the priced calendar; the widget
 makes no request until the guest picks dates. If that read fails, `initial`
 is omitted and the widget fetches on the client and shows its own error
 states, so the server read is an optimisation, never a dependency.
+
+The same boundary reads the page's `searchParams`. A house page accepts the
+search's URL contract, `/stays/<slug>?checkin&checkout&adults&children&infants&pets`
+(Hospitable's own parameter names, which its embed reads itself in
+`hospitable` mode), parsed leniently on the server (`parsePrefill`: a bad or
+past value is dropped, never an error) and checked against the calendar in
+the widget (`resolveSelection`: a check-in the calendar refuses clears both
+dates, a check-out the stay cannot reach is dropped on its own). A stay that
+holds is quoted at once, with the guests clamped to the house as usual.
 
 Inside the widget: `Calendar` is an ARIA grid with a roving tabindex, one
 month on narrow containers and two from `@xl`; every day knows whether it
