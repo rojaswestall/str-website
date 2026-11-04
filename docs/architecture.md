@@ -306,9 +306,11 @@ honeypot sits off-screen with `tabindex="-1"` (deliberately not
 
 In `native` mode (`NEXT_PUBLIC_HOSPITABLE_MODE`, or `site.hospitable.mode`)
 the house pages render the site's own widget instead of Hospitable's embed.
-It talks only to three routes on this site, which put the Hospitable Public
-API v2 behind the server so the browser never sees the access token. They
-only read and quote; nothing writes reservations, calendars, or messages.
+The widget talks to three routes on this site (properties, calendar, quote);
+the search's availability route and an admin spot-check sit beside them. All
+of them put the Hospitable Public API v2 behind the server so the browser
+never sees the access token. They only read and quote; nothing writes
+reservations, calendars, or messages.
 
 ### Routes
 
@@ -333,17 +335,26 @@ only read and quote; nothing writes reservations, calendars, or messages.
   answer comes from the cached property list and calendars, judged by the
   widget's own rules (`lib/booking/search.ts` imports them from `rules.ts`,
   so a house called free is one its calendar would let the guest pick),
-  plus `adults + children ≤ maxGuests` and `pets === 0 || petsAllowed`. Each
-  house is `{ available: true, nights, nightly: { min, max },
-estimatedNightlyTotal }` (cents, each night at the calendar's direct
-  preview, nights only: no cleaning fee or taxes; the quote on the house
-  page is the price) or `{ available: false, reason }` with `reason` one of
-  `unavailable`, `min-stay`, `max-nights`, `closed-to-arrival`,
-  `closed-to-departure`, `max-guests`, `pets`, `past`, or `unknown` when
-  that house's calendar could not be read (never reported free). Missing
-  guest counts default to two adults; bad values are `400 INVALID` with
-  `errors` keyed by parameter. 60 per minute per client address,
-  `Cache-Control: no-store`; `502 UPSTREAM` only when every calendar failed.
+  plus `adults + children ≤ maxGuests` and `pets === 0 || petsAllowed`.
+  `results` has one entry per house in content order, each the card fields
+  (`id`, `slug`, `name`, `bedrooms`, `bathrooms`, `maxGuests`,
+  `petsAllowed`, `heroImage`, `currency`; no markups, Airbnb link or
+  check-in times) and a `stay`:
+  `{ available: true, nights, nightly: { min, max }, estimatedNightlyTotal }`
+  (cents, each night at the calendar's direct preview, nights only: no
+  cleaning fee or taxes; the quote on the house page is the price) or
+  `{ available: false, reason, nights }` with `reason`
+  one of `unavailable`, `min-stay` (with the check-in day's `minStay`),
+  `max-nights`, `closed-to-arrival`, `closed-to-departure`, `max-guests`,
+  `pets`, `past`, or `unknown` when that house's calendar could not be read
+  (never reported free). The query is parsed strictly (`parseSearchQuery`):
+  ISO dates, check-in not in the past, one to `MAX_NIGHTS` nights, `adults`
+  1–16, `children` 0–16, `infants` 0–5, `pets` 0–2 (`MAX_GUESTS`,
+  `MAX_INFANTS`, `MAX_PETS` in `rules.ts`); a repeated parameter's first
+  value counts. Missing guest counts default to two adults; anything else
+  wrong is `400 INVALID` with `errors` keyed by parameter. 60 per minute per
+  client address, `Cache-Control: no-store`; `502 UPSTREAM` only when every
+  calendar failed.
 - `GET /api/admin/comparison-check?propertyId&date` — `Bearer
 BOOKING_ADMIN_TOKEN`, compared in constant time; a 404 while the token is
   unset. Returns the base rate, the Airbnb estimate and the direct preview

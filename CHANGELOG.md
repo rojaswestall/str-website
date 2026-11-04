@@ -4,6 +4,16 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
+## Unreleased — checkpoint 1 written up to the documentation pattern
+
+- Docs only. `docs/architecture.md` no longer says the widget's API is
+  "three routes", and the `/api/availability` entry now records what a
+  result carries and the bounds the query is held to. `docs/development.md`
+  gains the search in the `MAX_NIGHTS` row, the right e2e count, and two
+  gotchas learned building checkpoint 1 (another worktree's `next start`
+  masquerading as your build; the availability limit test and reused
+  servers).
+
 ## Unreleased — the docs are the brief
 
 - The native-search brief moved out of `docs/prompts/` into
