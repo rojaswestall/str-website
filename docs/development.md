@@ -264,6 +264,65 @@ you changed something a spec asserts, such as a name or a count).
 - Changing a slug changes the URL; update `content/properties.ts`, the
   property URL in the Hospitable dashboard, and any inbound links.
 
+## Working on the booking code
+
+These hold for every change under `lib/booking/`, `app/api/`,
+`components/booking/`, `components/search/`, and `components/hospitable/`.
+The code keeps them today and a change must not loosen them.
+
+- **The Hospitable token never reaches the browser, logs, or git.** Every
+  Hospitable call goes through `lib/booking/client.ts` on the server.
+- **Read and quote only.** Nothing writes a reservation, calendar, or
+  message to Hospitable. A change that seems to need a write stops and is
+  raised with the hosts first.
+- **The quote is the source of truth for anything the guest pays.**
+  Anything else, the calendar's nightly preview or a search estimate, is
+  labelled as an estimate.
+- **Never state an Airbnb price as fact.** The comparison is the
+  config-driven formula, labelled as an estimate, with a link to the listing.
+- **Hospitable's response wins over these docs.** If the API contradicts
+  something written here, fix the docs.
+- **Hospitable's own search is never called.** There is no search endpoint
+  in the Public API v2; availability comes from the cached calendars.
+- **Never change a Vercel environment variable as part of a code change.**
+  Production's switch to the native widget is the hosts' step in
+  [`plan.md`](plan.md) §1b.
+- **`stub` and `hospitable` modes keep behaving exactly as they do.** New
+  booking work is the `native` branch of the mode switch.
+- Tailwind token utilities only (`check:colors` enforces it), the existing
+  hairline / paper / ink / muted / mono-eyebrow vocabulary, both themes,
+  axe-clean, no new runtime dependencies.
+- Before every commit, run what CI runs (above). If Chromium crashes under
+  Playwright's default worker count on a small machine, add `--workers=1`.
+
+## Documentation
+
+The docs are the brief. Work is specified, tracked, and recorded in `docs/`
+and never in prompt files: whoever picks up a piece of work, a person or a
+coding agent, reads the docs, and the pull request that ships the work
+updates them. There is no `docs/prompts/`; do not create one. A brief for a
+session is a pointer at the sections below, not a copy of them.
+
+Where each kind of change is written up:
+
+- [`plan.md`](plan.md) — what is not done yet, including the spec for work
+  that is scoped but not started: steps, decisions already made, open
+  questions with their defaults. The PR that ships an item removes it here
+  and describes the result in the files below.
+- [`architecture.md`](architecture.md) — what is built and why: routes,
+  components, data flow, the decisions behind them. New behaviour is
+  described here in the PR that adds it.
+- `development.md` (this file) — how to run, check, and test. A new
+  environment variable, script, spec, or gotcha goes in its table or list.
+- `README.md` — the short version: the route list, the events list, the
+  rules the code keeps.
+- `CHANGELOG.md` — one entry per PR under "Unreleased", dated when it merges.
+- [`hospitable-discovery.md`](hospitable-discovery.md) — what the Public
+  API actually returns; add to it when a new call or field is used.
+
+A PR is not finished while a doc still describes the old behaviour. When
+reviewing one, read the docs diff against the code diff.
+
 ## Agent notes
 
 `AGENTS.md` (written by `next dev`, committed) points coding agents at the

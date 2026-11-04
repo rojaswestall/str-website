@@ -4,11 +4,20 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
-## Unreleased — native search, checkpoint 1: availability API and house-page prefill
+## Unreleased — the docs are the brief
+
+- The native-search brief moved out of `docs/prompts/` into the docs it
+  belongs in: the remaining checkpoints and open questions in `docs/plan.md`
+  §1c, the shared decisions under "Search" in `docs/architecture.md`, and
+  the rules for booking code under "Working on the booking code" in
+  `docs/development.md`. A new "Documentation" section there says which
+  file each kind of change is written up in. There are no prompt files.
+
+## 2026-11-04 — native search, checkpoint 1: availability API and house-page prefill (#46)
 
 The first of three checkpoints replacing Hospitable's embedded search with
-the site's own, in `native` mode only (`docs/prompts/native-search.md` is
-the brief). `stub` and `hospitable` modes are unchanged.
+the site's own, in `native` mode only (the remaining two are specified in
+`docs/plan.md` §1c). `stub` and `hospitable` modes are unchanged.
 
 - **`GET /api/availability?checkin&checkout&adults&children&infants&pets`.**
   Which of the three houses are free for a stay, judged from the cached
@@ -30,7 +39,7 @@ the brief). `stub` and `hospitable` modes are unchanged.
   which the server filters out. `search.native.spec.ts` covers the route and
   the prefill; `search.test.ts` the rules and the URL parsing.
 
-## Unreleased — direct-booking widget, checkpoint 5: hardening and docs
+## 2026-10-31 — direct-booking widget, checkpoint 5: hardening and docs (#40, mode rename #45 on 2026-11-04)
 
 - **First paint from the server.** In native mode the house page now reads
   the catalog and the house's calendar on the server and renders the priced

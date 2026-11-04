@@ -100,16 +100,22 @@ in [`.env.example`](.env.example) and explained in
 
 ## Documentation
 
+The docs are the brief: work still to do is specified in `docs/plan.md`,
+and the PR that ships it describes the result in the other docs in the same
+change ("Documentation" in [`docs/development.md`](docs/development.md)
+says which file gets what). There are no prompt files.
+
 - [`docs/development.md`](docs/development.md) — setup, environment
-  variables, scripts, the test suite and its gotchas, CI, and how to edit
-  content.
+  variables, scripts, the test suite and its gotchas, CI, how to edit
+  content, the rules for booking code, and how the docs are kept.
 - [`docs/architecture.md`](docs/architecture.md) — what is built: routes,
   components, the content model, theming, the Hospitable integration, the
   contact API, the booking widget and API, SEO, and the CSP.
 - [`docs/hospitable-discovery.md`](docs/hospitable-discovery.md) — what the
   Hospitable Public API returns, verified against the live account.
 - [`docs/plan.md`](docs/plan.md) — remaining work only: go-live checklist,
-  `[TBC]` content, open decisions, engineering follow-ups.
+  the native search checkpoints still to build, `[TBC]` content, open
+  decisions, engineering follow-ups.
 - `design/artifact.html` — the static visual reference. Open it in a
   browser; do not edit it.
 - `AGENTS.md` — pointer for coding agents to the Next 16 docs bundled in
