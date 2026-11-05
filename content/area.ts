@@ -2,56 +2,91 @@ import type { AreaPick } from "./types";
 
 /*
  * Area-guide picks, shown on /area and, closest first, in "Near this house" on
- * each property page. Titles and blurbs are placeholders until the hosts
- * choose the places (docs/plan.md, "Content still marked [TBC]"); the artifact's
- * prompt text for each slot is kept as the blurb so the page still reads as a
- * brief.
+ * each property page. These are the hosts' own recommendations; keep each
+ * blurb to one or two sentences.
  *
  * `driveMinutes` is by car from each house, keyed by property slug. Every
  * house needs an entry; null shows "t.b.c.". Picks can be added freely: give
- * each a unique `id` (it becomes the /area#<id> anchor).
+ * each a unique `id` (it becomes the /area#<id> anchor). `link` is only set
+ * where the place's own site has been checked. `photo` is optional; without
+ * one the card shows the striped placeholder slot.
  */
 export const areaPicks: AreaPick[] = [
   {
-    title: "[TBC] Somewhere to eat",
-    id: "eat",
+    title: "Radio Coffee & Beer",
+    id: "radio",
+    kind: "coffee",
+    blurb:
+      "Coffee in the morning, local craft beer and live music at night, in a 1940s house on Manchaca. Veracruz All Natural's taco truck and Dee Dee's Northeastern Thai share the yard, so it covers breakfast through dinner.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://radiocoffeeandbeer.com/",
+  },
+  {
+    title: "Cannon Coffee",
+    id: "cannon-coffee",
+    kind: "coffee",
+    blurb:
+      "Our neighborhood coffee shop on William Cannon: a proper cortado and a quiet table for the morning.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://www.cannoncoffeetx.com/",
+  },
+  {
+    title: "Radix House Coffee",
+    id: "radix-house",
+    kind: "coffee",
+    blurb:
+      "A local roaster's coffee truck on William Cannon. Grab one on the way out for the day.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://www.radixhouse.com/",
+  },
+  {
+    title: "Bee Dumpling",
+    id: "bee-dumpling",
     kind: "eat",
     blurb:
-      "[TBC] The one place you send every guest to. A specific recommendation from the host beats a list of twenty links.",
+      "Handmade soup dumplings, potstickers and noodle soups in the same shopping center as Cannon Coffee. Easy for takeout back to the house.",
     driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
-    photo: {
-      src: "/photos/area/eat.jpg",
-      alt: "[TBC] Placeholder for a photo of the place to eat",
-      width: 1200,
-      height: 1200,
-    },
+    link: "https://beedumplingtx.com/",
   },
   {
-    title: "[TBC] Somewhere outdoors",
-    id: "outdoors",
+    title: "LeRoy and Lewis Barbecue",
+    id: "leroy-and-lewis",
+    kind: "eat",
+    blurb:
+      "The barbecue we send people to: Central Texas smoke with a modern menu, and a Michelin guide listing to back it up.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
+    title: "Evangeline Café",
+    id: "evangeline",
+    kind: "eat",
+    blurb:
+      "A small, unfussy spot on Brodie Lane cooking very good Cajun and French dishes. A true neighborhood favorite.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
+    title: "Thicket Food Park",
+    id: "thicket",
+    kind: "eat",
+    blurb:
+      "A food-truck park on South 1st with something for everyone: Artipasta's fresh Italian pasta, and Brooklyn Breakfast Shop for stuffed French toast and fried chicken sandwiches.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
+    title: "Garrison Park & Pool",
+    id: "garrison-park",
     kind: "outdoors",
     blurb:
-      "[TBC] A greenbelt trail, a swimming hole, a park within a short drive of all three houses.",
+      "A big neighborhood park just up Manchaca with a city pool: a 50-meter pool, a diving board and a wading pool for little ones. The pool is open in the summer season only.",
     driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
-    photo: {
-      src: "/photos/area/outdoors.jpg",
-      alt: "[TBC] Placeholder for a photo of the outdoors pick",
-      width: 1200,
-      height: 1200,
-    },
+    link: "https://austintexas.gov/parks/locations/garrison-pool",
   },
   {
-    title: "[TBC] Something only locals know",
-    id: "local",
-    kind: "local",
+    title: "Mary Moore Searight Metro Park",
+    id: "mary-moore-searight",
+    kind: "outdoors",
     blurb:
-      "[TBC] The detail that makes the page worth reading: the coffee place that opens early, the shortcut that avoids 290 at rush hour, the night the music is good.",
+      "Wide-open parkland along Slaughter Creek with easy walking loops and mountain-bike trails, a short drive south.",
     driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
-    photo: {
-      src: "/photos/area/local.jpg",
-      alt: "[TBC] Placeholder for a photo of the locals-only pick",
-      width: 1200,
-      height: 1200,
-    },
   },
 ];

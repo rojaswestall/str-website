@@ -164,7 +164,7 @@ export const AreaPickSchema = z.object({
     message: "id is lowercase letters, digits, and hyphens",
   }),
   title: nonEmpty,
-  kind: z.enum(["eat", "outdoors", "local"]),
+  kind: z.enum(["coffee", "eat", "outdoors", "local"]),
   blurb: nonEmpty,
   /**
    * Drive time in minutes from each house, keyed by property slug. Every

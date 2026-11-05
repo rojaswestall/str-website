@@ -3,6 +3,7 @@ import type { AreaPick } from "@/content";
 import { DriveTimes } from "./DriveTimes";
 
 const KIND_LABEL: Record<AreaPick["kind"], string> = {
+  coffee: "Coffee",
   eat: "Eat",
   outdoors: "Outdoors",
   local: "Local knowledge",

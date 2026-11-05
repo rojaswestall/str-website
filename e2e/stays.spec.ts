@@ -245,12 +245,12 @@ test.describe("property pages", () => {
     ).toBeVisible();
     const items = nearby.locator("li");
     await expect(items).toHaveCount(3);
-    // Each pick links to its entry on the guide page.
-    for (const id of ["eat", "outdoors", "local"]) {
-      await expect(nearby.locator(`a[href="/area#${id}"]`)).toHaveCount(1);
+    // Each pick links to its entry on the guide page and shows this house's
+    // drive time (a number, or the t.b.c. gap until confirmed).
+    for (const item of await items.all()) {
+      await expect(item.locator('a[href^="/area#"]')).toHaveCount(1);
+      await expect(item).toContainText(/\d+ min drive|drive time t\.b\.c\./);
     }
-    // Drive times are open items: one t.b.c. gap per pick, never a number.
-    await expect(items.filter({ hasText: "drive time t.b.c." })).toHaveCount(3);
     await expect(
       nearby.getByRole("link", { name: /full area guide/ }),
     ).toHaveAttribute("href", "/area");

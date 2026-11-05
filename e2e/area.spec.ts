@@ -13,19 +13,18 @@ test.describe("area guide", () => {
     ).toBeVisible();
 
     const picks = page.getByTestId("area-picks").locator("article");
-    await expect(picks).toHaveCount(3);
-    for (const [index, id] of ["eat", "outdoors", "local"].entries()) {
+    await expect(picks.first()).toBeVisible();
+    const count = await picks.count();
+    for (let index = 0; index < count; index++) {
       const pick = picks.nth(index);
-      await expect(pick).toHaveAttribute("id", id);
+      await expect(pick).toHaveAttribute("id", /^[a-z0-9-]+$/);
       const times = pick.getByTestId("drive-times");
       // One row per house, in content order.
       await expect(times.locator("dt")).toHaveText(HOUSES);
-      // Unconfirmed times render as the dashed t.b.c. gap, never a number.
-      await expect(times.locator("dd")).toHaveText([
-        "t.b.c.",
-        "t.b.c.",
-        "t.b.c.",
-      ]);
+      // Each time is a confirmed number or the dashed t.b.c. gap.
+      for (const dd of await times.locator("dd").all()) {
+        await expect(dd).toHaveText(/^(\d+ min( drive)?|t\.b\.c\.)$/);
+      }
     }
   });
 
