@@ -33,8 +33,9 @@ import { defineConfig, devices } from "@playwright/test";
  * NEXT_PUBLIC_HOSPITABLE_MODE=native into .next-native) runs
  * booking.native.spec.ts (the site's own booking widget and the /api/*
  * routes behind it, end to end) and search.native.spec.ts (the
- * availability route, the house page prefilled from the URL, and the
- * home-page search bar with and without JavaScript). The build
+ * availability route, the house page prefilled from the URL, the
+ * home-page search bar with and without JavaScript, and the /search
+ * results page rendered on the server). The build
  * is pointed at the stand-in Hospitable API in e2e/mock-hospitable/server.mjs
  * (port 3999) with a throwaway token, so nothing reaches Hospitable and no
  * secret is needed.
