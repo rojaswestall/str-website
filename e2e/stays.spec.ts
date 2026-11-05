@@ -235,6 +235,22 @@ test.describe("property pages", () => {
     });
   }
 
+  test("lists walkable area picks first under Near this house", async ({
+    page,
+  }) => {
+    // The South Austin houses have picks within walking distance.
+    await page.goto("/stays/south-austin");
+    const items = page.getByTestId("nearby-picks").locator("li");
+    await expect(items.first()).toContainText(/\d+ min walk/);
+    // Once the walks end, no later item is a walk.
+    const texts = await items.allTextContents();
+    const firstDrive = texts.findIndex((t) => !/min walk/.test(t));
+    if (firstDrive !== -1) {
+      for (const t of texts.slice(firstDrive))
+        expect(t).not.toMatch(/min walk/);
+    }
+  });
+
   test("lists the closest area picks with this house's drive time and links to /area", async ({
     page,
   }) => {

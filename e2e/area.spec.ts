@@ -28,6 +28,26 @@ test.describe("area guide", () => {
     }
   });
 
+  test("shows a walk time instead of the drive for a house that is close", async ({
+    page,
+  }) => {
+    await page.goto("/area");
+    const walks = page.locator(
+      '[data-testid="drive-times"] [data-mode="walk"]',
+    );
+    // At least one pick is listed as walkable from some house.
+    await expect(walks.first()).toBeVisible();
+    for (const row of await walks.all()) {
+      await expect(row.locator("dd")).toHaveText(/^\d+ min walk$/);
+    }
+    // Drive rows never read as walks.
+    for (const row of await page
+      .locator('[data-testid="drive-times"] [data-mode="drive"] dd')
+      .all()) {
+      await expect(row).not.toHaveText(/walk/);
+    }
+  });
+
   test("is linked from the header nav and the home page", async ({ page }) => {
     await page.goto("/");
     await page

@@ -11,9 +11,9 @@ import { faqs as rawFaqs, policies as rawPolicies } from "./policies";
 import { properties as rawProperties } from "./properties";
 import { site as rawSite } from "./site";
 import { z } from "zod";
+import { assertAreaPicksValid, sortPicksNear } from "@/lib/area-travel";
 
 import {
-  type AreaPick,
   AreaPicksSchema,
   FaqRowsSchema,
   HostsSchema,
@@ -51,31 +51,11 @@ const site = parse("site", SiteConfigSchema, rawSite);
 
 const propertiesBySlug = new Map(properties.map((p) => [p.slug, p]));
 
-// Cross-file checks the per-file schemas cannot see: unique pick ids, and a
-// drive time (or an explicit null) from every house to every pick.
-{
-  const slugs = properties.map((p) => p.slug).sort();
-  const ids = new Set<string>();
-  for (const pick of areaPicks) {
-    if (ids.has(pick.id)) {
-      throw new Error(`content/area.ts: duplicate pick id "${pick.id}"`);
-    }
-    ids.add(pick.id);
-    const keys = Object.keys(pick.driveMinutes).sort();
-    if (keys.join() !== slugs.join()) {
-      throw new Error(
-        `content/area.ts: pick "${pick.id}" needs driveMinutes for exactly ${slugs.join(", ")} (has ${keys.join(", ") || "none"})`,
-      );
-    }
-    for (const slug of Object.keys(pick.walkMinutes ?? {})) {
-      if (!slugs.includes(slug)) {
-        throw new Error(
-          `content/area.ts: pick "${pick.id}" has walkMinutes for unknown house "${slug}"`,
-        );
-      }
-    }
-  }
-}
+// Cross-file checks the per-file schemas cannot see (lib/area-travel.ts).
+assertAreaPicksValid(
+  areaPicks,
+  properties.map((p) => p.slug),
+);
 
 const licenses: License[] = properties.map((p) => ({
   propertyName: p.name,
@@ -107,33 +87,11 @@ export function getAreaPicks() {
   return areaPicks;
 }
 
-/** How a guest gets from one house to a pick: a short walk, or a drive. */
-export type Travel =
-  { mode: "walk"; minutes: number } | { mode: "drive"; minutes: number | null };
+export { getTravel, type Travel } from "@/lib/area-travel";
 
-/** Walk time from this house when the pick lists one, otherwise drive time. */
-export function getTravel(pick: AreaPick, slug: string): Travel {
-  const walk = pick.walkMinutes?.[slug];
-  if (walk !== undefined) return { mode: "walk", minutes: walk };
-  return { mode: "drive", minutes: pick.driveMinutes[slug] ?? null };
-}
-
-/**
- * Picks ordered by how close they are to one house: walkable picks first
- * (shortest walk first), then by drive time. Picks without a confirmed time
- * for that house keep their content order, after the timed ones.
- */
+/** Picks ordered by how close they are to one house (lib/area-travel.ts). */
 export function getAreaPicksNear(slug: string) {
-  const rank = (travel: Travel) =>
-    travel.minutes === null
-      ? Number.POSITIVE_INFINITY
-      : travel.mode === "walk"
-        ? travel.minutes - 10_000
-        : travel.minutes;
-  return areaPicks
-    .map((pick, index) => ({ pick, index, rank: rank(getTravel(pick, slug)) }))
-    .sort((a, b) => a.rank - b.rank || a.index - b.index)
-    .map(({ pick }) => pick);
+  return sortPicksNear(areaPicks, slug);
 }
 
 export function getPolicies() {
