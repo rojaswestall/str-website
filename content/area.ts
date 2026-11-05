@@ -82,6 +82,50 @@ export const areaPicks: AreaPick[] = [
     link: "https://austintexas.gov/parks/locations/garrison-pool",
   },
   {
+    title: "Sunrise at Shore & Shore Raw Bar",
+    id: "shore",
+    kind: "eat",
+    blurb:
+      "Two sister spots near the Y in Oak Hill. Sunrise does breakfast tacos and fair-trade coffee in the morning; next door, Shore is the dinner-out choice for raw oysters, grilled fish and steak, with half-price oysters at weekday happy hour.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://www.sunriseatshore.com/",
+  },
+  {
+    title: "Escuela Farms",
+    id: "escuela-farms",
+    kind: "eat",
+    blurb:
+      "Dinner on a working farm, in the building that was once Oak Hill's elementary school. The produce on the plate is grown on the property. Evenings Tuesday to Saturday; book ahead.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://escuelafarm.com/",
+  },
+  {
+    title: "La Popular",
+    id: "la-popular",
+    kind: "eat",
+    blurb:
+      "Modern Mexican and craft agave cocktails at Lantana Place, with 80-plus mezcals and tequilas. Good for a group dinner or happy hour.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://www.lapopularcdmx.com/locations/austin",
+  },
+  {
+    title: "CARVE American Grille",
+    id: "carve",
+    kind: "eat",
+    blurb:
+      "Live-fire grill at Lantana Place: the bacon-wrapped, cherry-smoked filet is the order, and weekend brunch is good too.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://www.carveamericangrille.com/",
+  },
+  {
+    title: "Moviehouse & Eatery",
+    id: "moviehouse",
+    kind: "eat",
+    blurb:
+      "Dinner and a movie in one seat, also at Lantana Place. An easy night out, or a rainy-day plan with kids.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
     title: "Mary Moore Searight Metro Park",
     id: "mary-moore-searight",
     kind: "outdoors",
