@@ -4,14 +4,21 @@ import { describe, it } from "node:test";
 import { addDays } from "./dates";
 import {
   evaluateStay,
+  freeFirst,
   guestSummary,
+  houseHref,
+  nothingKnown,
   openDays,
   parsePrefill,
+  parseSearchPage,
   parseSearchQuery,
+  refusalText,
+  resultsHeadline,
   searchHref,
   searchQueryString,
+  stayLabel,
 } from "./search";
-import type { CalendarDay, SearchQuery } from "./types";
+import type { CalendarDay, SearchQuery, StayEvaluation } from "./types";
 
 /*
  * A synthetic 60-day calendar from 2027-03-01 (a Monday): $112.00 base on
@@ -442,5 +449,226 @@ describe("openDays", () => {
       });
     }
     assert.deepEqual(openDays("2027-03-30", "2027-03-29"), []);
+  });
+});
+
+describe("parseSearchPage", () => {
+  it("has a stay to search only when both dates survive", () => {
+    const whole = parseSearchPage(
+      { checkin: "2027-03-05", checkout: "2027-03-08", adults: "3" },
+      limits,
+    );
+    assert.deepEqual(
+      whole.query,
+      stay("2027-03-05", "2027-03-08", { adults: 3 }),
+    );
+    assert.equal(whole.tooLong, false);
+    assert.deepEqual(whole.selection, {
+      checkIn: "2027-03-05",
+      checkOut: "2027-03-08",
+    });
+
+    // Nothing, a bad date, the past, a check-out not after the check-in:
+    // all "no dates", with whatever is valid kept for the bar.
+    for (const params of [
+      {},
+      { checkin: "bad" },
+      { checkin: "2027-02-20", checkout: "2027-03-05" },
+      { checkin: "2027-03-08", checkout: "2027-03-05" },
+      { checkin: "2027-03-05", checkout: "2027-03-05" },
+      { checkin: "2027-03-05" },
+    ]) {
+      const page = parseSearchPage(params, limits);
+      assert.equal(page.query, null, JSON.stringify(params));
+      assert.equal(page.tooLong, false, JSON.stringify(params));
+    }
+    assert.deepEqual(
+      parseSearchPage({ checkin: "2027-03-08", checkout: "2027-03-05" }, limits)
+        .selection,
+      { checkIn: "2027-03-08", checkOut: null },
+    );
+  });
+
+  it("is lenient about guests where the route is strict", () => {
+    const page = parseSearchPage(
+      {
+        checkin: "2027-03-05",
+        checkout: "2027-03-08",
+        adults: "99",
+        pets: "x",
+      },
+      limits,
+    );
+    assert.deepEqual(page.query, stay("2027-03-05", "2027-03-08"));
+  });
+
+  it("flags a stay longer than the maximum, and only that", () => {
+    const long = parseSearchPage(
+      { checkin: "2027-03-05", checkout: addDays("2027-03-05", 91) },
+      limits,
+    );
+    assert.equal(long.query, null);
+    assert.equal(long.tooLong, true);
+    assert.deepEqual(long.selection, { checkIn: "2027-03-05", checkOut: null });
+
+    const longest = parseSearchPage(
+      { checkin: "2027-03-05", checkout: addDays("2027-03-05", 90) },
+      limits,
+    );
+    assert.equal(longest.tooLong, false);
+    assert.equal(longest.query?.checkOut, addDays("2027-03-05", 90));
+
+    // A past check-in is dropped first: there is no stay to call too long.
+    const past = parseSearchPage(
+      { checkin: "2027-02-01", checkout: "2027-12-01" },
+      limits,
+    );
+    assert.equal(past.tooLong, false);
+  });
+});
+
+describe("the results page", () => {
+  const free: StayEvaluation = {
+    available: true,
+    nights: 3,
+    nightly: { min: 12400, max: 12400 },
+    estimatedNightlyTotal: 37200,
+  };
+  const refused = (
+    reason: Extract<StayEvaluation, { available: false }>["reason"],
+    minStay?: number,
+  ): Extract<StayEvaluation, { available: false }> => ({
+    available: false,
+    reason,
+    nights: 3,
+    ...(minStay ? { minStay } : {}),
+  });
+  const guests = { adults: 3, children: 1, infants: 0, pets: 0 };
+
+  it("links a free house with the whole stay and any other with the guests only", () => {
+    assert.equal(
+      houseHref("south-austin", guests, {
+        checkIn: "2027-03-12",
+        checkOut: "2027-03-15",
+      }),
+      "/stays/south-austin?checkin=2027-03-12&checkout=2027-03-15&adults=3&children=1&infants=0&pets=0",
+    );
+    assert.equal(
+      houseHref("oak-hill", guests),
+      "/stays/oak-hill?adults=3&children=1&infants=0&pets=0",
+    );
+    // What the link carries is what the house page reads back.
+    const href = houseHref("south-austin", guests, {
+      checkIn: "2027-03-12",
+      checkOut: "2027-03-15",
+    });
+    assert.deepEqual(
+      parsePrefill(new URLSearchParams(href.split("?")[1]), limits),
+      {
+        selection: { checkIn: "2027-03-12", checkOut: "2027-03-15" },
+        guests,
+      },
+    );
+  });
+
+  it("puts the free houses first and keeps content order within each group", () => {
+    const results = [
+      { slug: "a", stay: refused("min-stay", 3) },
+      { slug: "b", stay: free },
+      { slug: "c", stay: refused("pets") },
+      { slug: "d", stay: free },
+    ];
+    assert.deepEqual(
+      freeFirst(results).map((r) => r.slug),
+      ["b", "d", "a", "c"],
+    );
+    assert.equal(results[0]!.slug, "a", "the input is not reordered");
+  });
+
+  it("knows nothing only when every calendar failed", () => {
+    assert.equal(
+      nothingKnown([
+        { stay: refused("unknown") },
+        { stay: refused("unknown") },
+      ]),
+      true,
+    );
+    assert.equal(
+      nothingKnown([{ stay: refused("unknown") }, { stay: refused("pets") }]),
+      false,
+    );
+    assert.equal(
+      nothingKnown([{ stay: refused("unknown") }, { stay: free }]),
+      false,
+    );
+  });
+
+  it("writes the stay and the headline", () => {
+    // 12 March 2027 is a Friday.
+    assert.equal(
+      stayLabel("2027-03-12", "2027-03-15"),
+      "Fri, Mar 12 → Mon, Mar 15 · 3 nights",
+    );
+    assert.equal(
+      stayLabel("2027-03-12", "2027-03-13"),
+      "Fri, Mar 12 → Sat, Mar 13 · 1 night",
+    );
+    const headline = (stays: StayEvaluation[]) =>
+      resultsHeadline(
+        stays.map((s) => ({ stay: s })),
+        "2027-03-12",
+        "2027-03-15",
+      );
+    const dates = "Fri, Mar 12 → Mon, Mar 15 · 3 nights";
+    assert.equal(
+      headline([free, refused("unavailable"), free]),
+      `2 of 3 houses are free for ${dates}`,
+    );
+    assert.equal(
+      headline([refused("pets"), refused("unavailable"), free]),
+      `1 of 3 houses is free for ${dates}`,
+    );
+    assert.equal(
+      headline([free, free, free]),
+      `All 3 houses are free for ${dates}`,
+    );
+    assert.equal(
+      headline([refused("pets"), refused("unknown")]),
+      `No house is free for ${dates}`,
+    );
+    assert.equal(headline([free]), `The house is free for ${dates}`);
+  });
+
+  it("says why a house is not free in one plain line", () => {
+    const house = { maxGuests: 4 };
+    assert.equal(
+      refusalText(refused("unavailable"), house),
+      "Booked for some of those nights",
+    );
+    assert.equal(
+      refusalText(refused("min-stay", 3), house),
+      "Needs a 3-night minimum on those dates",
+    );
+    assert.equal(
+      refusalText(refused("min-stay"), house),
+      "Needs a longer stay on those dates",
+    );
+    assert.equal(refusalText(refused("max-guests"), house), "Sleeps up to 4");
+    assert.equal(refusalText(refused("pets"), house), "No pets at this house");
+    assert.equal(
+      refusalText(refused("past"), house),
+      "Those dates are in the past",
+    );
+    assert.equal(
+      refusalText(refused("unknown"), house),
+      "Couldn't check this house just now",
+    );
+    for (const reason of [
+      "max-nights",
+      "closed-to-arrival",
+      "closed-to-departure",
+    ] as const) {
+      assert.match(refusalText(refused(reason), house), /\S/);
+    }
   });
 });

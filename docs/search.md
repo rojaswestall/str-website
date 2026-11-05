@@ -4,15 +4,15 @@ The site's own property search: the bar on the home hero and the `/search`
 results page, replacing Hospitable's embedded search in `native` mode only.
 `hospitable` and `stub` modes keep the embed and the stub described under
 "Hospitable integration" in [`architecture.md`](architecture.md). This file
-is the whole story for the feature: the decisions, what is built, and what
-is left. The PR that ships a checkpoint updates it.
+is the whole story for the feature: the decisions and what was built, in
+three checkpoints. All three have shipped; nothing is left to build.
 
 ## Why
 
 In `native` mode the house pages render the site's own booking widget, but
-the hero still mounts Hospitable's `<hospitable-direct-mps>` bar and
-`/search` its results view. Both are visually broken inside the layout
-(fields wrap, the Search button clips) and both are a black box. Search
+the hero mounted Hospitable's `<hospitable-direct-mps>` bar and `/search`
+its results view. Both were visually broken inside the layout (fields
+wrapped, the Search button clipped) and both were a black box. Search
 should match the widget.
 
 ## Decisions
@@ -77,7 +77,7 @@ three houses with calendars that differ, `search.test.ts` and
 stand-in and the specs under "End-to-end" in
 [`development.md`](development.md).
 
-**Checkpoint 2.** The home-page search bar: `components/search/SearchBar.tsx`
+**Checkpoint 2 (#49).** The home-page search bar: `components/search/SearchBar.tsx`
 (client) and `index.ts`, mounted by `SearchWidget` for the bar variant in
 `native` mode inside `BookingAnalytics`, in the prerendered HTML. Today's
 date comes from `cachedToday` (`lib/booking/today.ts`, a `"use cache"`
@@ -108,63 +108,29 @@ the no-JavaScript submit landing on the same URL, axe in both themes with
 the picker open). `visual.spec.ts` runs in the stub project only, so `/` in
 native mode was not added to it. `Hero.tsx` is unchanged.
 
-`/search` still mounts the embed (or the stub) in every mode until the
-checkpoint below ships.
+**Checkpoint 3.** The `/search` page: in `native` mode `SearchWidget`'s
+results variant renders the bar prefilled from the URL over `SearchResults`
+(`components/search/SearchResults.tsx`, with `ResultCard.tsx`), an async
+Server Component that awaits `connection()`, reads the URL with
+`parseSearchPage` and calls `searchAvailability` directly, each half in its
+own `Suspense` boundary with the empty bar and `ResultsSkeleton` prerendered
+as fallbacks. Free houses come first with the estimate and "See the price
+and book" (the whole stay to the house page), the rest with the reason
+(`refusalText`) and "See the calendar"; anything short of a whole, future
+stay within `MAX_NIGHTS` is an invitation over three plain cards, and when
+nothing could be checked the houses are listed with no claim. A new search
+from the bar is a transition that shows the skeleton while pending
+(`data-pending` on the form), and the bar adopts the URL when it changes
+under it, so back and forward restore both. Two things differ from the
+checklist this replaced: the headline's dates are month-first ("Fri, Mar 12
+→ Mon, Mar 15 · 3 nights"), as the bar and the widget write them, and
+without JavaScript `/search` shows no results (a streamed boundary needs a
+script), only a `noscript` line pointing at the house links. The page is
+described under "Search" in [`architecture.md`](architecture.md); its tests
+are the "/search results page" block of `search.native.spec.ts` and
+`search.test.ts`. The "couldn't check" state is not covered end to end (the
+stand-in cannot fail once its calendars are cached); it was checked by hand
+against a dead upstream and with no token.
 
-## Checkpoint 3 — the `/search` page
-
-Goal: `/search` becomes a server-rendered results page in `native` mode,
-with the bar on top prefilled from the URL.
-
-- [ ] `app/search/page.tsx` keeps its heading, lede, `noindex`, and the
-      "Or go straight to a house" nav. In `native` mode it renders the
-      results variant of `SearchBar` prefilled from `searchParams`, then
-      `<Suspense fallback={<ResultsSkeleton />}><SearchResults … /></Suspense>`
-      where `SearchResults` is an async Server Component that does
-      `await connection()`, parses the URL, calls `searchAvailability`, and
-      renders. Without dates it renders an invitation to pick them and all
-      three houses as plain cards (no availability claim). In `hospitable`
-      and `stub` modes the page is unchanged.
-- [ ] `components/search/SearchResults.tsx` and `ResultCard.tsx`: one card
-      per house, in content order, each with the hero photo (`next/image`,
-      `sizes` set), name, "N bed · N bath · up to N guests", and either
-  - free: "from $Y / night", "about $X for N nights, before fees and
-    taxes", and a primary button "See the price and book" →
-    `/stays/<slug>?checkin&checkout&adults&children&infants&pets`; or
-  - not free: a one-line plain-English reason from `reason` ("Booked for
-    some of those nights", "Needs a 3-night minimum on those dates",
-    "Sleeps up to 4", "No pets at this house", "Those dates are in the
-    past", "Couldn't check this house just now") and a ghost button
-    "See the calendar" → `/stays/<slug>` with the guest parameters only.
-
-  Free houses first, then the rest; a heading line says "2 of 3 houses are
-  free for Fri 12 Mar → Mon 15 Mar · 3 nights". The estimate copy must
-  make clear it is not the price: the quote on the house page is.
-
-- [ ] Changing the bar on `/search` navigates to the new URL (router push
-      with the new query) and the results stream again; show the skeleton
-      while pending (`useTransition` or the Suspense boundary; no spinner
-      library). Back/forward restore results because the URL is the state.
-- [ ] Edge cases handled explicitly: `checkout <= checkin` or past dates
-      (treat as "no dates", keep whatever is valid in the bar); more than
-      `MAX_NIGHTS`; every house unavailable (say so, offer the house
-      calendars); every calendar failed (`UPSTREAM`-style message, houses
-      listed without claims); a house Hospitable does not list (simply not
-      in the results, same as the booking routes).
-- [ ] Tests. E2E in `chromium-native` (`search.native.spec.ts`): the full
-      path home → bar → `/search` → card → house page with the footer total
-      already shown; a stay that crosses the stand-in's blocked range lists
-      that house as not free with the right reason; a 1-night Friday stay
-      trips the min-stay house; 6 adults trips the small house; `pets=1`
-      trips the no-pets house; `/search` with no parameters shows the
-      invitation and three cards; `/search?checkin=bad` shows the
-      invitation with the bar empty; the page makes no client fetch for
-      the first paint and no request to Hospitable's hosts; axe in both
-      themes. `hospitable.spec.ts`'s stub-mode `/search` test and the
-      `hospitable.live.spec.ts` test keep passing untouched.
-- [ ] Docs, in the same PR: this file (move the checkpoint to "Built" and
-      drop the "still mount the embed" line), `architecture.md` (the
-      `/search` row in the routes table, the components list), the tests
-      table in `development.md`, the "Search" paragraph in `README.md`,
-      `CHANGELOG.md`. Before Production switches to `native`, the bar and
-      `/search` need checking on the Preview alongside the house pages.
+Before Production switches to `native`, the bar and `/search` need checking
+on the Preview alongside the house pages.

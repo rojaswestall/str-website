@@ -3,7 +3,7 @@ import { z } from "zod";
 import { SEARCH_RESULTS_PATH } from "@/lib/hospitable";
 
 import { addDays, isIsoDate, nightsBetween } from "./dates";
-import { plural } from "./format";
+import { formatWeekdayDate, plural } from "./format";
 import {
   canCheckIn,
   checkOutVerdict,
@@ -283,6 +283,38 @@ export function parsePrefill(
   };
 }
 
+export type PageSearch = Prefill & {
+  /** The stay to search, when the URL holds a whole one; else null. */
+  query: SearchQuery | null;
+  /** Real, future dates more than `maxNights` apart: worth saying so. */
+  tooLong: boolean;
+};
+
+/**
+ * What the `/search` page makes of its URL. The bar gets whatever is valid
+ * (`parsePrefill`), and there is a stay to search only when both dates
+ * survived; anything else is "no dates", never an error. A stay longer than
+ * `maxNights` loses its check-out like any other bad value, and is flagged
+ * so the page can say why instead of only asking for dates again.
+ */
+export function parseSearchPage(
+  params: SearchParamsInput,
+  limits: StayLimits,
+): PageSearch {
+  const prefill = parsePrefill(params, limits);
+  const { checkIn, checkOut } = prefill.selection;
+  const raw = firstValues(params);
+  return {
+    ...prefill,
+    query:
+      checkIn && checkOut ? { checkIn, checkOut, ...prefill.guests } : null,
+    tooLong:
+      checkIn !== null &&
+      isIsoDate(raw.checkout) &&
+      nightsBetween(checkIn, raw.checkout) > limits.maxNights,
+  };
+}
+
 /* ------------------------------------------------------------------------ */
 /* The search bar                                                           */
 /* ------------------------------------------------------------------------ */
@@ -340,4 +372,105 @@ export function openDays(today: string, through: string): CalendarDay[] {
     });
   }
   return days;
+}
+
+/* ------------------------------------------------------------------------ */
+/* The results page                                                         */
+/* ------------------------------------------------------------------------ */
+
+/** The guest parameters alone, in the URL contract's order. */
+function guestQueryString(guests: Guests): string {
+  return new URLSearchParams({
+    adults: String(guests.adults),
+    children: String(guests.children),
+    infants: String(guests.infants),
+    pets: String(guests.pets),
+  }).toString();
+}
+
+/**
+ * A result's link to its house page. With a stay it is the whole URL
+ * contract, so the page quotes it on arrival; without one (the house is not
+ * free, or no dates were searched) only the guests travel, and the guest
+ * picks dates on the house's own calendar.
+ */
+export function houseHref(
+  slug: string,
+  guests: Guests,
+  stay?: Pick<SearchQuery, "checkIn" | "checkOut">,
+): string {
+  const query = stay
+    ? searchQueryString({ ...stay, ...guests })
+    : guestQueryString(guests);
+  return `/stays/${slug}?${query}`;
+}
+
+/** Free houses first, then the rest; content order within each group. */
+export function freeFirst<T extends { stay: StayEvaluation }>(
+  results: readonly T[],
+): T[] {
+  return [
+    ...results.filter((r) => r.stay.available),
+    ...results.filter((r) => !r.stay.available),
+  ];
+}
+
+/** True when no calendar could be read: nothing can be claimed about any house. */
+export function nothingKnown(
+  results: readonly { stay: StayEvaluation }[],
+): boolean {
+  return results.every((r) => !r.stay.available && r.stay.reason === "unknown");
+}
+
+/** "Fri, Mar 12 → Mon, Mar 15 · 3 nights" */
+export function stayLabel(checkIn: string, checkOut: string): string {
+  const nights = nightsBetween(checkIn, checkOut);
+  return `${formatWeekdayDate(checkIn)} → ${formatWeekdayDate(checkOut)} · ${plural(nights, "night")}`;
+}
+
+/** "2 of 3 houses are free for Fri, Mar 12 → Mon, Mar 15 · 3 nights" */
+export function resultsHeadline(
+  results: readonly { stay: StayEvaluation }[],
+  checkIn: string,
+  checkOut: string,
+): string {
+  const total = results.length;
+  const free = results.filter((r) => r.stay.available).length;
+  const stay = stayLabel(checkIn, checkOut);
+  if (free === 0) return `No house is free for ${stay}`;
+  if (free === total) {
+    return total === 1
+      ? `The house is free for ${stay}`
+      : `All ${total} houses are free for ${stay}`;
+  }
+  return `${free} of ${total} houses ${free === 1 ? "is" : "are"} free for ${stay}`;
+}
+
+/** Why a house is not free, in one plain line for its result card. */
+export function refusalText(
+  stay: Extract<StayEvaluation, { available: false }>,
+  house: { maxGuests: number },
+): string {
+  switch (stay.reason) {
+    case "unavailable":
+      return "Booked for some of those nights";
+    case "min-stay":
+      return stay.minStay
+        ? `Needs a ${stay.minStay}-night minimum on those dates`
+        : "Needs a longer stay on those dates";
+    case "max-nights":
+      return "Too long a stay to book online";
+    case "closed-to-arrival":
+      return "No check-in on that day";
+    case "closed-to-departure":
+      return "No check-out on that day";
+    case "max-guests":
+      return `Sleeps up to ${house.maxGuests}`;
+    case "pets":
+      return "No pets at this house";
+    case "past":
+      return "Those dates are in the past";
+    case "unknown":
+      return "Couldn't check this house just now";
+  }
 }

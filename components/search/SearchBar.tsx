@@ -13,6 +13,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  useTransition,
 } from "react";
 
 import { Calendar, GuestPicker } from "@/components/booking";
@@ -88,17 +89,23 @@ function useHydrated() {
 }
 
 /*
- * The site's own property search bar, mounted on the home hero in native
- * mode (and, next, on /search), in the prerendered HTML: `today` is the
- * cached date from lib/booking/today.ts, never the browser clock. A real
- * GET form to /search with Hospitable's parameter names, so it works
- * before hydration and without JavaScript:
+ * The site's own property search bar, mounted in native mode on the home
+ * hero and at the top of /search, in the prerendered HTML: `today` comes
+ * from the server (the cached date from lib/booking/today.ts on the hero),
+ * never the browser clock. A real GET form to /search with Hospitable's
+ * parameter names, so it works before hydration and without JavaScript:
  * two `<input type="date">` fields and, in a `<details>`, a number input per
  * guest kind. Once hydrated the same form swaps those for hidden inputs
  * behind three buttons that open the widget's own `Calendar` (no prices,
  * no availability: the search answers that) and `GuestPicker` in a
  * non-modal dialog, submits with a client-side navigation to the identical
  * URL, and emits `search_submitted` for `BookingAnalytics`.
+ *
+ * On /search the URL is the state. The page passes the stay in the URL as
+ * the defaults, and when they change under a mounted bar (a new search, or
+ * back and forward, which re-render the page in place) the bar adopts them.
+ * The submit is a transition: while the next results are on their way the
+ * form carries `data-pending`, which the page uses to show its skeleton.
  *
  * The popovers are grid children of the row: inline below their field on a
  * narrow container, floated under the row from 32rem. Escape closes one and
@@ -127,6 +134,26 @@ export function SearchBar({
   const [guests, setGuests] = useState<Guests>(defaultGuests);
   const [open, setOpen] = useState<Popover | null>(null);
   const [hint, setHint] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  // New defaults from the server mean the URL changed under this bar: take
+  // them, whatever was being edited (state adjusted during render, so the
+  // stale stay is never painted).
+  const defaults = [
+    defaultSelection.checkIn,
+    defaultSelection.checkOut,
+    defaultGuests.adults,
+    defaultGuests.children,
+    defaultGuests.infants,
+    defaultGuests.pets,
+  ].join("|");
+  const [adopted, setAdopted] = useState(defaults);
+  if (adopted !== defaults) {
+    setAdopted(defaults);
+    setSelection(defaultSelection);
+    setGuests(defaultGuests);
+    setHint(null);
+  }
 
   const windowEnd = useMemo(
     () => addMonths(today, CALENDAR_WINDOW_MONTHS),
@@ -222,7 +249,9 @@ export function SearchBar({
         },
       }),
     );
-    router.push(searchHref(query));
+    startTransition(() => {
+      router.push(searchHref(query));
+    });
   }
 
   const checkInLabel = `${id}-checkin-label`;
@@ -240,6 +269,7 @@ export function SearchBar({
       action={SEARCH_RESULTS_PATH}
       data-testid="search-bar"
       data-hydrated={hydrated ? "true" : undefined}
+      data-pending={pending ? "" : undefined}
       onSubmit={onSubmit}
       onKeyDown={onKeyDown}
       onBlur={onBlur}

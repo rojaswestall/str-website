@@ -72,7 +72,13 @@ arrival when the calendar allows it; whatever does not hold is dropped. In
 `native` mode the home hero's bar is the site's own form
 (`components/search/SearchBar.tsx`), a plain GET to `/search` with those
 parameters that works without JavaScript and, hydrated, picks the dates
-and guests with the widget's own calendar and picker.
+and guests with the widget's own calendar and picker. `/search` then
+renders the answer on the server (`components/search/SearchResults.tsx`):
+the same bar prefilled from the URL and a card per house, the free ones
+first with the estimate and a button that carries the stay to the house
+page, the others with the reason and a link to the house's calendar. In
+`stub` and `hospitable` modes the bar and `/search` are the stub and
+Hospitable's embed, as before.
 
 **Markups** come from Hospitable (each property's `listing_markups`, per
 channel). To change what guests pay, change the direct markup in
@@ -107,7 +113,7 @@ in [`.env.example`](.env.example) and explained in
 ## Documentation
 
 The docs are the brief: work in progress is specified in a feature doc
-(today [`docs/search.md`](docs/search.md)), and the PR that ships a step
+(such as [`docs/search.md`](docs/search.md)), and the PR that ships a step
 describes the result in the other docs in the same change ("Documentation"
 in [`docs/development.md`](docs/development.md) says which file gets what).
 There are no prompt files.
@@ -120,8 +126,8 @@ There are no prompt files.
   contact API, the booking widget and API, SEO, and the CSP.
 - [`docs/hospitable-discovery.md`](docs/hospitable-discovery.md) — what the
   Hospitable Public API returns, verified against the live account.
-- [`docs/search.md`](docs/search.md) — the native search: decisions, what
-  is built, the checkpoints still to build.
+- [`docs/search.md`](docs/search.md) — the native search: decisions, open
+  questions, and what each of its three checkpoints built.
 - [`docs/plan.md`](docs/plan.md) — the original go-live checklist (Vercel,
   Hospitable, Resend, `[TBC]` content). No longer maintained.
 - `design/artifact.html` — the static visual reference. Open it in a

@@ -4,6 +4,49 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
+## Unreleased — native search, checkpoint 3: the `/search` results page
+
+The last of three checkpoints replacing Hospitable's embedded search with
+the site's own, in `native` mode only (`docs/search.md`). `stub` and
+`hospitable` modes are unchanged: `/search` there is still the stub or the
+embed inside the same page, fully static.
+
+- **`/search` renders its results on the server in `native` mode.** The bar
+  on top is prefilled from the URL; under it `SearchResults` reads the same
+  cached calendars as `/api/availability` (`searchAvailability`, called
+  directly) and lists a card per house, free houses first. No request
+  leaves the browser for the first paint and none goes to Hospitable's
+  hosts. The page keeps its heading, lede, `noindex` and "Or go straight to
+  a house" nav in every mode.
+- **Cards.** Hero photo, name, "N bed · N bath · up to N guests". Free:
+  "from $Y / night", "about $X for N nights, before fees and taxes" and
+  "See the price and book", which carries the whole stay to the house page
+  so it is quoted on arrival. Not free: the reason in one line (booked
+  nights, the minimum stay, "Sleeps up to 4", "No pets at this house", …)
+  and "See the calendar" with the guests only. The figures are labelled
+  estimates; the quote on the house page is the price.
+- **Everything else is said plainly.** No dates, bad or past dates, or a
+  check-out not after the check-in: an invitation to pick dates over the
+  three houses as plain cards, the bar keeping whatever was valid; a stay
+  over `MAX_NIGHTS` also says so. Every house refused: said so, with the
+  calendars on offer. Nothing could be checked: said so, houses listed
+  with no claim.
+- **A new search shows it is working.** Searching again from the bar is a
+  client-side navigation to the same route; the results give way to the
+  skeleton while it is pending. Back and forward restore the bar and the
+  results, because the URL is the state.
+- **Headline dates are month-first** ("Fri, Mar 12 → Mon, Mar 15 · 3
+  nights"), matching the bar and the booking widget, where the brief's
+  example was day-first.
+- **Without JavaScript** `/search` cannot show results (a streamed Suspense
+  boundary needs a script to be revealed); it says so and points at the
+  house links.
+- **Tests.** The page end to end in `search.native.spec.ts` (hero bar →
+  results → card → quoted house page; every refusal the stand-in's three
+  calendars produce; the "no dates" URLs; the pending skeleton and
+  back/forward; axe in both themes), and the URL parsing, links, ordering
+  and copy in `search.test.ts`.
+
 ## Unreleased — native search, checkpoint 2: the home-page search bar
 
 The second of three checkpoints replacing Hospitable's embedded search with
