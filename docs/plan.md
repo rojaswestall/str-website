@@ -56,13 +56,16 @@ later item depends on the earlier ones.
         in the page text. If the live widget refuses to load on a house,
         compare its Hospitable listing name with `name` in
         `content/properties.ts`.
-- [ ] **Apple Maps token.** Once the Apple Developer membership is active:
-      Certificates, Identifiers & Profiles → Services → Maps → Tokens → (+),
-      type **MapKit JS**, restriction **Domain** (the production domain,
-      the Vercel preview domain, and `localhost` if wanted). Set it as
-      `NEXT_PUBLIC_MAPKIT_TOKEN` for Production (and Preview) and redeploy.
-      Until then the city map is the drawn SVG. Check the three `mapArea`
-      positions in `content/properties.ts` look right on the real map.
+- [ ] **Apple Maps token for Production.** Preview has its own MapKit JS
+      token (domain-restricted to the map branch's preview), and the map
+      works there. Production needs a **separate** token: Certificates,
+      Identifiers & Profiles → Services → Maps → Tokens → (+), type
+      **MapKit JS**, restriction **Domain**, listing the production domain
+      (and `www.` if used). The allowed domains are baked into the token, so
+      a token made for a preview address is refused on the real domain
+      (401 in the console; the site falls back to the drawn SVG). Set it as
+      `NEXT_PUBLIC_MAPKIT_TOKEN` for Production and redeploy. Check in the
+      console that MapKit loads with no 401.
 - [ ] **CSP to enforcing.** Deploy with the current report-only header, open
       `/`, `/search`, `/area`, each `/stays/<slug>`, and a 404 on the
       production domain with the live widgets, and collect console

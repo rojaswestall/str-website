@@ -29,6 +29,7 @@ export function CityMap({ highlightSlug, className }: CityMapProps) {
   const houses: MapHouse[] = getAllProperties().map((property) => ({
     slug: property.slug,
     name: property.name,
+    shortName: property.shortName,
     neighborhood: property.neighborhood,
     sleeps: property.sleeps,
     bedrooms: property.bedrooms,
