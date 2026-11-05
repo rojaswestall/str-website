@@ -5,6 +5,7 @@ import {
   assertAreaPicksValid,
   getTravel,
   sortPicksNear,
+  type CheckedPick,
   type TravelPick,
 } from "./area-travel";
 
@@ -145,5 +146,47 @@ describe("assertAreaPicksValid", () => {
         ),
       /walkMinutes for unknown house "mars"/,
     );
+  });
+
+  describe("photo credits", () => {
+    const photo = {
+      src: "/photos/area/x.jpg",
+      alt: "x",
+      width: 1200,
+      height: 800,
+    };
+    const base = {
+      id: "pic",
+      driveMinutes: { "oak-hill": 1, "south-austin": 2 },
+    };
+
+    it("rejects a photo with no credit", () => {
+      const p: CheckedPick = { ...base, photo };
+      assert.throws(
+        () => assertAreaPicksValid([p], HOUSES),
+        /pick "pic" has a photo but no photoCredit/,
+      );
+    });
+
+    it("accepts a credited photo, or one the hosts own", () => {
+      const credited: CheckedPick = {
+        ...base,
+        photo,
+        photoCredit: {
+          author: "A",
+          license: "CC BY 4.0",
+          source: "https://example.org/x",
+        },
+      };
+      const owned: CheckedPick = {
+        ...base,
+        id: "own",
+        photo,
+        photoOwned: true,
+      };
+      assert.doesNotThrow(() =>
+        assertAreaPicksValid([credited, owned], HOUSES),
+      );
+    });
   });
 });

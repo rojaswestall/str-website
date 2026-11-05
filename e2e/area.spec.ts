@@ -48,6 +48,29 @@ test.describe("area guide", () => {
     }
   });
 
+  test("pick photos load at 3:2 and carry a credit line", async ({ page }) => {
+    await page.goto("/area");
+    const cards = page.getByTestId("area-picks").locator("article");
+    const withPhoto = cards.filter({ has: page.locator("img") });
+    await expect(withPhoto.first()).toBeVisible();
+    for (const card of await withPhoto.all()) {
+      const img = card.locator("img").first();
+      await img.scrollIntoViewIfNeeded();
+      // Loaded, not a broken image.
+      await expect
+        .poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
+        .toBeGreaterThan(0);
+      // The frame is 3:2 (within a pixel of rounding).
+      const box = await img.boundingBox();
+      expect(box).not.toBeNull();
+      expect(Math.abs(box!.width / box!.height - 1.5)).toBeLessThan(0.02);
+      await expect(img).toHaveAttribute("alt", /\S/);
+      const credit = card.getByTestId("photo-credit");
+      await expect(credit).toContainText(/^Photo:/);
+      await expect(credit.locator("a")).toHaveAttribute("href", /^https:\/\//);
+    }
+  });
+
   test("is linked from the header nav and the home page", async ({ page }) => {
     await page.goto("/");
     await page

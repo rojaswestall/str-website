@@ -9,7 +9,11 @@ const KIND_LABEL: Record<AreaPick["kind"], string> = {
   local: "Local knowledge",
 };
 
-/** One area-guide pick on /area: photo, kind, title, blurb, drive time from each house. */
+/**
+ * One area-guide pick on /area: photo (3:2, framed like the property
+ * gallery) with its credit line, kind, title, blurb, and the travel time
+ * from each house.
+ */
 export function AreaPickCard({ pick }: { pick: AreaPick }) {
   return (
     <article
@@ -19,8 +23,13 @@ export function AreaPickCard({ pick }: { pick: AreaPick }) {
     >
       <PhotoFrame
         image={pick.photo ?? null}
-        ratio="1:1"
-        sizes="(min-width: 1180px) 360px, (min-width: 760px) 33vw, 100vw"
+        ratio="3:2"
+        sizes="(min-width: 1180px) 360px, (min-width: 600px) 50vw, 100vw"
+        caption={
+          pick.photo && pick.photoCredit ? (
+            <PhotoCredit credit={pick.photoCredit} />
+          ) : undefined
+        }
       />
       <p className="font-mono text-[0.74rem] tracking-[0.06em] text-muted uppercase">
         {KIND_LABEL[pick.kind]}
@@ -44,6 +53,30 @@ export function AreaPickCard({ pick }: { pick: AreaPick }) {
       </p>
       <DriveTimes pick={pick} className="mt-[0.25rem]" />
     </article>
+  );
+}
+
+/** "Photo: Author · CC BY 4.0", the author linking to the photo's source page. */
+function PhotoCredit({
+  credit,
+}: {
+  credit: NonNullable<AreaPick["photoCredit"]>;
+}) {
+  return (
+    <span data-testid="photo-credit" className="text-[0.68rem]">
+      Photo:{" "}
+      <a
+        href={credit.source}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-muted underline decoration-hairline underline-offset-2 hover:text-ink"
+      >
+        {credit.author}
+      </a>
+      <span aria-hidden="true"> · </span>
+      <span className="sr-only">, </span>
+      {credit.license}
+    </span>
   );
 }
 

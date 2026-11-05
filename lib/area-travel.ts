@@ -9,6 +9,10 @@ import type { AreaPick } from "../content/types";
 /** The fields of a pick these functions read. */
 export type TravelPick = Pick<AreaPick, "id" | "driveMinutes" | "walkMinutes">;
 
+/** The fields `assertAreaPicksValid` reads: travel plus the photo credit. */
+export type CheckedPick = TravelPick &
+  Partial<Pick<AreaPick, "photo" | "photoCredit" | "photoOwned">>;
+
 /** How a guest gets from one house to a pick: a short walk, or a drive. */
 export type Travel =
   { mode: "walk"; minutes: number } | { mode: "drive"; minutes: number | null };
@@ -44,11 +48,11 @@ export function sortPicksNear<T extends TravelPick>(
 
 /**
  * Checks the per-file schema cannot make: unique pick ids, a drive time (or
- * an explicit null) from every house, and walk times only for real houses.
- * Throws on the first problem.
+ * an explicit null) from every house, walk times only for real houses, and a
+ * credit for every photo the hosts do not own. Throws on the first problem.
  */
 export function assertAreaPicksValid(
-  picks: readonly TravelPick[],
+  picks: readonly CheckedPick[],
   houseSlugs: readonly string[],
 ): void {
   const slugs = [...houseSlugs].sort();
@@ -70,6 +74,11 @@ export function assertAreaPicksValid(
           `content/area.ts: pick "${pick.id}" has walkMinutes for unknown house "${slug}"`,
         );
       }
+    }
+    if (pick.photo && !pick.photoCredit && !pick.photoOwned) {
+      throw new Error(
+        `content/area.ts: pick "${pick.id}" has a photo but no photoCredit (set photoOwned: true if the hosts took it)`,
+      );
     }
   }
 }
