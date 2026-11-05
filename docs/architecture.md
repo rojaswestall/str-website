@@ -185,7 +185,12 @@ fails `next build` and `pnpm check:content`. **Always import from
   (`check:content` enforces that from the alt text). Resized from the hosts'
   originals: 2400 px long edge for heroes, 1600 px for the gallery, JPEG q80,
   metadata stripped; frames crop to 3:2. `home/hero-collage.jpg` is the real
-  21:9 collage. The 1:1 area photos are still striped placeholders.
+  21:9 collage. Area-guide photos are 3:2 like the gallery, 1200 px long
+  edge (they only fill a card), JPEG q80, in `public/photos/area/<pick-id>.jpg`;
+  most are Wikimedia Commons or Flickr photos under CC/public-domain licences,
+  credited on the card from `photoCredit` (`check:content` fails on a photo
+  with no credit unless `photoOwned` is set). A pick with no photo shows the
+  striped placeholder.
 - **Guest quotes**: three per house from Airbnb reviews in
   `content/properties.ts` (author and month optional). Ratings and review
   counts were refreshed from the listings on 2026-10-12.

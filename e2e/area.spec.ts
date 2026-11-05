@@ -13,19 +13,61 @@ test.describe("area guide", () => {
     ).toBeVisible();
 
     const picks = page.getByTestId("area-picks").locator("article");
-    await expect(picks).toHaveCount(3);
-    for (const [index, id] of ["eat", "outdoors", "local"].entries()) {
+    await expect(picks.first()).toBeVisible();
+    const count = await picks.count();
+    for (let index = 0; index < count; index++) {
       const pick = picks.nth(index);
-      await expect(pick).toHaveAttribute("id", id);
+      await expect(pick).toHaveAttribute("id", /^[a-z0-9-]+$/);
       const times = pick.getByTestId("drive-times");
       // One row per house, in content order.
       await expect(times.locator("dt")).toHaveText(HOUSES);
-      // Unconfirmed times render as the dashed t.b.c. gap, never a number.
-      await expect(times.locator("dd")).toHaveText([
-        "t.b.c.",
-        "t.b.c.",
-        "t.b.c.",
-      ]);
+      // Each time is a confirmed number or the dashed t.b.c. gap.
+      for (const dd of await times.locator("dd").all()) {
+        await expect(dd).toHaveText(/^(\d+ min( drive| walk)?|t\.b\.c\.)$/);
+      }
+    }
+  });
+
+  test("shows a walk time instead of the drive for a house that is close", async ({
+    page,
+  }) => {
+    await page.goto("/area");
+    const walks = page.locator(
+      '[data-testid="drive-times"] [data-mode="walk"]',
+    );
+    // At least one pick is listed as walkable from some house.
+    await expect(walks.first()).toBeVisible();
+    for (const row of await walks.all()) {
+      await expect(row.locator("dd")).toHaveText(/^\d+ min walk$/);
+    }
+    // Drive rows never read as walks.
+    for (const row of await page
+      .locator('[data-testid="drive-times"] [data-mode="drive"] dd')
+      .all()) {
+      await expect(row).not.toHaveText(/walk/);
+    }
+  });
+
+  test("pick photos load at 3:2 and carry a credit line", async ({ page }) => {
+    await page.goto("/area");
+    const cards = page.getByTestId("area-picks").locator("article");
+    const withPhoto = cards.filter({ has: page.locator("img") });
+    await expect(withPhoto.first()).toBeVisible();
+    for (const card of await withPhoto.all()) {
+      const img = card.locator("img").first();
+      await img.scrollIntoViewIfNeeded();
+      // Loaded, not a broken image.
+      await expect
+        .poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
+        .toBeGreaterThan(0);
+      // The frame is 3:2 (within a pixel of rounding).
+      const box = await img.boundingBox();
+      expect(box).not.toBeNull();
+      expect(Math.abs(box!.width / box!.height - 1.5)).toBeLessThan(0.02);
+      await expect(img).toHaveAttribute("alt", /\S/);
+      const credit = card.getByTestId("photo-credit");
+      await expect(credit).toContainText(/^Photo:/);
+      await expect(credit.locator("a")).toHaveAttribute("href", /^https:\/\//);
     }
   });
 
