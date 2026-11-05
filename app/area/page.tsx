@@ -57,7 +57,8 @@ export default function AreaPage() {
           Oak Hill sits on the southwest edge of town and the other two houses
           are in South Austin, so the same place can be a short hop from one and
           a longer drive from another. Every pick lists the drive time from each
-          house; look for the one you&apos;re booking.
+          house, or the walk when it&apos;s close; look for the one you&apos;re
+          booking.
         </p>
       </header>
 

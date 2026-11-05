@@ -168,11 +168,10 @@ named, then run `pnpm check:content`. See "Editing content" in
       Hospitable Direct payment setup).
 - [ ] Host bios: one line each for Alexis, Gabe, and Aaron, and whether to
       show photos (`content/hosts.ts`).
-- [ ] Area-guide picks: name, one or two sentences, a 1:1 photo you own, and
-      drive minutes from **each** house (`content/area.ts`, `driveMinutes`
-      keyed by slug; `null` renders t.b.c.). More than three is fine. The
-      three photos under `public/photos/area/` are still striped
-      placeholders.
+- [x] Area-guide picks: 24 hosts' picks with drive minutes from each house
+      and walk minutes where close (`content/area.ts`).
+- [ ] Area-guide photos: picks have no `photo` yet, so each card shows the
+      striped placeholder. Add 1:1 photos the hosts own.
 - [ ] The live domain in `site.domain` (`content/site.ts`; still `[TBC]`).
 - [ ] Confirm you hold the rights to every photo in `public/photos/`.
 - [ ] Brand assets: wordmark (text-only is fine), favicon, default OG image.
