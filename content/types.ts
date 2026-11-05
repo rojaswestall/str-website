@@ -172,6 +172,12 @@ export const AreaPickSchema = z.object({
    * "t.b.c." until the hosts confirm it.
    */
   driveMinutes: z.record(z.string(), z.number().int().positive().nullable()),
+  /**
+   * Walking time in minutes, keyed by property slug, for houses the place is
+   * a short walk from. Where set it is shown instead of the drive time for
+   * that house. Leave a house out when it is not a comfortable walk.
+   */
+  walkMinutes: z.record(z.string(), z.number().int().positive()).optional(),
   link: z.url().optional(),
   photo: ImageSchema.optional(),
 });

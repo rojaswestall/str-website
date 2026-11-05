@@ -23,7 +23,7 @@ test.describe("area guide", () => {
       await expect(times.locator("dt")).toHaveText(HOUSES);
       // Each time is a confirmed number or the dashed t.b.c. gap.
       for (const dd of await times.locator("dd").all()) {
-        await expect(dd).toHaveText(/^(\d+ min( drive)?|t\.b\.c\.)$/);
+        await expect(dd).toHaveText(/^(\d+ min( drive| walk)?|t\.b\.c\.)$/);
       }
     }
   });

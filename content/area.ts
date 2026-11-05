@@ -126,6 +126,31 @@ export const areaPicks: AreaPick[] = [
     driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
   },
   {
+    title: "Jack Allen's Kitchen",
+    id: "jack-allens",
+    kind: "eat",
+    blurb:
+      "Oak Hill's Southern comfort-food classic on Highway 71, with a deep bourbon list and happy-hour margaritas.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
+    title: "Twin Falls & Sculpture Falls",
+    id: "twin-falls",
+    kind: "outdoors",
+    blurb:
+      "The Barton Creek Greenbelt's best-known hike: about three miles out and back from a trailhead off Mopac, with swimming holes at both falls. Twin Falls is half a mile in, down a rocky stretch. After a dry spell the creek can stop running, so check before you go.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
+    title: "Lady Bird Johnson Wildflower Center",
+    id: "wildflower-center",
+    kind: "outdoors",
+    blurb:
+      "Gardens and trails of Texas native plants, minutes from Oak Hill. Spring wildflower season is the showstopper, but it's a good half-day any time of year. Tickets are sold on their site.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://www.wildflower.org/visit",
+  },
+  {
     title: "Mary Moore Searight Metro Park",
     id: "mary-moore-searight",
     kind: "outdoors",

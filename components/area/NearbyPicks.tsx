@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { MonoHeading } from "@/components/property/MonoHeading";
 import { TbcText } from "@/components/ui";
-import { getAreaPicksNear, type Property } from "@/content";
+import { getAreaPicksNear, getTravel, type Property } from "@/content";
 import { KIND_LABEL } from "./AreaPickCard";
-import { DriveTime } from "./DriveTimes";
+import { TravelTime } from "./DriveTimes";
 
 /**
- * "Near this house" on a property page: the closest area-guide picks by drive
- * time from this house, each linking to its entry on /area, which shows the
+ * "Near this house" on a property page: the closest area-guide picks from
+ * this house (walkable ones first, then by drive time), each linking to its entry on /area, which shows the
  * times from every house.
  */
 export function NearbyPicks({
@@ -39,7 +39,7 @@ export function NearbyPicks({
               <TbcText value={pick.title} />
             </Link>
             <span className="font-mono text-[0.74rem] tracking-[0.04em] text-ink tabular-nums">
-              <DriveTime minutes={pick.driveMinutes[property.slug]} />
+              <TravelTime travel={getTravel(pick, property.slug)} />
             </span>
             <span className="col-span-2 font-mono text-[0.7rem] tracking-[0.06em] text-muted uppercase">
               {KIND_LABEL[pick.kind]}

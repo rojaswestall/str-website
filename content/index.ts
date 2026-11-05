@@ -13,6 +13,7 @@ import { site as rawSite } from "./site";
 import { z } from "zod";
 
 import {
+  type AreaPick,
   AreaPicksSchema,
   FaqRowsSchema,
   HostsSchema,
@@ -66,6 +67,13 @@ const propertiesBySlug = new Map(properties.map((p) => [p.slug, p]));
         `content/area.ts: pick "${pick.id}" needs driveMinutes for exactly ${slugs.join(", ")} (has ${keys.join(", ") || "none"})`,
       );
     }
+    for (const slug of Object.keys(pick.walkMinutes ?? {})) {
+      if (!slugs.includes(slug)) {
+        throw new Error(
+          `content/area.ts: pick "${pick.id}" has walkMinutes for unknown house "${slug}"`,
+        );
+      }
+    }
   }
 }
 
@@ -99,18 +107,32 @@ export function getAreaPicks() {
   return areaPicks;
 }
 
+/** How a guest gets from one house to a pick: a short walk, or a drive. */
+export type Travel =
+  { mode: "walk"; minutes: number } | { mode: "drive"; minutes: number | null };
+
+/** Walk time from this house when the pick lists one, otherwise drive time. */
+export function getTravel(pick: AreaPick, slug: string): Travel {
+  const walk = pick.walkMinutes?.[slug];
+  if (walk !== undefined) return { mode: "walk", minutes: walk };
+  return { mode: "drive", minutes: pick.driveMinutes[slug] ?? null };
+}
+
 /**
- * Picks ordered by drive time from one house, closest first. Picks without a
- * confirmed time for that house keep their content order, after the timed ones.
+ * Picks ordered by how close they are to one house: walkable picks first
+ * (shortest walk first), then by drive time. Picks without a confirmed time
+ * for that house keep their content order, after the timed ones.
  */
 export function getAreaPicksNear(slug: string) {
+  const rank = (travel: Travel) =>
+    travel.minutes === null
+      ? Number.POSITIVE_INFINITY
+      : travel.mode === "walk"
+        ? travel.minutes - 10_000
+        : travel.minutes;
   return areaPicks
-    .map((pick, index) => ({ pick, index, minutes: pick.driveMinutes[slug] }))
-    .sort(
-      (a, b) =>
-        (a.minutes ?? Number.POSITIVE_INFINITY) -
-          (b.minutes ?? Number.POSITIVE_INFINITY) || a.index - b.index,
-    )
+    .map((pick, index) => ({ pick, index, rank: rank(getTravel(pick, slug)) }))
+    .sort((a, b) => a.rank - b.rank || a.index - b.index)
     .map(({ pick }) => pick);
 }
 

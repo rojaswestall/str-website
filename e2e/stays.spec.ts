@@ -249,7 +249,9 @@ test.describe("property pages", () => {
     // drive time (a number, or the t.b.c. gap until confirmed).
     for (const item of await items.all()) {
       await expect(item.locator('a[href^="/area#"]')).toHaveCount(1);
-      await expect(item).toContainText(/\d+ min drive|drive time t\.b\.c\./);
+      await expect(item).toContainText(
+        /\d+ min (drive|walk)|drive time t\.b\.c\./,
+      );
     }
     await expect(
       nearby.getByRole("link", { name: /full area guide/ }),
