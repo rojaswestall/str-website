@@ -63,7 +63,13 @@ function fakeMapKit({ rejectToken = false } = {}) {
         wrap.append(delegate.calloutElementForAnnotation(annotation));
         this.element.append(wrap);
       }
-      showItems(items) { this.element.dataset.shown = String(items.length); }
+      setRegionAnimated(region) {
+        const [center, span] = region.args;
+        this.element.dataset.region = JSON.stringify({
+          latitude: center.latitude, longitude: center.longitude,
+          latitudeDelta: span.args[0], longitudeDelta: span.args[1],
+        });
+      }
       destroy() { this.destroyed = true; this.element.replaceChildren(); }
     }
     FakeMap.ColorSchemes = { Light: "light", Dark: "dark" };
@@ -77,7 +83,7 @@ function fakeMapKit({ rejectToken = false } = {}) {
       MarkerAnnotation,
       Coordinate,
       CoordinateSpan: Simple,
-      Padding: Simple,
+      CoordinateRegion: Simple,
       CameraZoomRange: Simple,
       FeatureVisibility,
       addEventListener(type, listener) {
@@ -162,9 +168,22 @@ test.describe("city map on Apple Maps (MapKit token set)", () => {
         map.locator(`[data-testid="fake-marker"][data-slug="${slug}"]`),
       ).toHaveCount(1);
     }
-    await expect(map.locator("[data-fake-map]")).toHaveAttribute(
-      "data-shown",
-      "3",
+    // Opens framed on the houses plus downtown (lib/map-frame.ts): the Capitol
+    // north-east of centre, every house south-west of it.
+    const region = JSON.parse(
+      (await map.locator("[data-fake-map]").getAttribute("data-region")) ??
+        "{}",
+    ) as {
+      latitude: number;
+      longitude: number;
+      latitudeDelta: number;
+      longitudeDelta: number;
+    };
+    expect(region.latitude).toBeLessThan(30.2747);
+    expect(region.longitude).toBeLessThan(-97.7404);
+    expect(region.latitude + region.latitudeDelta / 2).toBeGreaterThan(30.2747);
+    expect(region.longitude + region.longitudeDelta / 2).toBeGreaterThan(
+      -97.7404,
     );
 
     // Nothing highlighted on the home page: every marker is ink.

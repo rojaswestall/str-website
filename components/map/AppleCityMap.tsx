@@ -18,6 +18,7 @@ import {
   type MapKitErrorEvent,
   type MapKitMap,
 } from "@/lib/mapkit";
+import { cityFrame } from "@/lib/map-frame";
 import { buildCallout, type MapHouse } from "./callout";
 
 type AppleCityMapProps = {
@@ -157,11 +158,21 @@ export function AppleCityMap({
           return marker;
         });
         map.addAnnotations(markers);
-        map.showItems(markers, {
-          animate: false,
-          padding: new mapkit.Padding(56, 40, 40, 40),
-          minimumSpan: new mapkit.CoordinateSpan(0.06, 0.06),
-        });
+        // Open on the houses with downtown and the river in view (lib/map-frame).
+        const frame = cityFrame(houses);
+        map.setRegionAnimated(
+          new mapkit.CoordinateRegion(
+            new mapkit.Coordinate(
+              frame.center.latitude,
+              frame.center.longitude,
+            ),
+            new mapkit.CoordinateSpan(
+              frame.latitudeDelta,
+              frame.longitudeDelta,
+            ),
+          ),
+          false,
+        );
 
         applyTheme();
         setStatus("ready");
