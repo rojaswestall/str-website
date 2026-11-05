@@ -8,6 +8,8 @@ import {
 import type { Property } from "@/content";
 import { cx } from "@/lib/cx";
 
+import { AirbnbTitle } from "./AirbnbTitle";
+
 /** The house itself: sleeps, bedrooms, beds, baths. */
 export function propertyRoomItems(property: Property): SpecItem[] {
   return [
@@ -81,6 +83,7 @@ export function PropertyBand({
         >
           {property.name}
         </h3>
+        <AirbnbTitle title={property.airbnbTitle} className="-mt-2" />
         <Credential
           rating={property.rating}
           reviewCount={property.reviewCount}

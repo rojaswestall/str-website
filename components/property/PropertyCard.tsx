@@ -3,6 +3,8 @@ import { Credential, PhotoFrame } from "@/components/ui";
 import type { Property } from "@/content";
 import { cx } from "@/lib/cx";
 
+import { AirbnbTitle } from "./AirbnbTitle";
+
 /** Compact card: hero photo, place line, name (the link), credential, and the one-line summary. */
 export function PropertyCard({
   property,
@@ -33,6 +35,7 @@ export function PropertyCard({
           {property.name}
         </Link>
       </h3>
+      <AirbnbTitle title={property.airbnbTitle} className="-mt-[0.4rem]" />
       <Credential
         rating={property.rating}
         reviewCount={property.reviewCount}
