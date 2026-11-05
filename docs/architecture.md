@@ -198,6 +198,10 @@ fails `next build` and `pnpm check:content`. **Always import from
 - **Map pins** are `mapPin: { x, y }` in `CitySketch`'s 400×400 viewBox, and
   `mapArea: { latitude, longitude }` on the Apple map: a neighbourhood-level
   point, never the street address (the map also caps zoom at about 2.5 km).
+  The two Dan Jean units are one building; their pins sit about 500 m apart
+  so each can be tapped. Each pin is labelled with `shortName`, and the map
+  opens on a fixed frame (`lib/map-frame.ts`) that includes downtown and
+  the river, with the houses in the south-west.
 - **Area picks** carry an `id` (for `/area#<id>` anchors) and `driveMinutes`
   keyed by every house slug; `content/index.ts` checks ids are unique and
   every house has a time.

@@ -6,6 +6,13 @@ checkpoints, each its own PR, so a reader can see what each one added.
 
 ## Unreleased — live on the native widget
 
+- **Apple Maps city map.** With `NEXT_PUBLIC_MAPKIT_TOKEN` set, "Where we
+  are" on the home page and each house page is a live Apple map: pins
+  labelled with each house's short name, the site's own callout card on
+  tap, and an opening view that frames the houses against downtown and the
+  river. On the home page its top lines up with the search box. Without a
+  token, or if Apple refuses it, the drawn SVG map shows as before.
+
 - **Production runs the native widget.** On 2026-11-05 the hosts switched
   Production's `NEXT_PUBLIC_HOSPITABLE_MODE` to `native`, so the home-page
   bar, the house pages and `/search` are now the site's own for guests, as
