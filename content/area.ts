@@ -151,6 +151,65 @@ export const areaPicks: AreaPick[] = [
     link: "https://www.wildflower.org/visit",
   },
   {
+    title: "Franklin Barbecue",
+    id: "franklin",
+    kind: "eat",
+    blurb:
+      "The most famous brisket in Texas, on East 11th. The line forms before the 11am opening and the meat sells out by mid-afternoon, so bring a chair, or skip the wait by preordering on their site. Closed Mondays.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://franklinbbq.com/",
+  },
+  {
+    title: "Terry Black's Barbecue",
+    id: "terry-blacks",
+    kind: "eat",
+    blurb:
+      "Big, roadhouse-style barbecue on Barton Springs Road, open every day and into the evening, so it's the easier brisket fix. Get the sliced brisket and a beef rib.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
+    title: "Barton Springs Pool",
+    id: "barton-springs",
+    kind: "outdoors",
+    blurb:
+      "Austin's spring-fed swimming hole in Zilker Park, cool and clear all year. Buy tickets ahead in the city's ATXSwims app to skip the counter.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
+    title: "Paddling Lady Bird Lake",
+    id: "lady-bird-lake",
+    kind: "outdoors",
+    blurb:
+      "Rent a kayak, canoe or paddleboard at Zilker Park Boat Rentals and paddle toward the downtown skyline. Pairs well with a swim at Barton Springs next door.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
+    title: "The Congress Avenue Bridge bats",
+    id: "bats",
+    kind: "local",
+    blurb:
+      "At sunset in the warm months, the bats that roost under the bridge stream out over the lake. Watch free from the lawn on the southeast side of the bridge, or from a bat cruise on the water, which runs March through October.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://tpwd.texas.gov/huntwild/wild/species/bats/bat-watching-sites/congress-avenue-bridge.phtml",
+  },
+  {
+    title: "The Continental Club",
+    id: "continental-club",
+    kind: "local",
+    blurb:
+      "A small, legendary live-music room on South Congress. If you want to hear a band tonight, start here.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+    link: "https://continentalclub.com/",
+  },
+  {
+    title: "Mount Bonnell",
+    id: "mount-bonnell",
+    kind: "outdoors",
+    blurb:
+      "A short climb up stone steps to the best sunset view in town, over the river and the west hills. Go about half an hour before sundown.",
+    driveMinutes: { "oak-hill": null, "south-austin": null, "fire-side": null },
+  },
+  {
     title: "Mary Moore Searight Metro Park",
     id: "mary-moore-searight",
     kind: "outdoors",
