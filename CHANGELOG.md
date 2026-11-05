@@ -4,6 +4,13 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
+## Unreleased — Airbnb listing titles as subtitles
+
+- Each house's Airbnb listing title (`airbnbTitle` in
+  `content/properties.ts`) appears as a subtitle under its short name on the
+  home-page cards and bands, the house page header, and the `/search` result
+  cards. The short names stay the headings, titles and URLs.
+
 ## Unreleased — live on the native widget
 
 - **Production runs the native widget.** On 2026-11-05 the hosts switched

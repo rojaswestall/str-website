@@ -92,6 +92,8 @@ export const PropertySchema = z
     name: nonEmpty,
     /** Short label for nav, map legend, and tight layouts. */
     shortName: nonEmpty,
+    /** The listing's title on Airbnb, shown as a subtitle under `name`. */
+    airbnbTitle: nonEmpty,
     neighborhood: nonEmpty,
     /** The mono line above the name, e.g. "Oak Hill, Austin · off Hwy 290 & 71". */
     locationLine: nonEmpty,

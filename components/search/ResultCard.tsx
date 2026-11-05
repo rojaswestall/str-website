@@ -1,4 +1,6 @@
+import { AirbnbTitle } from "@/components/property/AirbnbTitle";
 import { Button, PhotoFrame } from "@/components/ui";
+import { getProperty } from "@/content";
 import { formatDollars, plural } from "@/lib/booking/format";
 import type { Guests } from "@/lib/booking/rules";
 import { houseHref, refusalText } from "@/lib/booking/search";
@@ -44,6 +46,7 @@ export function ResultCard({
 }) {
   const headingId = `result-${house.slug}`;
   const free = stay?.available === true;
+  const airbnbTitle = getProperty(house.slug)?.airbnbTitle;
   return (
     <article
       aria-labelledby={headingId}
@@ -76,6 +79,9 @@ export function ResultCard({
       >
         {house.name}
       </h3>
+      {airbnbTitle ? (
+        <AirbnbTitle title={airbnbTitle} className="-mt-[0.4rem]" />
+      ) : null}
       <p className="font-mono text-[0.78rem] tracking-[0.04em] text-muted">
         {house.bedrooms} bed · {house.bathrooms} bath · up to {house.maxGuests}{" "}
         guests

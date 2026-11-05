@@ -186,6 +186,12 @@ fails `next build` and `pnpm check:content`. **Always import from
   originals: 2400 px long edge for heroes, 1600 px for the gallery, JPEG q80,
   metadata stripped; frames crop to 3:2. `home/hero-collage.jpg` is the real
   21:9 collage. The 1:1 area photos are still striped placeholders.
+- **Airbnb titles**: each property's `airbnbTitle` is its listing title on
+  Airbnb, copied by hand. `AirbnbTitle` shows it as a subtitle under the
+  short house name on the home cards and bands, the house page header and
+  the `/search` result cards, so a guest who found a house on Airbnb
+  recognises it here. The short names stay the headings, page titles and
+  URLs. Update the content when a listing is retitled on Airbnb.
 - **Guest quotes**: three per house from Airbnb reviews in
   `content/properties.ts` (author and month optional). Ratings and review
   counts were refreshed from the listings on 2026-10-12.
