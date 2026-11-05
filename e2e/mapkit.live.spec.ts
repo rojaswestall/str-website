@@ -47,6 +47,7 @@ function fakeMapKit({ rejectToken = false } = {}) {
           button.type = "button";
           button.dataset.testid = "fake-marker";
           button.dataset.slug = annotation.data.slug;
+          button.dataset.titleVisibility = annotation.titleVisibility;
           button.textContent = annotation.title;
           button.addEventListener("click", () => this.select(annotation));
           this.element.append(button);
@@ -163,6 +164,11 @@ test.describe("city map on Apple Maps (MapKit token set)", () => {
 
     const markers = map.getByTestId("fake-marker");
     await expect(markers).toHaveCount(3);
+    // Each pin is labelled with the house's short name, shown under it.
+    await expect(markers).toHaveText(["Oak Hill", "South Austin", "Fire Side"]);
+    for (const marker of await markers.all()) {
+      await expect(marker).toHaveAttribute("data-title-visibility", "adaptive");
+    }
     for (const slug of ["oak-hill", "south-austin", "fire-side"]) {
       await expect(
         map.locator(`[data-testid="fake-marker"][data-slug="${slug}"]`),
@@ -209,7 +215,7 @@ test.describe("city map on Apple Maps (MapKit token set)", () => {
     const map = page.getByTestId("city-map");
     await expect(map).toHaveAttribute("data-map-status", "ready");
 
-    await map.getByRole("button", { name: "Fire Side Home" }).click();
+    await map.getByRole("button", { name: "Fire Side" }).click();
     const callout = map.getByTestId("map-callout");
     await expect(callout).toHaveCount(1);
     await expect(callout).toHaveAttribute("data-slug", "fire-side");
@@ -256,7 +262,7 @@ test.describe("city map on Apple Maps (MapKit token set)", () => {
       map.locator("[data-map-pin][data-highlighted]"),
     ).toHaveAttribute("data-map-pin", "south-austin");
 
-    await map.getByRole("button", { name: "South Austin Stay" }).click();
+    await map.getByRole("button", { name: "South Austin" }).click();
     const callout = map.getByTestId("map-callout");
     await expect(callout).toContainText("You're looking at this one");
     await expect(callout.getByRole("link")).toHaveCount(0);

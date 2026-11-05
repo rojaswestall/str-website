@@ -147,8 +147,12 @@ export function AppleCityMap({
           const marker = new mapkit.MarkerAnnotation(
             new mapkit.Coordinate(house.latitude, house.longitude),
             {
-              title: house.name,
-              titleVisibility: mapkit.FeatureVisibility.Hidden,
+              // The short name shows under the pin, so a visitor can tell the
+              // houses apart without tapping (phones have no hover). Adaptive:
+              // Apple hides it while the callout is open or when it would
+              // collide with another label.
+              title: house.shortName,
+              titleVisibility: mapkit.FeatureVisibility.Adaptive,
               subtitleVisibility: mapkit.FeatureVisibility.Hidden,
               callout,
               data: house,
