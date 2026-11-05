@@ -174,6 +174,18 @@ export const areaPicks: AreaPick[] = [
       "A big neighborhood park just up Manchaca with a city pool: a 50-meter pool, a diving board and a wading pool for little ones. The pool is open in the summer season only.",
     driveMinutes: { "oak-hill": 11, "south-austin": 4, "fire-side": 4 },
     link: "https://austintexas.gov/parks/locations/garrison-pool",
+    photo: {
+      src: "/photos/area/garrison-park.jpg",
+      alt: "Representative photo: the view from a diving board over an outdoor pool (not taken at Garrison Pool)",
+      width: 1200,
+      height: 800,
+    },
+    photoCredit: {
+      author: "Citizen D",
+      license: "CC BY-SA 3.0",
+      source:
+        "https://commons.wikimedia.org/wiki/File:Rippon_Lea_swimming_pool.jpg",
+    },
   },
   {
     title: "Sunrise at Shore & Shore Raw Bar",
@@ -205,6 +217,18 @@ export const areaPicks: AreaPick[] = [
     driveMinutes: { "oak-hill": 1, "south-austin": 13, "fire-side": 13 },
     walkMinutes: { "oak-hill": 13 },
     link: "https://escuelafarm.com/",
+    photo: {
+      src: "/photos/area/escuela-farms.jpg",
+      alt: "Representative photo: tomatoes ripening on the vine in a farm garden (not taken at Escuela Farms)",
+      width: 1200,
+      height: 800,
+    },
+    photoCredit: {
+      author: "NRCS Oregon",
+      license: "CC BY 2.0",
+      source:
+        "https://commons.wikimedia.org/wiki/File:Blackberry_Bog_Farm_-_52435807189.jpg",
+    },
   },
   {
     title: "La Popular",
@@ -235,6 +259,18 @@ export const areaPicks: AreaPick[] = [
       "Live-fire grill at Lantana Place: the bacon-wrapped, cherry-smoked filet is the order, and weekend brunch is good too.",
     driveMinutes: { "oak-hill": 6, "south-austin": 17, "fire-side": 17 },
     link: "https://www.carveamericangrille.com/",
+    photo: {
+      src: "/photos/area/carve.jpg",
+      alt: "Representative photo: grilled steak on a wooden board (not taken at CARVE)",
+      width: 1200,
+      height: 800,
+    },
+    photoCredit: {
+      author: "Nenad Stojkovic",
+      license: "CC BY 4.0",
+      source:
+        "https://commons.wikimedia.org/wiki/File:Grilled_steak_served_with_orange_slices_and_sauce_on_wooden_board_-_Flickr_-_nenadstojkovicart.jpg",
+    },
   },
   {
     title: "Moviehouse & Eatery by Cinépolis",
