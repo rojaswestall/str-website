@@ -5,11 +5,11 @@ run by Alexis, Gabe, and Aaron. Guests pick dates and see a price on the
 site's own booking widget, then pay on Hospitable's hosted checkout; Airbnb
 stays available as a secondary link.
 
-**Status:** built and green in CI, with the Vercel project and domain set
-up. The native widget runs on Vercel Preview; Production still embeds
-Hospitable's widget until the go-live steps in [`docs/plan.md`](docs/plan.md)
-are done. Resend (contact email), the enforcing CSP, and the content still to
-confirm are there too. Changes are listed in [`CHANGELOG.md`](CHANGELOG.md).
+**Status:** live. Since 2026-11-05 Production and Preview both run the
+site's own booking widget and search (`NEXT_PUBLIC_HOSPITABLE_MODE=native`).
+Still open from the go-live checklist in [`docs/plan.md`](docs/plan.md):
+Resend (contact email), the enforcing CSP, and the content still to
+confirm. Changes are listed in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Stack
 
@@ -68,7 +68,17 @@ calendar (labelled as such; nights only, before fees and taxes). Hospitable
 has no search endpoint and none is called, and no quote is created by a
 search. A house page accepts the same parameters
 (`/stays/<slug>?checkin=…&checkout=…&adults=…`) and quotes the stay on
-arrival when the calendar allows it; whatever does not hold is dropped.
+arrival when the calendar allows it; whatever does not hold is dropped. In
+`native` mode the home hero's bar is the site's own form
+(`components/search/SearchBar.tsx`), a plain GET to `/search` with those
+parameters that works without JavaScript and, hydrated, picks the dates
+and guests with the widget's own calendar and picker. `/search` then
+renders the answer on the server (`components/search/SearchResults.tsx`):
+the same bar prefilled from the URL and a card per house, the free ones
+first with the estimate and a button that carries the stay to the house
+page, the others with the reason and a link to the house's calendar. In
+`stub` and `hospitable` modes the bar and `/search` are the stub and
+Hospitable's embed, as before.
 
 **Markups** come from Hospitable (each property's `listing_markups`, per
 channel). To change what guests pay, change the direct markup in
@@ -87,7 +97,9 @@ the catalog and calendar read on the server so the first HTML already holds
 the priced calendar. `<BookingWidget />` with no `propertyId` renders a
 switcher over every bookable house. It emits bubbling DOM `CustomEvent`s
 (`widget_loaded`, `dates_selected`, `quote_shown`, `comparison_shown`,
-`reserve_clicked`) that `BookingAnalytics` forwards to Vercel Web Analytics.
+`reserve_clicked`) that `BookingAnalytics` forwards to Vercel Web Analytics
+as `booking_<event>`; the home-page search bar's `search_submitted` travels
+the same way.
 
 **Rules the code keeps.** The access token is read in `lib/booking/client.ts`
 only (`server-only`), never logged, never sent to the browser, never in git
@@ -100,16 +112,23 @@ in [`.env.example`](.env.example) and explained in
 
 ## Documentation
 
+The docs are the brief: work in progress is specified in a feature doc (the
+native search had `docs/search.md` until it shipped and was folded into
+`docs/architecture.md`), and the PR that ships a step describes the result
+in the other docs in the same change ("Documentation" in
+[`docs/development.md`](docs/development.md) says which file gets what).
+There are no prompt files.
+
 - [`docs/development.md`](docs/development.md) — setup, environment
-  variables, scripts, the test suite and its gotchas, CI, and how to edit
-  content.
+  variables, scripts, the test suite and its gotchas, CI, how to edit
+  content, the rules for booking code, and how the docs are kept.
 - [`docs/architecture.md`](docs/architecture.md) — what is built: routes,
   components, the content model, theming, the Hospitable integration, the
   contact API, the booking widget and API, SEO, and the CSP.
 - [`docs/hospitable-discovery.md`](docs/hospitable-discovery.md) — what the
   Hospitable Public API returns, verified against the live account.
-- [`docs/plan.md`](docs/plan.md) — remaining work only: go-live checklist,
-  `[TBC]` content, open decisions, engineering follow-ups.
+- [`docs/plan.md`](docs/plan.md) — the original go-live checklist (Vercel,
+  Hospitable, Resend, `[TBC]` content). No longer maintained.
 - `design/artifact.html` — the static visual reference. Open it in a
   browser; do not edit it.
 - `AGENTS.md` — pointer for coding agents to the Next 16 docs bundled in

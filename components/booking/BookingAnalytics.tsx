@@ -9,6 +9,8 @@ import { type ReactNode, useEffect, useRef } from "react";
  * about analytics; any other listener on the page can use the same events.
  * Details are flattened to the primitive values `track` accepts. None of the
  * events carries guest details, so nothing personal can leave the page here.
+ * `search_submitted` comes from the home-page search bar (components/search),
+ * which mounts inside the same wrapper.
  */
 
 export const BOOKING_EVENTS = [
@@ -17,6 +19,7 @@ export const BOOKING_EVENTS = [
   "quote_shown",
   "comparison_shown",
   "reserve_clicked",
+  "search_submitted",
 ] as const;
 
 type Primitive = string | number | boolean | null;

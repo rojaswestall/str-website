@@ -5,7 +5,12 @@ import { getAllProperties, getSite, type Property } from "@/content";
 import { cached } from "./cache";
 import { hospitableFetch } from "./client";
 import { getBookingConfig } from "./config";
-import { addMonths, nightsBetween, todayInBookingZone } from "./dates";
+import {
+  addMonths,
+  CALENDAR_WINDOW_MONTHS,
+  nightsBetween,
+  todayInBookingZone,
+} from "./dates";
 import { markupPct, normalizeCalendar, normalizeQuote } from "./normalize";
 import type { ParsedQuoteRequest } from "./schema";
 import { evaluateStay } from "./search";
@@ -28,8 +33,7 @@ import { UpstreamPropertyListSchema } from "./upstream";
 
 const PROPERTIES_TTL_MS = 60 * 60 * 1000;
 const CALENDAR_TTL_MS = 5 * 60 * 1000;
-/** How far ahead the calendar is read; also the cap on any requested range. */
-export const CALENDAR_WINDOW_MONTHS = 18;
+export { CALENDAR_WINDOW_MONTHS };
 
 function contentByHospitableId(): Map<string, Property> {
   const map = new Map<string, Property>();
