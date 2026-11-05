@@ -4,7 +4,20 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
-## Unreleased — native search, checkpoint 3: the `/search` results page
+## Unreleased — live on the native widget
+
+- **Production runs the native widget.** On 2026-11-05 the hosts switched
+  Production's `NEXT_PUBLIC_HOSPITABLE_MODE` to `native`, so the home-page
+  bar, the house pages and `/search` are now the site's own for guests, as
+  they already were on Preview. No code changed for it; the `hospitable`
+  embed stays in the codebase and the test suite.
+- **Docs.** The native search is complete, so `docs/search.md` was folded
+  into the "Search" section of `docs/architecture.md` (decisions and open
+  questions) and deleted. The status paragraphs in `README.md` and
+  `docs/architecture.md` say the site is live; the four entries below that
+  merged to `main` together in #47 are dated.
+
+## 2026-11-05 — native search, checkpoint 3: the `/search` results page (#50, to `main` in #47)
 
 The last of three checkpoints replacing Hospitable's embedded search with
 the site's own, in `native` mode only (`docs/search.md`). `stub` and
@@ -50,7 +63,7 @@ embed inside the same page, fully static.
   a month and failed that day; they now use the same always-future stay as
   the new tests.
 
-## Unreleased — native search, checkpoint 2: the home-page search bar
+## 2026-11-05 — native search, checkpoint 2: the home-page search bar (#49, to `main` in #47)
 
 The second of three checkpoints replacing Hospitable's embedded search with
 the site's own, in `native` mode only (`docs/search.md`). `stub` and
@@ -83,7 +96,7 @@ checkpoint 3.
   in `search.test.ts`; the bar end to end in `search.native.spec.ts`,
   including a `javaScriptEnabled: false` context.
 
-## Unreleased — checkpoint 1 written up to the documentation pattern
+## 2026-11-05 — checkpoint 1 written up to the documentation pattern (#48, to `main` in #47)
 
 - Docs only. `docs/architecture.md` no longer says the widget's API is
   "three routes", and the `/api/availability` entry now records what a
@@ -93,7 +106,7 @@ checkpoint 3.
   masquerading as your build; the availability limit test and reused
   servers).
 
-## Unreleased — the docs are the brief
+## 2026-11-05 — the docs are the brief (#47)
 
 - The native-search brief moved out of `docs/prompts/` into
   `docs/search.md`, the feature's doc: decisions, what is built, the

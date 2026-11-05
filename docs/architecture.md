@@ -1,8 +1,8 @@
 # Architecture and current state
 
-What the site is and how it is built, as of October 2026. For running and
-testing it, see [`development.md`](development.md); for what is left to do,
-see [`plan.md`](plan.md).
+What the site is and how it is built, as of November 2026. For running and
+testing it, see [`development.md`](development.md); the original go-live
+checklist is [`plan.md`](plan.md), no longer maintained.
 
 ## What the site does
 
@@ -14,12 +14,13 @@ secondary link. The look is ported from the "Keep Austin Staying" artifact
 (`design/artifact.html`): warm paper palette, Newsreader headlines, IBM Plex
 Sans body, IBM Plex Mono labels, plus a dark mode.
 
-**Status:** feature-complete and green in CI; the Vercel project and custom
-domain are set up. Not yet live for guests: Resend is not set up (the contact
-form runs dry and delivers nothing), the CSP is still report-only, and some
-copy is still `[TBC]` (rates, policies, host bios, area picks). The repo
-default for Hospitable is `stub` mode; production turns on `hospitable` through
-`NEXT_PUBLIC_HOSPITABLE_MODE`. See [`plan.md`](plan.md).
+**Status:** live on the site's own booking widget and search since
+2026-11-05: Production and Preview both run `native` through
+`NEXT_PUBLIC_HOSPITABLE_MODE` (the repo default is `stub`; `hospitable`, the
+embedded widget, is kept and tested but no longer deployed). Still open from
+[`plan.md`](plan.md): Resend is not set up (the contact form runs dry and
+delivers nothing), the CSP is still report-only, and some copy is still
+`[TBC]` (rates, policies, host bios, area picks).
 
 ## Stack and key decisions
 
@@ -451,9 +452,47 @@ The site's own search replaces Hospitable's embedded bar and results page in
 `native` mode only: the availability route and the house-page prefill
 (above), the home-page bar and the `/search` results (below). `SearchWidget`
 is the switch; in `stub` and `hospitable` modes it renders the stub or the
-embed as before and never reads the URL. The decisions (URL contract, one
-set of rules, estimates vs. the quote, server-rendered results, mode
-switch) and the open questions are in [`search.md`](search.md).
+embed as before and never reads the URL. It shipped in three checkpoints
+(#46, #49, #50; the feature doc `search.md` that specified them was folded
+into this section when the last one shipped).
+
+**Decisions.**
+
+- **URL contract.** `/search?checkin=YYYY-MM-DD&checkout=YYYY-MM-DD&adults=2&children=0&infants=0&pets=0`,
+  and the same parameters on `/stays/<slug>`. They are Hospitable's own
+  parameter names, so links keep working in `hospitable` mode, where the
+  loader reads them from the page URL. Dates are ISO in `America/Chicago`
+  (`BOOKING_TIME_ZONE`). Missing guest counts default to two adults and none
+  of the rest. A page ignores an unknown or invalid value; the route answers
+  `INVALID` with field errors.
+- **One set of rules.** A house is free for a stay when `canCheckIn` holds
+  and `checkOutVerdict` is `ok` under the same `StayLimits` the quote route
+  uses, plus `adults + children ≤ maxGuests` and `pets === 0 || petsAllowed`.
+  `lib/booking/search.ts` imports these from `rules.ts`; nothing
+  re-implements them, so search and the calendar cannot disagree.
+- **Estimates, not prices.** A result's figure is the calendar's direct
+  preview folded over the nights (`round(base × (1 + direct markup))` per
+  night, nights only, before cleaning fee and taxes), always labelled as an
+  estimate. No quote is created by a search; the quote on the house page is
+  the only number presented as the price, and the Airbnb comparison stays
+  there too.
+- **Server-rendered results.** `/search` reads the URL and renders results
+  on the server inside `Suspense` after `await connection()`, the
+  `BookingPanel` pattern; the route exists for in-page updates and tests,
+  not for the first paint.
+- **Rate limit.** The availability route reads cached calendars only and
+  never reaches Hospitable more than the calendar route would, so it shares
+  `lib/rateLimit.ts` with a looser budget than `/api/quote` (60 a minute per
+  client) and is `no-store`.
+- **Hospitable's search is never called.** There is no search endpoint in
+  the Public API v2; availability comes from the three cached calendars.
+
+Open questions, left at their defaults unless a host decides otherwise:
+results show calendar estimates and the house page quotes (rather than a
+real quote per free house on every search: three POSTs, each a quote record
+in Hospitable, slower, exact); no "next available dates" suggestion when a
+house is not free; the no-dates `/search` is not linked from the site nav
+(it stays reachable from the hero and `noindex`).
 
 **The bar.** In `native` mode `SearchWidget` renders `SearchBar`
 (`components/search/`) for the hero instead of the embed, wrapped in

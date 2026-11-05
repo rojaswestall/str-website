@@ -5,11 +5,11 @@ run by Alexis, Gabe, and Aaron. Guests pick dates and see a price on the
 site's own booking widget, then pay on Hospitable's hosted checkout; Airbnb
 stays available as a secondary link.
 
-**Status:** built and green in CI, with the Vercel project and domain set
-up. The native widget runs on Vercel Preview; Production still embeds
-Hospitable's widget until the go-live steps in [`docs/plan.md`](docs/plan.md)
-are done. Resend (contact email), the enforcing CSP, and the content still to
-confirm are there too. Changes are listed in [`CHANGELOG.md`](CHANGELOG.md).
+**Status:** live. Since 2026-11-05 Production and Preview both run the
+site's own booking widget and search (`NEXT_PUBLIC_HOSPITABLE_MODE=native`).
+Still open from the go-live checklist in [`docs/plan.md`](docs/plan.md):
+Resend (contact email), the enforcing CSP, and the content still to
+confirm. Changes are listed in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Stack
 
@@ -112,10 +112,11 @@ in [`.env.example`](.env.example) and explained in
 
 ## Documentation
 
-The docs are the brief: work in progress is specified in a feature doc
-(such as [`docs/search.md`](docs/search.md)), and the PR that ships a step
-describes the result in the other docs in the same change ("Documentation"
-in [`docs/development.md`](docs/development.md) says which file gets what).
+The docs are the brief: work in progress is specified in a feature doc (the
+native search had `docs/search.md` until it shipped and was folded into
+`docs/architecture.md`), and the PR that ships a step describes the result
+in the other docs in the same change ("Documentation" in
+[`docs/development.md`](docs/development.md) says which file gets what).
 There are no prompt files.
 
 - [`docs/development.md`](docs/development.md) — setup, environment
@@ -126,8 +127,6 @@ There are no prompt files.
   contact API, the booking widget and API, SEO, and the CSP.
 - [`docs/hospitable-discovery.md`](docs/hospitable-discovery.md) — what the
   Hospitable Public API returns, verified against the live account.
-- [`docs/search.md`](docs/search.md) — the native search: decisions, open
-  questions, and what each of its three checkpoints built.
 - [`docs/plan.md`](docs/plan.md) — the original go-live checklist (Vercel,
   Hospitable, Resend, `[TBC]` content). No longer maintained.
 - `design/artifact.html` — the static visual reference. Open it in a
