@@ -45,7 +45,10 @@ embed inside the same page, fully static.
   results → card → quoted house page; every refusal the stand-in's three
   calendars produce; the "no dates" URLs; the pending skeleton and
   back/forward; axe in both themes), and the URL parsing, links, ordering
-  and copy in `search.test.ts`.
+  and copy in `search.test.ts`. Two checkpoint 1 tests that built a stay
+  across the stand-in's reserved nights started it yesterday on the 10th of
+  a month and failed that day; they now use the same always-future stay as
+  the new tests.
 
 ## Unreleased — native search, checkpoint 2: the home-page search bar
 

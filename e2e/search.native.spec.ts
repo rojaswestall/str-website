@@ -67,6 +67,17 @@ function verdicts(results: Result[]): Record<string, string> {
   );
 }
 
+/**
+ * A stay over South Austin's reserved 10th–12th that starts in the future
+ * whatever today is: the run is looked for two days out, so the check-in,
+ * two days before the 11th, is never in the past (from `nextReservedDay(today)`
+ * it would be yesterday on the 10th of a month).
+ */
+function blockedStay(today: string) {
+  const reserved = nextReservedDay(addDays(today, 2));
+  return { checkIn: addDays(reserved, -2), checkOut: addDays(reserved, 1) };
+}
+
 test.describe("GET /api/availability", () => {
   test("answers for all three houses with calendar estimates, never cached", async ({
     request,
@@ -128,10 +139,10 @@ test.describe("GET /api/availability", () => {
     const today = todayInAustin();
 
     // Crossing South Austin's reserved 10th–12th.
-    const reserved = nextReservedDay(today);
+    const crossing = blockedStay(today);
     const blocked = await search(request, {
-      checkin: addDays(reserved, -2),
-      checkout: addDays(reserved, 1),
+      checkin: crossing.checkIn,
+      checkout: crossing.checkOut,
     });
     expect(verdicts((await blocked.json()).results)).toEqual({
       "oak-hill": "free",
@@ -309,10 +320,9 @@ test.describe("house page prefilled from the URL", () => {
 
     // A real date the calendar refuses (the stay crosses reserved nights):
     // dropped by the widget against the calendar.
-    const reserved = nextReservedDay(today);
-    const checkIn = addDays(reserved, -2);
+    const { checkIn, checkOut } = blockedStay(today);
     await page.goto(
-      `/stays/south-austin?checkin=${checkIn}&checkout=${addDays(reserved, 1)}`,
+      `/stays/south-austin?checkin=${checkIn}&checkout=${checkOut}`,
     );
     await expect(footer).toContainText("Choose a check-out date");
     await expect(
@@ -618,16 +628,6 @@ async function slugs(results: Locator): Promise<(string | null)[]> {
   return results
     .getByTestId("search-result")
     .evaluateAll((cards) => cards.map((c) => c.getAttribute("data-slug")));
-}
-
-/**
- * A stay over South Austin's reserved 10th–12th that starts in the future
- * whatever today is: the run is looked for two days out, so the check-in,
- * two days before the 11th, is never in the past.
- */
-function blockedStay(today: string) {
-  const reserved = nextReservedDay(addDays(today, 2));
-  return { checkIn: addDays(reserved, -2), checkOut: addDays(reserved, 1) };
 }
 
 test.describe("/search results page", () => {
