@@ -306,8 +306,8 @@ The code keeps them today and a change must not loosen them.
 - **Hospitable's own search is never called.** There is no search endpoint
   in the Public API v2; availability comes from the cached calendars.
 - **Never change a Vercel environment variable as part of a code change.**
-  Production's switch to the native widget is the hosts' step in
-  [`plan.md`](plan.md) §1b.
+  Production and Preview have run `native` since 2026-11-05; the hosts
+  flipped the switch themselves, and flipping it back is theirs too.
 - **`stub` and `hospitable` modes keep behaving exactly as they do.** New
   booking work is the `native` branch of the mode switch.
 - Tailwind token utilities only (`check:colors` enforces it), the existing
@@ -326,13 +326,14 @@ session is a pointer at the sections below, not a copy of them.
 
 Where each kind of change is written up:
 
-- **A feature doc** per area of work in progress, such as
-  [`search.md`](search.md): the decisions, what is built, and the remaining
-  steps as a checklist with decisions already made and open questions with
-  their defaults. Start one when a piece of work spans more than one PR;
-  the PR that ships a step moves it from "remaining" to "built" in the same
-  file and describes the result in the files below. Once the feature is
-  complete, fold the doc into `architecture.md` and delete it.
+- **A feature doc** per area of work in progress (the native search had
+  `search.md` while its three checkpoints shipped): the decisions, what is
+  built, and the remaining steps as a checklist with decisions already made
+  and open questions with their defaults. Start one when a piece of work
+  spans more than one PR; the PR that ships a step moves it from
+  "remaining" to "built" in the same file and describes the result in the
+  files below. Once the feature is complete, fold the doc into
+  `architecture.md` and delete it, as `search.md` was.
 - [`architecture.md`](architecture.md) — what is built and why: routes,
   components, data flow, the decisions behind them. New behaviour is
   described here in the PR that adds it.

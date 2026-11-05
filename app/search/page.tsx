@@ -7,8 +7,8 @@ import { canonicalUrl } from "@/lib/seo";
 
 /*
  * The search results page. The hero bar on the home page submits here with
- * the dates and guests in the query string (the URL contract in
- * docs/search.md), and `SearchWidget` lists the houses that are free:
+ * the dates and guests in the query string (the URL contract under "Search"
+ * in docs/architecture.md), and `SearchWidget` lists the houses that are free:
  *
  * - `native` mode: the site's own bar, prefilled from the URL, over results
  *   rendered on the server from the cached calendars. Both read the URL, so
