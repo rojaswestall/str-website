@@ -2,6 +2,8 @@ import { Credential } from "@/components/ui";
 import type { Property } from "@/content";
 import { cx } from "@/lib/cx";
 
+import { AirbnbTitle } from "./AirbnbTitle";
+
 /** Place line, house name, review credential, and the one-line summary. */
 export function PropertyHeader({
   property,
@@ -18,6 +20,10 @@ export function PropertyHeader({
       <h1 className="max-w-[18ch] font-display text-[clamp(2.1rem,5vw,3.4rem)] leading-[1.06] font-normal tracking-[-0.012em] text-balance">
         {property.name}
       </h1>
+      <AirbnbTitle
+        title={property.airbnbTitle}
+        className="-mt-2 text-[clamp(1rem,1.5vw,1.1rem)]"
+      />
       <Credential
         rating={property.rating}
         reviewCount={property.reviewCount}

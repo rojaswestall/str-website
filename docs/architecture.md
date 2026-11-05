@@ -191,6 +191,12 @@ fails `next build` and `pnpm check:content`. **Always import from
   credited on the card from `photoCredit` (`check:content` fails on a photo
   with no credit unless `photoOwned` is set). A pick with no photo shows the
   striped placeholder.
+- **Airbnb titles**: each property's `airbnbTitle` is its listing title on
+  Airbnb, copied by hand. `AirbnbTitle` shows it as a subtitle under the
+  short house name on the home cards and bands, the house page header and
+  the `/search` result cards, so a guest who found a house on Airbnb
+  recognises it here. The short names stay the headings, page titles and
+  URLs. Update the content when a listing is retitled on Airbnb.
 - **Guest quotes**: three per house from Airbnb reviews in
   `content/properties.ts` (author and month optional). Ratings and review
   counts were refreshed from the listings on 2026-10-12.
