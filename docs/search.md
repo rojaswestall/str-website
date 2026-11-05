@@ -108,7 +108,7 @@ the no-JavaScript submit landing on the same URL, axe in both themes with
 the picker open). `visual.spec.ts` runs in the stub project only, so `/` in
 native mode was not added to it. `Hero.tsx` is unchanged.
 
-**Checkpoint 3.** The `/search` page: in `native` mode `SearchWidget`'s
+**Checkpoint 3 (#50).** The `/search` page: in `native` mode `SearchWidget`'s
 results variant renders the bar prefilled from the URL over `SearchResults`
 (`components/search/SearchResults.tsx`, with `ResultCard.tsx`), an async
 Server Component that awaits `connection()`, reads the URL with
