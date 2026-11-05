@@ -6,11 +6,21 @@ import { getAllProperties } from "@/content";
 import { canonicalUrl } from "@/lib/seo";
 
 /*
- * Results page for Hospitable's property search. The hero bar on the home
- * page submits here with the dates and guests in the query string, and the
- * widget below lists the houses that are free. Its content is client-rendered
- * by Hospitable, so the page is kept out of the index; the three house links
- * are the no-script fallback and the first thing on screen while it loads.
+ * The search results page. The hero bar on the home page submits here with
+ * the dates and guests in the query string (the URL contract in
+ * docs/search.md), and `SearchWidget` lists the houses that are free:
+ *
+ * - `native` mode: the site's own bar, prefilled from the URL, over results
+ *   rendered on the server from the cached calendars. Both read the URL, so
+ *   they stream in inside Suspense boundaries and the rest of the page is
+ *   prerendered; `searchParams` is passed down as a promise and awaited
+ *   only there.
+ * - `hospitable` mode: Hospitable's embed, which reads the URL itself and
+ *   renders on the client. `stub` mode: the placeholder panel.
+ *
+ * Kept out of the index in every mode (the results depend on the query);
+ * the three house links are the no-script fallback and the first thing on
+ * screen while the results load.
  */
 export const metadata: Metadata = {
   title: "Check dates",
@@ -20,7 +30,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default function SearchPage() {
+export default function SearchPage({ searchParams }: PageProps<"/search">) {
   const properties = getAllProperties();
   return (
     <Section className="flex-1" aria-labelledby="search-heading">
@@ -39,7 +49,7 @@ export default function SearchPage() {
         </p>
       </Prose>
       <div className="mt-[clamp(2rem,4vw,3rem)]">
-        <SearchWidget variant="results" />
+        <SearchWidget variant="results" searchParams={searchParams} />
       </div>
       <nav
         aria-label="The houses"
