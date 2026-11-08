@@ -88,8 +88,8 @@ later item depends on the earlier ones.
         all carry the real `https://` origin.
   - [ ] Theme toggle persists; analytics events appear in Vercel.
   - [ ] Run axe (browser extension) on a stay page with the real booking
-        iframe and confirm the iframe has a title; confirm the TikTok
-        fallback hides once the player loads and the player does not trap
+        iframe and confirm the iframe has a title; press play on a
+        TikTok and confirm the poster hides once the player loads and the player does not trap
         keyboard focus. CI never loads either third party.
   - [ ] Re-scrape `/` and the three stay pages in the Facebook Sharing
         Debugger, X card validator, and Slack once the final share cards

@@ -590,15 +590,23 @@ The ★ on the card is inline SVG because Newsreader has no star glyph.
 
 `lib/csp.ts` defines the policy; `next.config.ts` sends it on every path as
 `Content-Security-Policy-Report-Only`. It allows the Hospitable loader,
-search library, and iframes, Vercel Analytics, and TikTok's embed and CDN.
+search library, and iframes, Vercel Analytics, and TikTok's player iframe.
 `script-src` keeps `'unsafe-inline'` because Next's static pages and
 next-themes' pre-paint script are inline and a nonce would force dynamic
 rendering. Switching to enforcing is a go-live item in [`plan.md`](plan.md).
 
 ## Third-party embeds
 
-`components/embeds/TikTokEmbed.tsx` builds the `blockquote.tiktok-embed`
-imperatively in a leaf container and injects `tiktok.com/embed.js` through
-`useInjectedScript`, showing a styled fallback until the player appears.
+`components/embeds/TikTokEmbed.tsx` is click to play. Each clip starts as a
+poster: the photo and credit of the area pick named by the clip's `poster`
+(checked in `content/index.ts`), the handle, and a play link to the clip.
+Only pressing play mounts TikTok's player iframe
+(`tiktok.com/player/v1/<id>`), so the home page sends TikTok nothing on load
+and visitors rarely hit its rate limit. `lib/tiktok-player.ts` reads the
+player's `postMessage` events: `onPlayerReady` removes the poster (and
+unmutes); `onPlayerError`, or no ready message within 10 seconds (what a
+rate-limited load looks like), removes the iframe and shows "Watch on
+TikTok" instead of TikTok's own error screen. Blocked autoplay (error 3002)
+counts as ready.
 Rule for any embed: the element a third-party script mutates must be a React
 leaf, or React throws on unmount.
