@@ -71,6 +71,81 @@ test.describe("area guide", () => {
     }
   });
 
+  test("Closest to sorts the picks for the chosen house", async ({ page }) => {
+    await page.goto("/area");
+    const filter = page.getByTestId("area-filter");
+    const any = filter.getByRole("button", { name: "Any house" });
+    await expect(any).toHaveAttribute("aria-pressed", "true");
+    const ids = () =>
+      page
+        .getByTestId("area-picks")
+        .locator("article")
+        .evaluateAll((els) => els.map((el) => el.id));
+    const contentOrder = await ids();
+
+    await filter.getByRole("button", { name: "An Oak Hill Home" }).click();
+    await expect(page).toHaveURL(/\?house=oak-hill$/);
+    await expect(
+      filter.getByRole("button", { name: "An Oak Hill Home" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(any).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByTestId("area-filter-status")).toContainText(
+      "Closest first from An Oak Hill Home",
+    );
+
+    // Same picks, new order: walks first, then drives in rising order.
+    const sorted = await ids();
+    expect([...sorted].sort()).toEqual([...contentOrder].sort());
+    expect(sorted).not.toEqual(contentOrder);
+    const rows = page
+      .getByTestId("area-picks")
+      .locator('article [data-testid="drive-times"] [data-slug="oak-hill"]');
+    const travel = await rows.evaluateAll((els) =>
+      els.map((el) => ({
+        walk: el.getAttribute("data-mode") === "walk",
+        minutes: Number(el.querySelector("dd")?.textContent?.match(/\d+/)?.[0]),
+      })),
+    );
+    const rank = (t: { walk: boolean; minutes: number }) =>
+      (t.walk ? 0 : 1000) + t.minutes;
+    travel.slice(1).forEach((t, i) => {
+      expect(rank(t)).toBeGreaterThanOrEqual(rank(travel[i]!));
+    });
+    // The chosen house's row stands out on each card.
+    await expect(rows.first().locator("dt")).toHaveCSS("font-weight", "600");
+
+    // Grouped under closeness headings, closest group first.
+    const headings = page.getByTestId("area-picks").getByRole("heading", {
+      level: 2,
+    });
+    await expect(headings.first()).toHaveText(
+      /^(A short walk|Under 10 minutes)/,
+    );
+
+    // A reload keeps the choice; Any house restores the content order.
+    await page.reload();
+    await expect(
+      filter.getByRole("button", { name: "An Oak Hill Home" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(await ids()).toEqual(sorted);
+    await any.click();
+    await expect(page).toHaveURL(/\/area$/);
+    expect(await ids()).toEqual(contentOrder);
+  });
+
+  test("opens sorted for the house named in the link", async ({ page }) => {
+    await page.goto("/area?house=south-austin");
+    await expect(
+      page
+        .getByTestId("area-filter")
+        .getByRole("button", { name: "South Austin Stay" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    // The South Austin houses have picks within walking distance.
+    await expect(
+      page.getByTestId("area-picks").getByRole("heading", { level: 2 }).first(),
+    ).toHaveText(/^A short walk/);
+  });
+
   test("is linked from the header nav and the home page", async ({ page }) => {
     await page.goto("/");
     await page

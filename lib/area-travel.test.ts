@@ -7,6 +7,8 @@ import {
   sortPicksNear,
   type CheckedPick,
   type TravelPick,
+  TRAVEL_BANDS,
+  travelBand,
 } from "./area-travel";
 
 const HOUSES = ["oak-hill", "south-austin"];
@@ -188,5 +190,40 @@ describe("assertAreaPicksValid", () => {
         assertAreaPicksValid([credited, owned], HOUSES),
       );
     });
+  });
+});
+
+describe("travelBand", () => {
+  it("puts any walk in the walk band, however long", () => {
+    assert.equal(travelBand({ mode: "walk", minutes: 25 }), "walk");
+  });
+
+  it("splits drives at 10 and 20 minutes", () => {
+    assert.equal(travelBand({ mode: "drive", minutes: 1 }), "near");
+    assert.equal(travelBand({ mode: "drive", minutes: 9 }), "near");
+    assert.equal(travelBand({ mode: "drive", minutes: 10 }), "mid");
+    assert.equal(travelBand({ mode: "drive", minutes: 20 }), "mid");
+    assert.equal(travelBand({ mode: "drive", minutes: 21 }), "far");
+  });
+
+  it("marks an unconfirmed drive as unknown", () => {
+    assert.equal(travelBand({ mode: "drive", minutes: null }), "unknown");
+  });
+
+  it("lists the bands in the same order sortPicksNear uses", () => {
+    const picks = [
+      pick("far", { h: 30 }),
+      pick("unknown", { h: null }),
+      pick("mid", { h: 15 }),
+      pick("walk", { h: 2 }, { h: 9 }),
+      pick("near", { h: 5 }),
+    ];
+    const bands = sortPicksNear(picks, "h").map((p) =>
+      travelBand(getTravel(p, "h")),
+    );
+    assert.deepEqual(
+      bands,
+      TRAVEL_BANDS.map((b) => b.band),
+    );
   });
 });

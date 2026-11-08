@@ -7,8 +7,8 @@ import { TravelTime } from "./DriveTimes";
 
 /**
  * "Near this house" on a property page: the closest area-guide picks from
- * this house (walkable ones first, then by drive time), each linking to its entry on /area, which shows the
- * times from every house.
+ * this house (walkable ones first, then by drive time), each linking to its
+ * entry on /area, opened with this house chosen in the "Closest to" filter.
  */
 export function NearbyPicks({
   property,
@@ -33,7 +33,7 @@ export function NearbyPicks({
             className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-[0.2rem] border-b border-hairline py-[0.85rem]"
           >
             <Link
-              href={`/area#${pick.id}`}
+              href={`/area?house=${property.slug}#${pick.id}`}
               className="font-display text-[1.1rem] text-ink no-underline hover:underline"
             >
               <TbcText value={pick.title} />
@@ -48,7 +48,7 @@ export function NearbyPicks({
         ))}
       </ul>
       <Link
-        href="/area"
+        href={`/area?house=${property.slug}`}
         className="self-start border-b border-transparent py-[0.2rem] font-mono text-[0.78rem] tracking-[0.06em] text-muted uppercase no-underline transition-[color,border-color] duration-[120ms] hover:border-accent hover:text-ink"
       >
         The full area guide<span aria-hidden="true"> →</span>

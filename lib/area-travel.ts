@@ -82,3 +82,24 @@ export function assertAreaPicksValid(
     }
   }
 }
+
+/** How close a pick is to one house, for the headings on a sorted /area. */
+export type TravelBand = "walk" | "near" | "mid" | "far" | "unknown";
+
+/** Bands in display order, closest first, with their headings. */
+export const TRAVEL_BANDS: readonly { band: TravelBand; label: string }[] = [
+  { band: "walk", label: "A short walk" },
+  { band: "near", label: "Under 10 minutes" },
+  { band: "mid", label: "10 to 20 minutes" },
+  { band: "far", label: "Over 20 minutes" },
+  { band: "unknown", label: "Drive time to confirm" },
+];
+
+/** Walkable, under 10 min, 10–20 min, or over 20 min by car. */
+export function travelBand(travel: Travel): TravelBand {
+  if (travel.minutes === null) return "unknown";
+  if (travel.mode === "walk") return "walk";
+  if (travel.minutes < 10) return "near";
+  if (travel.minutes <= 20) return "mid";
+  return "far";
+}

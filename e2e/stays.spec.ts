@@ -261,16 +261,18 @@ test.describe("property pages", () => {
     ).toBeVisible();
     const items = nearby.locator("li");
     await expect(items).toHaveCount(3);
-    // Each pick links to its entry on the guide page and shows this house's
-    // drive time (a number, or the t.b.c. gap until confirmed).
+    // Each pick links to its entry on the guide page, sorted for this house,
+    // and shows this house's drive time (a number, or the t.b.c. gap).
     for (const item of await items.all()) {
-      await expect(item.locator('a[href^="/area#"]')).toHaveCount(1);
+      await expect(
+        item.locator('a[href^="/area?house=oak-hill#"]'),
+      ).toHaveCount(1);
       await expect(item).toContainText(
         /\d+ min (drive|walk)|drive time t\.b\.c\./,
       );
     }
     await expect(
       nearby.getByRole("link", { name: /full area guide/ }),
-    ).toHaveAttribute("href", "/area");
+    ).toHaveAttribute("href", "/area?house=oak-hill");
   });
 });
