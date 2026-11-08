@@ -90,7 +90,7 @@ test.describe("area guide", () => {
     ).toHaveAttribute("aria-pressed", "true");
     await expect(any).toHaveAttribute("aria-pressed", "false");
     await expect(page.getByTestId("area-filter-status")).toContainText(
-      "Closest first from An Oak Hill Home",
+      "Sorted by travel time from An Oak Hill Home, walkable places first.",
     );
 
     // Same picks, new order: walks first, then drives in rising order.

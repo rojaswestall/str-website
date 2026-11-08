@@ -127,7 +127,7 @@ export function AreaPicksBrowser({
           className="m-0 font-mono text-[0.72rem] leading-[1.5] tracking-[0.04em] text-muted min-[720px]:ml-auto min-[720px]:max-w-[38ch] min-[720px]:text-right"
         >
           {active
-            ? `Closest first from ${active.name}, walks before drives.`
+            ? `Sorted by travel time from ${active.name}, walkable places first.`
             : "Pick a house to sort by how close each place is."}
         </p>
       </div>
