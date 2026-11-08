@@ -10,8 +10,8 @@
  * - booking.hospitable.com / *.hospitable.com: the booking iframe and the
  *   loader's ping to api.hospitable.com.
  * - va.vercel-scripts.com / vitals.vercel-insights.com: Vercel Web Analytics.
- * - www.tiktok.com: embed.js and the player iframe. embed.js then loads its
- *   library script and stylesheet from lf16-tiktok-web.tiktokcdn-us.com.
+ * - www.tiktok.com: the click-to-play player iframe (lib/tiktok-player.ts).
+ *   No TikTok script runs on this site's pages.
  * - fonts.googleapis.com / fonts.gstatic.com: listed in the step 6 prompt.
  *   Fonts are self-hosted by next/font, so step 14 can drop them if no
  *   report ever needs them.
@@ -32,8 +32,6 @@ export const cspDirectives: Readonly<Record<string, readonly string[]>> = {
     "https://cdn.hsptb.com",
     "https://hospitable.b-cdn.net",
     "https://va.vercel-scripts.com",
-    "https://www.tiktok.com",
-    "https://lf16-tiktok-web.tiktokcdn-us.com",
     "https://cdn.apple-mapkit.com",
     "'wasm-unsafe-eval'",
   ],
@@ -59,7 +57,6 @@ export const cspDirectives: Readonly<Record<string, readonly string[]>> = {
     "'unsafe-inline'",
     "https://hospitable.b-cdn.net",
     "https://fonts.googleapis.com",
-    "https://lf16-tiktok-web.tiktokcdn-us.com",
   ],
   "font-src": [
     "'self'",

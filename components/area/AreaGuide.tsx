@@ -1,20 +1,21 @@
 import { TikTokEmbed } from "@/components/embeds/TikTokEmbed";
 import { Button, Section, SectionHead } from "@/components/ui";
-import { getSite } from "@/content";
+import { getTikToks } from "@/content";
 
 /*
- * `#area` on the home page: the TikTok feature row (one clip per entry in
- * `site.tiktoks`, hidden when the list is empty; layouts described below),
+ * `#area` on the home page: the TikTok feature row (one click-to-play clip
+ * per entry in `site.tiktoks`, hidden when the list is empty; layouts
+ * described below),
  * then a pointer to the full area guide at /area.
  */
 export function AreaGuide() {
-  const site = getSite();
+  const tiktoks = getTikToks();
 
   return (
     <Section id="area" hairline aria-labelledby="area-heading">
       <SectionHead id="area-heading" title="What's worth doing" meta="Austin" />
 
-      {site.tiktoks.length > 0 ? (
+      {tiktoks.length > 0 ? (
         /*
          * Three layouts:
          * - from 860px: the clips side by side, spaced evenly so the gap
@@ -29,11 +30,11 @@ export function AreaGuide() {
           data-testid="video-feature"
           className="mb-[clamp(2.5rem,5vw,3.5rem)] grid gap-y-[clamp(2.5rem,5vw,3.5rem)] border-b border-hairline pb-[clamp(2.5rem,5vw,3.5rem)] min-[860px]:grid-cols-[repeat(2,340px)] min-[860px]:justify-evenly"
         >
-          {site.tiktoks.map((clip) => (
+          {tiktoks.map((clip) => (
             <article
               key={clip.url}
               data-testid="video-clip"
-              className="grid min-w-0 items-start gap-x-[clamp(1.5rem,4vw,2.5rem)] gap-y-[1.1rem] min-[600px]:grid-cols-[325px_minmax(0,1fr)] min-[860px]:grid-cols-1"
+              className="grid min-w-0 content-start items-start gap-x-[clamp(1.5rem,4vw,2.5rem)] gap-y-[1.1rem] min-[600px]:grid-cols-[325px_minmax(0,1fr)] min-[860px]:grid-cols-1"
             >
               <div className="w-full max-w-[340px] min-w-0 justify-self-center min-[600px]:justify-self-start">
                 <TikTokEmbed clip={clip} />
