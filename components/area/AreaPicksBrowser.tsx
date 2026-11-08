@@ -145,11 +145,8 @@ export function AreaPicksBrowser({
             className="flex flex-col gap-[clamp(1rem,2vw,1.25rem)]"
           >
             {group.label ? (
-              <h2 className="m-0 flex items-baseline gap-3 font-mono text-[0.74rem] font-normal tracking-[0.08em] text-ink uppercase">
+              <h2 className="m-0 font-mono text-[0.74rem] font-normal tracking-[0.08em] text-ink uppercase">
                 {group.label}
-                <span className="text-muted tabular-nums">
-                  {group.ids.length}
-                </span>
               </h2>
             ) : null}
             <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))] gap-[clamp(1.5rem,3vw,2.5rem)]">

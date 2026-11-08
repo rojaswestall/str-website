@@ -155,7 +155,7 @@ test.describe("area guide", () => {
     // The South Austin houses have picks within walking distance.
     await expect(
       page.getByTestId("area-picks").getByRole("heading", { level: 2 }).first(),
-    ).toHaveText(/^A short walk/);
+    ).toHaveText(/^A short walk$/);
   });
 
   test("is linked from the header nav and the home page", async ({ page }) => {
