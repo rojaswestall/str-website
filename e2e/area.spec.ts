@@ -111,8 +111,14 @@ test.describe("area guide", () => {
     travel.slice(1).forEach((t, i) => {
       expect(rank(t)).toBeGreaterThanOrEqual(rank(travel[i]!));
     });
-    // The chosen house's row stands out on each card.
+    // Each card shows only the chosen house's row, highlighted.
     await expect(rows.first().locator("dt")).toHaveCSS("font-weight", "600");
+    const cards = page.getByTestId("area-picks").locator("article");
+    const visibleRows = cards
+      .first()
+      .locator('[data-testid="drive-times"] > [data-slug]:visible');
+    await expect(visibleRows).toHaveCount(1);
+    await expect(visibleRows).toHaveAttribute("data-slug", "oak-hill");
 
     // Grouped under closeness headings, closest group first.
     const headings = page.getByTestId("area-picks").getByRole("heading", {
@@ -131,6 +137,12 @@ test.describe("area guide", () => {
     await any.click();
     await expect(page).toHaveURL(/\/area$/);
     expect(await ids()).toEqual(contentOrder);
+    // With no house chosen, every house's row is back.
+    await expect(
+      cards
+        .first()
+        .locator('[data-testid="drive-times"] > [data-slug]:visible'),
+    ).toHaveCount(HOUSES.length);
   });
 
   test("opens sorted for the house named in the link", async ({ page }) => {

@@ -22,7 +22,7 @@ export function DriveTimes({
 }) {
   return (
     <dl
-      aria-label={`Travel time to ${pick.title.replace(/^\[TBC\]\s*/, "")} from each house`}
+      aria-label={`Travel time to ${pick.title.replace(/^\[TBC\]\s*/, "")}`}
       data-testid="drive-times"
       className={cx(
         "m-0 border-t border-hairline font-mono text-[0.74rem] tracking-[0.04em]",

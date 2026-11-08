@@ -51,13 +51,15 @@ export default function AreaPage() {
     picks.map((pick) => [pick.id, <AreaPickCard key={pick.id} pick={pick} />]),
   );
   /*
-   * With a house chosen, its row in every card's travel list stands out. One
-   * rule per house, since CSS cannot compare two attribute values.
+   * With a house chosen, every card's travel list shows only that house's
+   * row, highlighted; the other houses' rows are hidden. One pair of rules
+   * per house, since CSS cannot compare two attribute values.
    */
   const highlight = houses
     .map(
       ({ slug }) =>
-        `[data-active-house="${slug}"] [data-testid="drive-times"] [data-slug="${slug}"] :is(dt,dd){color:var(--ink);font-weight:600}`,
+        `[data-active-house="${slug}"] [data-testid="drive-times"] > [data-slug]:not([data-slug="${slug}"]){display:none}` +
+        `[data-active-house="${slug}"] [data-testid="drive-times"] > [data-slug="${slug}"] :is(dt,dd){color:var(--ink);font-weight:600}`,
     )
     .join("");
   const anyTbc = picks.some(
