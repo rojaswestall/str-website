@@ -235,6 +235,22 @@ test.describe("property pages", () => {
     });
   }
 
+  test("lists walkable area picks first under Near this house", async ({
+    page,
+  }) => {
+    // The South Austin houses have picks within walking distance.
+    await page.goto("/stays/south-austin");
+    const items = page.getByTestId("nearby-picks").locator("li");
+    await expect(items.first()).toContainText(/\d+ min walk/);
+    // Once the walks end, no later item is a walk.
+    const texts = await items.allTextContents();
+    const firstDrive = texts.findIndex((t) => !/min walk/.test(t));
+    if (firstDrive !== -1) {
+      for (const t of texts.slice(firstDrive))
+        expect(t).not.toMatch(/min walk/);
+    }
+  });
+
   test("lists the closest area picks with this house's drive time and links to /area", async ({
     page,
   }) => {
@@ -245,14 +261,18 @@ test.describe("property pages", () => {
     ).toBeVisible();
     const items = nearby.locator("li");
     await expect(items).toHaveCount(3);
-    // Each pick links to its entry on the guide page.
-    for (const id of ["eat", "outdoors", "local"]) {
-      await expect(nearby.locator(`a[href="/area#${id}"]`)).toHaveCount(1);
+    // Each pick links to its entry on the guide page, sorted for this house,
+    // and shows this house's drive time (a number, or the t.b.c. gap).
+    for (const item of await items.all()) {
+      await expect(
+        item.locator('a[href^="/area?house=oak-hill#"]'),
+      ).toHaveCount(1);
+      await expect(item).toContainText(
+        /\d+ min (drive|walk)|drive time t\.b\.c\./,
+      );
     }
-    // Drive times are open items: one t.b.c. gap per pick, never a number.
-    await expect(items.filter({ hasText: "drive time t.b.c." })).toHaveCount(3);
     await expect(
       nearby.getByRole("link", { name: /full area guide/ }),
-    ).toHaveAttribute("href", "/area");
+    ).toHaveAttribute("href", "/area?house=oak-hill");
   });
 });

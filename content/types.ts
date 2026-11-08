@@ -164,7 +164,7 @@ export const AreaPickSchema = z.object({
     message: "id is lowercase letters, digits, and hyphens",
   }),
   title: nonEmpty,
-  kind: z.enum(["eat", "outdoors", "local"]),
+  kind: z.enum(["coffee", "eat", "outdoors", "local"]),
   blurb: nonEmpty,
   /**
    * Drive time in minutes from each house, keyed by property slug. Every
@@ -172,8 +172,30 @@ export const AreaPickSchema = z.object({
    * "t.b.c." until the hosts confirm it.
    */
   driveMinutes: z.record(z.string(), z.number().int().positive().nullable()),
+  /**
+   * Walking time in minutes, keyed by property slug, for houses the place is
+   * a short walk from. Where set it is shown instead of the drive time for
+   * that house. Leave a house out when it is not a comfortable walk.
+   */
+  walkMinutes: z.record(z.string(), z.number().int().positive()).optional(),
   link: z.url().optional(),
+  /** 3:2 photo under /photos/area/; omit for the striped placeholder slot. */
   photo: ImageSchema.optional(),
+  /**
+   * Credit for a photo the hosts did not take, as its licence requires
+   * (CC BY and CC BY-SA need the author, the licence and a link to the
+   * source). Shown under the photo. Required whenever `photo` is set,
+   * unless `photoOwned` is true.
+   */
+  photoCredit: z
+    .object({
+      author: nonEmpty,
+      license: nonEmpty,
+      source: z.url(),
+    })
+    .optional(),
+  /** True when the hosts own the photo, so it needs no credit line. */
+  photoOwned: z.boolean().optional(),
 });
 export type AreaPick = z.infer<typeof AreaPickSchema>;
 export const AreaPicksSchema = z.array(AreaPickSchema).min(1);

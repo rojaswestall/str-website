@@ -49,7 +49,7 @@ last 24 hours resolves to the previous one; that is intended.
 | ------------------------------------ | ----------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `/`                                  | `app/page.tsx`                                        | static     | Hero, stays, area (TikToks), why book direct + form, reviews, hosts                                                          |
 | `/stays/[slug]`                      | `app/stays/[slug]/page.tsx`                           | static × 3 | `oak-hill`, `south-austin`, `fire-side`; unknown slugs 404 via proxy                                                         |
-| `/area`                              | `app/area/page.tsx`                                   | static     | Area picks with drive times from every house                                                                                 |
+| `/area`                              | `app/area/page.tsx`                                   | static     | Area picks with travel times from every house; "Closest to" filter via `?house=`                                             |
 | `/search`                            | `app/search/page.tsx`                                 | static     | Search results (streamed into the static page in `native` mode, Hospitable's embed otherwise); `noindex`, not in the sitemap |
 | `/api/contact`                       | `app/api/contact/route.ts`                            | dynamic    | POST only (other methods 405)                                                                                                |
 | `/api/properties`                    | `app/api/properties/route.ts`                         | dynamic    | Booking API: the bookable houses (see Booking API)                                                                           |
@@ -185,7 +185,12 @@ fails `next build` and `pnpm check:content`. **Always import from
   (`check:content` enforces that from the alt text). Resized from the hosts'
   originals: 2400 px long edge for heroes, 1600 px for the gallery, JPEG q80,
   metadata stripped; frames crop to 3:2. `home/hero-collage.jpg` is the real
-  21:9 collage. The 1:1 area photos are still striped placeholders.
+  21:9 collage. Area-guide photos are 3:2 like the gallery, 1200 px long
+  edge (they only fill a card), JPEG q80, in `public/photos/area/<pick-id>.jpg`;
+  most are Wikimedia Commons or Flickr photos under CC/public-domain licences,
+  credited on the card from `photoCredit` (`check:content` fails on a photo
+  with no credit unless `photoOwned` is set). A pick with no photo shows the
+  striped placeholder.
 - **Guest quotes**: three per house from Airbnb reviews in
   `content/properties.ts` (author and month optional). Ratings and review
   counts were refreshed from the listings on 2026-10-12.
@@ -203,8 +208,13 @@ fails `next build` and `pnpm check:content`. **Always import from
   opens on a fixed frame (`lib/map-frame.ts`) that includes downtown and
   the river, with the houses in the south-west.
 - **Area picks** carry an `id` (for `/area#<id>` anchors) and `driveMinutes`
-  keyed by every house slug; `content/index.ts` checks ids are unique and
-  every house has a time.
+  keyed by every house slug (plus optional `walkMinutes`);
+  `lib/area-travel.ts` checks ids are unique and every house has a time.
+  `/area` has a "Closest to" filter (`components/area/AreaPicksBrowser.tsx`):
+  the server renders each card once and the per-house order, and the browser
+  re-sorts and groups them (a short walk / under 10 / 10–20 / over 20 min)
+  for the house in `?house=<slug>`. The page stays static; "Near this house"
+  links open `/area?house=<slug>`.
 
 `pnpm check:content` additionally asserts unique slugs, a hero photo per
 house, outdoor-last gallery order, that every image file exists under
