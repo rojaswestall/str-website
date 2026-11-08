@@ -173,7 +173,7 @@ named, then run `pnpm check:content`. See "Editing content" in
 - [x] Area-guide photos: all 24 picks have a licensed photo with a credit
       line. Nine are representative shots, not taken at the place (alt text
       says so): Cannon Coffee, Radix House, Bee Dumpling, Shore, La Popular,
-      Jack Allen's, CARVE, Escuela Farms, Garrison Park; Terry Black's plate
+      Jack Allen's, CARVE, Escuela, Garrison Park; Terry Black's plate
       is unconfirmed as theirs. Swap in the hosts' own photos when they have
       them (set `photoOwned: true` and drop `photoCredit`).
 - [ ] The live domain in `site.domain` (`content/site.ts`; still `[TBC]`).

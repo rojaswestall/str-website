@@ -112,7 +112,7 @@ export const areaPicks: AreaPick[] = [
     id: "leroy-and-lewis",
     kind: "eat",
     blurb:
-      "The barbecue we send people to: Central Texas smoke with a modern menu, and a Michelin guide listing to back it up.",
+      "The barbecue we send people to: Central Texas smoke with a modern menu, and a Michelin star to back it up.",
     driveMinutes: { "oak-hill": 14, "south-austin": 5, "fire-side": 5 },
     photo: {
       src: "/photos/area/leroy-and-lewis.jpg",
@@ -209,17 +209,17 @@ export const areaPicks: AreaPick[] = [
     },
   },
   {
-    title: "Escuela Farms",
-    id: "escuela-farms",
+    title: "Escuela",
+    id: "escuela",
     kind: "eat",
     blurb:
-      "Farm-to-table Tex-Mex in Oak Hill's old elementary school, with vegetables grown right on the property. Book Fino, inside the schoolhouse, for a dressed-up dinner, or walk in to Campo for relaxed Tex-Mex barbecue out in the gardens. Tuesday to Saturday evenings.",
+      "Farm-to-table Tex-Mex in Oak Hill's old elementary school, with vegetables grown right on the property. Book Fino, inside the schoolhouse, for a dressed-up dinner, Tuesday to Saturday evenings. Campo, a casual Tex-Mex barbecue spot out in the gardens from pitmasters who cooked at Franklin and LeRoy and Lewis, is on the way.",
     driveMinutes: { "oak-hill": 1, "south-austin": 13, "fire-side": 13 },
     walkMinutes: { "oak-hill": 13 },
     link: "https://escuelafarm.com/",
     photo: {
-      src: "/photos/area/escuela-farms.jpg",
-      alt: "Representative photo: tomatoes ripening on the vine in a farm garden (not taken at Escuela Farms)",
+      src: "/photos/area/escuela.jpg",
+      alt: "Representative photo: tomatoes ripening on the vine in a farm garden (not taken at Escuela)",
       width: 1200,
       height: 800,
     },

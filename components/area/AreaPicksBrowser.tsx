@@ -68,7 +68,7 @@ export function AreaPicksBrowser({
   const order = active ? orders[active.slug] : null;
 
   /*
-   * A link like /area?house=oak-hill#escuela-farms scrolls to the pick before
+   * A link like /area?house=oak-hill#escuela scrolls to the pick before
    * hydration, in the unsorted order; scroll again once the sorted order is
    * in place. Only for the first sort.
    */
