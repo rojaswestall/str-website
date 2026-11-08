@@ -213,7 +213,7 @@ export const areaPicks: AreaPick[] = [
     id: "escuela-farms",
     kind: "eat",
     blurb:
-      "Dinner on a working farm, in the building that was once Oak Hill's elementary school. The produce on the plate is grown on the property. Evenings Tuesday to Saturday; book ahead.",
+      "Farm-to-table Tex-Mex in Oak Hill's old elementary school, with vegetables grown right on the property. Book Fino, inside the schoolhouse, for a dressed-up dinner, or walk in to Campo for relaxed Tex-Mex barbecue out in the gardens. Tuesday to Saturday evenings.",
     driveMinutes: { "oak-hill": 1, "south-austin": 13, "fire-side": 13 },
     walkMinutes: { "oak-hill": 13 },
     link: "https://escuelafarm.com/",
