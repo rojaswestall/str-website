@@ -361,6 +361,18 @@ export const areaPicks: AreaPick[] = [
       "A few minutes up 290: coffee and breakfast sandwiches in the morning, cocktails and burgers at night, with putt-putt, cornhole, pool tables and live music. Easygoing and family-friendly.",
     driveMinutes: { "oak-hill": 7, "south-austin": 14, "fire-side": 14 },
     link: "https://oakhillsocial.com/",
+    photo: {
+      src: "/photos/area/oak-hill-social.jpg",
+      alt: "Representative photo: an outdoor mini golf course (not taken at Oak Hill Social)",
+      width: 1200,
+      height: 800,
+    },
+    photoCredit: {
+      author: "Michael Rivera",
+      license: "CC BY-SA 4.0",
+      source:
+        "https://commons.wikimedia.org/wiki/File:Kolomoki_Mounds_miniature_golf_hole_16.jpg",
+    },
   },
   {
     title: "Pieous",
@@ -370,6 +382,18 @@ export const areaPicks: AreaPick[] = [
       "Wood-fired Neapolitan pizza and a house-made pastrami people drive out 290 for, in Belterra Village. Open breakfast through dinner; closed Mondays.",
     driveMinutes: { "oak-hill": 13, "south-austin": 21, "fire-side": 21 },
     link: "https://pieous.com/",
+    photo: {
+      src: "/photos/area/pieous.jpg",
+      alt: "Representative photo: a fire burning in a tiled wood-fired pizza oven (not taken at Pieous)",
+      width: 1200,
+      height: 800,
+    },
+    photoCredit: {
+      author: "Tony Webster",
+      license: "CC BY 2.0",
+      source:
+        "https://commons.wikimedia.org/wiki/File:Punch_Neapolitan_Pizza_(2257039638).jpg",
+    },
   },
   {
     title: "Jester King Brewery",
@@ -379,6 +403,17 @@ export const areaPicks: AreaPick[] = [
       "A farmhouse brewery on a big Hill Country property out Fitzhugh Road, with pizza to go with the beer. Walk-ins only, open every day; plan an afternoon.",
     driveMinutes: { "oak-hill": 15, "south-austin": 22, "fire-side": 22 },
     link: "https://jesterkingbrewery.com/",
+    photo: {
+      src: "/photos/area/jester-king.jpg",
+      alt: "Live oaks and picnic tables on the grounds at Jester King Brewery",
+      width: 872,
+      height: 581,
+    },
+    photoCredit: {
+      author: "gina pina",
+      license: "CC BY 2.0",
+      source: "https://www.flickr.com/photo.gne?id=7024251279",
+    },
   },
   {
     title: "The Salt Lick",
@@ -388,6 +423,17 @@ export const areaPicks: AreaPick[] = [
       "The classic Hill Country barbecue drive to Driftwood: meat smoking on the open pit as you walk in, live music on the patio, and bring your own beer or wine. You can book a table on their site.",
     driveMinutes: { "oak-hill": 22, "south-austin": 25, "fire-side": 25 },
     link: "https://saltlickbbq.com/",
+    photo: {
+      src: "/photos/area/salt-lick.jpg",
+      alt: "Meat smoking on the round open pit at The Salt Lick",
+      width: 1200,
+      height: 800,
+    },
+    photoCredit: {
+      author: "I'll Never Grow Up",
+      license: "CC BY 2.0",
+      source: "https://commons.wikimedia.org/wiki/File:Saltlickpit.jpg",
+    },
   },
   {
     title: "Hamilton Pool Preserve",
@@ -397,6 +443,17 @@ export const areaPicks: AreaPick[] = [
       "A collapsed limestone grotto with a waterfall, half an hour west. Reserve a morning or afternoon slot online and bring cash for entry. Only part of the pool is open for swimming right now because of falling rocks, and water access is never guaranteed, so check before you go.",
     driveMinutes: { "oak-hill": 34, "south-austin": 41, "fire-side": 41 },
     link: "https://parks.traviscountytx.gov/parks/hamilton-pool-preserve",
+    photo: {
+      src: "/photos/area/hamilton-pool.jpg",
+      alt: "The grotto and waterfall at Hamilton Pool, seen from the beach",
+      width: 1200,
+      height: 800,
+    },
+    photoCredit: {
+      author: "Trey Perry",
+      license: "CC BY 3.0",
+      source: "https://commons.wikimedia.org/wiki/File:Hamilton_Pool.jpeg",
+    },
   },
   {
     title: "The Veloway",
@@ -406,6 +463,17 @@ export const areaPicks: AreaPick[] = [
       "A 3.1-mile paved loop at Circle C Ranch Metro Park for bikes and inline skates, ridden one way, clockwise. No walkers or dogs, and helmets are required.",
     driveMinutes: { "oak-hill": 10, "south-austin": 12, "fire-side": 12 },
     link: "https://www.austintexas.gov/parks/locations/veloway",
+    photo: {
+      src: "/photos/area/veloway.jpg",
+      alt: "The sign for the Veloway at Circle C Ranch Metro Park",
+      width: 1024,
+      height: 683,
+    },
+    photoCredit: {
+      author: "leeleblanc",
+      license: "CC BY 2.0",
+      source: "https://www.flickr.com/photo.gne?id=14868581516",
+    },
   },
   {
     title: "Sunset Valley Farmers Market",
@@ -414,6 +482,17 @@ export const areaPicks: AreaPick[] = [
     blurb:
       "Saturday mornings, 9am to 1pm, at the Toney Burger Center: local farmers and makers selling only what they grow or make. Good for stocking the kitchen for the weekend.",
     driveMinutes: { "oak-hill": 10, "south-austin": 8, "fire-side": 8 },
+    photo: {
+      src: "/photos/area/sunset-valley-market.jpg",
+      alt: "Shoppers at a produce stand under a tent at the Sunset Valley Farmers Market",
+      width: 1024,
+      height: 683,
+    },
+    photoCredit: {
+      author: "Kent Wang",
+      license: "CC BY-SA 2.0",
+      source: "https://www.flickr.com/photo.gne?id=62515444",
+    },
   },
   {
     title: "Franklin Barbecue",

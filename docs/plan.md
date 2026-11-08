@@ -170,10 +170,10 @@ named, then run `pnpm check:content`. See "Editing content" in
       show photos (`content/hosts.ts`).
 - [x] Area-guide picks: 24 hosts' picks with drive minutes from each house
       and walk minutes where close (`content/area.ts`).
-- [x] Area-guide photos: all 24 picks have a licensed photo with a credit
-      line. Nine are representative shots, not taken at the place (alt text
+- [x] Area-guide photos: all 31 picks have a licensed photo with a credit
+      line. Eleven are representative shots, not taken at the place (alt text
       says so): Cannon Coffee, Radix House, Bee Dumpling, Shore, La Popular,
-      Jack Allen's, CARVE, Escuela, Garrison Park; Terry Black's plate
+      Jack Allen's, CARVE, Escuela, Garrison Park, Pieous, Oak Hill Social; Terry Black's plate
       is unconfirmed as theirs. Swap in the hosts' own photos when they have
       them (set `photoOwned: true` and drop `photoCredit`).
 - [ ] The live domain in `site.domain` (`content/site.ts`; still `[TBC]`).
