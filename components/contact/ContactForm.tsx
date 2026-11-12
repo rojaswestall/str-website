@@ -54,6 +54,8 @@ const inputClasses =
 type ContactFormProps = {
   /** Houses for the select, in order; the "General" option is added here. */
   properties: readonly ContactFormProperty[];
+  /** Slug pre-selected in the House select (the footer pop-up on a house page). */
+  defaultProperty?: string;
   className?: string;
 } & Omit<
   ComponentPropsWithoutRef<"form">,
@@ -62,6 +64,7 @@ type ContactFormProps = {
 
 export function ContactForm({
   properties,
+  defaultProperty = "",
   className,
   ...formProps
 }: ContactFormProps) {
@@ -214,7 +217,7 @@ export function ContactForm({
           <select
             {...props}
             name="property"
-            defaultValue=""
+            defaultValue={defaultProperty}
             className={cx(inputClasses, "cursor-pointer")}
           >
             <option value="">General</option>

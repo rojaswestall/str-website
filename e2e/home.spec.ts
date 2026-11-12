@@ -300,11 +300,78 @@ test.describe("site shell", () => {
     await expect(footer).toContainText(
       "Phone shared with guests after booking",
     );
-    // No public email or Instagram; the footer points at the contact form.
+    // No public email or Instagram; the footer opens the contact form.
     await expect(
-      footer.getByRole("link", { name: "Send us a message" }),
-    ).toHaveAttribute("href", "/#direct");
+      footer.getByRole("button", { name: "Send us a message" }),
+    ).toHaveAttribute("aria-haspopup", "dialog");
     await expect(footer.locator('a[href^="mailto:"]')).toHaveCount(0);
+  });
+
+  test("the footer's Send us a message opens the contact form in a pop-up", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const open = page
+      .getByRole("contentinfo")
+      .getByRole("button", { name: "Send us a message" });
+    const popup = page.getByRole("dialog", { name: "Send us a message" });
+    const form = popup.getByRole("form", { name: "Send us a message" });
+
+    // Opens with the full form; on the home page the house is "General".
+    await open.click();
+    await expect(popup).toBeVisible();
+    await expect(form.getByLabel("House")).toHaveValue("");
+    await expect(
+      form.getByRole("button", { name: "Send message" }),
+    ).toBeVisible();
+
+    // Closes from the Close button, a click on the dimmed page, and Escape,
+    // handing focus back to the footer button each time.
+    await popup.getByRole("button", { name: "Close" }).click();
+    await expect(popup).toHaveCount(0);
+    await expect(open).toBeFocused();
+    await open.click();
+    await page.mouse.click(5, 5);
+    await expect(popup).toHaveCount(0);
+    await open.click();
+    await page.keyboard.press("Escape");
+    await expect(popup).toHaveCount(0);
+    await expect(open).toBeFocused();
+
+    // Clicks inside the panel (not on a control) leave it open.
+    await open.click();
+    await popup.getByRole("heading", { name: "Send us a message" }).click();
+    await expect(popup).toBeVisible();
+
+    // Sending works from the pop-up. The route is intercepted so this spec
+    // never spends the contact limiter (contact-form.spec covers the real post).
+    await page.route("**/api/contact", (route) =>
+      route.fulfill({ status: 200, json: { ok: true } }),
+    );
+    await form.getByLabel("Name").fill("Taylor Guest");
+    await form.getByLabel("Email").fill("taylor@example.com");
+    await form
+      .getByLabel("Message")
+      .fill("Is March free at any of the houses?");
+    await form.getByRole("button", { name: "Send message" }).click();
+    await expect(popup.getByTestId("contact-form-success")).toBeVisible();
+
+    // Reopening after a send starts with a fresh, empty form.
+    await popup.getByRole("button", { name: "Close" }).click();
+    await open.click();
+    await expect(form.getByLabel("Name")).toHaveValue("");
+  });
+
+  test("on a house page the pop-up pre-selects that house", async ({
+    page,
+  }) => {
+    await page.goto("/stays/south-austin");
+    await page
+      .getByRole("contentinfo")
+      .getByRole("button", { name: "Send us a message" })
+      .click();
+    const popup = page.getByRole("dialog", { name: "Send us a message" });
+    await expect(popup.getByLabel("House")).toHaveValue("south-austin");
   });
 
   test("footer lists the three STR licenses", async ({ page }) => {
