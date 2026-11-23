@@ -74,6 +74,31 @@ test.describe("home page", () => {
     await expect(page.getByRole("list", { name: "Amenities" })).toHaveCount(0);
   });
 
+  test("band photo and name tap through to the house on small screens only", async ({
+    page,
+  }) => {
+    const slug = SLUGS[0];
+
+    // Desktop with a mouse: the photo and name stay inert; the buttons lead on.
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/");
+    const band = page.getByTestId("property-band").first();
+    for (const id of ["property-band-photo-link", "property-band-title-link"]) {
+      await expect(band.getByTestId(id)).toHaveCSS("pointer-events", "none");
+    }
+
+    // Stacked layout below 760px: both are tap targets for the house page.
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const id of ["property-band-photo-link", "property-band-title-link"]) {
+      const link = band.getByTestId(id);
+      await expect(link).toHaveCSS("pointer-events", "auto");
+      await expect(link).toHaveAttribute("href", `/stays/${slug}`);
+      await expect(link).toHaveAttribute("tabindex", "-1");
+    }
+    await band.getByTestId("property-band-photo-link").click();
+    await expect(page).toHaveURL(new RegExp(`/stays/${slug}$`));
+  });
+
   test("hero mounts the search stub and the area guide shows both TikTok posters", async ({
     page,
   }) => {
