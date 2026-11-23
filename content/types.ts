@@ -236,6 +236,12 @@ export const TikTokClipSchema = z.object({
   title: nonEmpty,
   /** One or two short paragraphs under the heading; keep them brief, the column is narrow. */
   body: z.array(nonEmpty).min(1),
+  /**
+   * Id of the area pick (content/area.ts) whose photo and credit fill the
+   * poster shown before the visitor presses play. The pick needs a credited
+   * or owned photo (checked in content/index.ts).
+   */
+  poster: nonEmpty,
 });
 export type TikTokClip = z.infer<typeof TikTokClipSchema>;
 

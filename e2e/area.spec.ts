@@ -145,6 +145,81 @@ test.describe("area guide", () => {
     ).toHaveCount(HOUSES.length);
   });
 
+  test("Show narrows the picks to one category", async ({ page }) => {
+    await page.goto("/area");
+    const filter = page.getByTestId("area-filter");
+    const everything = filter.getByRole("button", { name: "Everything" });
+    await expect(everything).toHaveAttribute("aria-pressed", "true");
+    const cards = page.getByTestId("area-picks").locator("article");
+    const total = await cards.count();
+    const kindsShown = () =>
+      cards.evaluateAll((els) => [
+        ...new Set(els.map((el) => el.getAttribute("data-kind"))),
+      ]);
+    expect((await kindsShown()).sort()).toEqual([
+      "coffee",
+      "eat",
+      "local",
+      "outdoors",
+    ]);
+
+    await filter.getByRole("button", { name: "Coffee" }).click();
+    await expect(page).toHaveURL(/\?kind=coffee$/);
+    await expect(
+      filter.getByRole("button", { name: "Coffee" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(everything).toHaveAttribute("aria-pressed", "false");
+    await expect.poll(kindsShown).toEqual(["coffee"]);
+    const coffee = await cards.count();
+    expect(coffee).toBeGreaterThan(0);
+    expect(coffee).toBeLessThan(total);
+
+    // Combines with Closest to: still only coffee, now under closeness headings.
+    await filter.getByRole("button", { name: "South Austin Stay" }).click();
+    await expect(page).toHaveURL(/\?kind=coffee&house=south-austin$/);
+    await expect.poll(kindsShown).toEqual(["coffee"]);
+    await expect(cards).toHaveCount(coffee);
+    await expect(
+      page.getByTestId("area-picks").getByRole("heading", { level: 2 }).first(),
+    ).toHaveText(/^A short walk$/);
+
+    // A reload keeps both; Everything brings the other categories back.
+    await page.reload();
+    await expect.poll(kindsShown).toEqual(["coffee"]);
+    await everything.click();
+    await expect(page).toHaveURL(/\?house=south-austin$/);
+    await expect(cards).toHaveCount(total);
+  });
+
+  test("opens filtered for the category named in the link", async ({
+    page,
+  }) => {
+    await page.goto("/area?kind=outdoors");
+    await expect(
+      page.getByTestId("area-filter").getByRole("button", { name: "Outdoors" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    // Polled: the server renders every pick and the browser filters on hydration.
+    await expect
+      .poll(() =>
+        page
+          .getByTestId("area-picks")
+          .locator("article")
+          .evaluateAll((els) => [
+            ...new Set(els.map((el) => el.getAttribute("data-kind"))),
+          ]),
+      )
+      .toEqual(["outdoors"]);
+  });
+
+  test("an unknown category in the link shows everything", async ({ page }) => {
+    await page.goto("/area?kind=nightlife");
+    await expect(
+      page
+        .getByTestId("area-filter")
+        .getByRole("button", { name: "Everything" }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
   test("opens sorted for the house named in the link", async ({ page }) => {
     await page.goto("/area?house=south-austin");
     await expect(

@@ -2,10 +2,13 @@
 
 import { type ReactNode, useEffect, useRef, useSyncExternalStore } from "react";
 
+import type { AreaPick } from "@/content";
 import type { TravelBand } from "@/lib/area-travel";
 import { cx } from "@/lib/cx";
 
 export type HouseOption = { slug: string; name: string };
+
+export type KindOption = { kind: AreaPick["kind"]; label: string };
 
 /** One house's sorted picks: id and its closeness band, closest first. */
 export type HouseOrder = readonly { id: string; band: TravelBand }[];
@@ -18,19 +21,25 @@ export type AreaPicksBrowserProps = {
   orders: Readonly<Record<string, HouseOrder>>;
   /** Band headings, closest first (TRAVEL_BANDS). */
   bands: readonly { band: TravelBand; label: string }[];
+  /** Categories for the "Show" filter, in display order. */
+  kindOptions: readonly KindOption[];
+  /** Each pick id's category. */
+  kinds: Readonly<Record<string, AreaPick["kind"]>>;
   /** The server-rendered card for each pick id. */
   cards: Readonly<Record<string, ReactNode>>;
 };
 
 /*
- * The chosen house lives in the URL as `?house=<slug>`, so a property page can
- * link straight to its sorted guide and a reload keeps the choice. It is read
- * with useSyncExternalStore rather than useSearchParams so /area stays a
- * static page: the server renders "Any house", and the browser re-sorts on
- * hydration when the URL names a house.
+ * The chosen house and category live in the URL as `?house=<slug>` and
+ * `?kind=<kind>`, so a property page can link straight to its sorted guide
+ * and a reload keeps the choice. They are read with useSyncExternalStore
+ * rather than useSearchParams so /area stays a static page: the server
+ * renders every pick for "Any house", and the browser re-sorts and filters on
+ * hydration when the URL names a house or a category.
  */
-const PARAM = "house";
-const CHANGE_EVENT = "area-house-change";
+const HOUSE_PARAM = "house";
+const KIND_PARAM = "kind";
+const CHANGE_EVENT = "area-filter-change";
 
 function subscribe(onChange: () => void) {
   window.addEventListener("popstate", onChange);
@@ -41,31 +50,44 @@ function subscribe(onChange: () => void) {
   };
 }
 
-const readHouse = () =>
-  new URLSearchParams(window.location.search).get(PARAM) ?? "";
-const readHouseOnServer = () => "";
+// The query string itself is the snapshot: a string, so it compares by value.
+const readSearch = () => window.location.search;
+const readSearchOnServer = () => "";
 
-function writeHouse(slug: string | null) {
+function writeParam(name: string, value: string | null) {
   const url = new URL(window.location.href);
-  if (slug) url.searchParams.set(PARAM, slug);
-  else url.searchParams.delete(PARAM);
+  if (value) url.searchParams.set(name, value);
+  else url.searchParams.delete(name);
   // Keep the #pick anchor out of the new URL: it has already done its job.
   url.hash = "";
   window.history.replaceState(window.history.state, "", url);
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
-/** The area guide's picks, re-sorted closest-first for the house a guest picks. */
+/**
+ * The area guide's picks, re-sorted closest-first for the house a guest picks
+ * and narrowed to the category they pick.
+ */
 export function AreaPicksBrowser({
   houses,
   defaultOrder,
   orders,
   bands,
+  kindOptions,
+  kinds,
   cards,
 }: AreaPicksBrowserProps) {
-  const fromUrl = useSyncExternalStore(subscribe, readHouse, readHouseOnServer);
-  const active = houses.find((h) => h.slug === fromUrl) ?? null;
+  const search = useSyncExternalStore(
+    subscribe,
+    readSearch,
+    readSearchOnServer,
+  );
+  const params = new URLSearchParams(search);
+  const active = houses.find((h) => h.slug === params.get(HOUSE_PARAM)) ?? null;
+  const activeKind =
+    kindOptions.find((k) => k.kind === params.get(KIND_PARAM)) ?? null;
   const order = active ? orders[active.slug] : null;
+  const shown = (id: string) => !activeKind || kinds[id] === activeKind.kind;
 
   /*
    * A link like /area?house=oak-hill#escuela scrolls to the pick before
@@ -85,51 +107,78 @@ export function AreaPicksBrowser({
         .map(({ band, label }) => ({
           band,
           label,
-          ids: order.filter((o) => o.band === band).map((o) => o.id),
+          ids: order
+            .filter((o) => o.band === band && shown(o.id))
+            .map((o) => o.id),
         }))
         .filter((g) => g.ids.length > 0)
-    : [{ band: null, label: null, ids: defaultOrder }];
+    : [{ band: null, label: null, ids: defaultOrder.filter(shown) }];
 
   return (
     <div className="flex flex-col gap-[clamp(1.5rem,3vw,2.25rem)]">
       <div
         data-testid="area-filter"
-        className="flex flex-col gap-3 border-y border-hairline py-[clamp(1rem,2vw,1.25rem)] min-[720px]:flex-row min-[720px]:items-center min-[720px]:gap-5"
+        className="flex flex-col gap-[clamp(0.85rem,1.6vw,1rem)] border-y border-hairline py-[clamp(1rem,2vw,1.25rem)]"
       >
-        <span
-          id="area-filter-label"
-          className="shrink-0 font-mono text-[0.72rem] tracking-[0.08em] text-muted uppercase"
-        >
-          Closest to
-        </span>
-        <div
-          role="group"
-          aria-labelledby="area-filter-label"
-          className="flex flex-wrap gap-2"
-        >
-          <FilterButton pressed={!active} onClick={() => writeHouse(null)}>
-            Any house
-          </FilterButton>
-          {houses.map((house) => (
+        <div className="flex flex-col gap-3 min-[720px]:flex-row min-[720px]:items-center min-[720px]:gap-5">
+          <FilterLabel id="area-filter-label">Closest to</FilterLabel>
+          <div
+            role="group"
+            aria-labelledby="area-filter-label"
+            className="flex flex-wrap gap-2"
+          >
             <FilterButton
-              key={house.slug}
-              pressed={active?.slug === house.slug}
-              onClick={() => writeHouse(house.slug)}
-              slug={house.slug}
+              pressed={!active}
+              onClick={() => writeParam(HOUSE_PARAM, null)}
             >
-              {house.name}
+              Any house
             </FilterButton>
-          ))}
+            {houses.map((house) => (
+              <FilterButton
+                key={house.slug}
+                pressed={active?.slug === house.slug}
+                onClick={() => writeParam(HOUSE_PARAM, house.slug)}
+                data={{ "data-house": house.slug }}
+              >
+                {house.name}
+              </FilterButton>
+            ))}
+          </div>
+          <p
+            aria-live="polite"
+            data-testid="area-filter-status"
+            className="m-0 font-mono text-[0.72rem] leading-[1.5] tracking-[0.04em] text-muted min-[720px]:ml-auto min-[720px]:max-w-[38ch] min-[720px]:text-right"
+          >
+            {active
+              ? `Sorted by travel time from ${active.name}, walkable places first.`
+              : "Pick a house to sort by how close each place is."}
+          </p>
         </div>
-        <p
-          aria-live="polite"
-          data-testid="area-filter-status"
-          className="m-0 font-mono text-[0.72rem] leading-[1.5] tracking-[0.04em] text-muted min-[720px]:ml-auto min-[720px]:max-w-[38ch] min-[720px]:text-right"
-        >
-          {active
-            ? `Sorted by travel time from ${active.name}, walkable places first.`
-            : "Pick a house to sort by how close each place is."}
-        </p>
+        <div className="flex flex-col gap-3 min-[720px]:flex-row min-[720px]:items-center min-[720px]:gap-5">
+          <FilterLabel id="area-kind-label">Show</FilterLabel>
+          <div
+            role="group"
+            aria-labelledby="area-kind-label"
+            className="flex flex-wrap gap-2"
+          >
+            <FilterButton
+              pressed={!activeKind}
+              onClick={() => writeParam(KIND_PARAM, null)}
+            >
+              Everything
+            </FilterButton>
+            {kindOptions.map((option) => (
+              <FilterButton
+                key={option.kind}
+                pressed={activeKind?.kind === option.kind}
+                onClick={() => writeParam(KIND_PARAM, option.kind)}
+                data={{ "data-kind": option.kind }}
+              >
+                {option.label}
+              </FilterButton>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div
@@ -163,22 +212,35 @@ export function AreaPicksBrowser({
   );
 }
 
+/* Same width on both rows, so the two button groups line up on desktop. */
+function FilterLabel({ id, children }: { id: string; children: ReactNode }) {
+  return (
+    <span
+      id={id}
+      className="shrink-0 font-mono text-[0.72rem] tracking-[0.08em] text-muted uppercase min-[720px]:w-[6.5rem]"
+    >
+      {children}
+    </span>
+  );
+}
+
 function FilterButton({
   pressed,
   onClick,
-  slug,
+  data,
   children,
 }: {
   pressed: boolean;
   onClick: () => void;
-  slug?: string;
+  /** data-house or data-kind, for tests and styling hooks. */
+  data?: Readonly<Record<`data-${string}`, string>>;
   children: ReactNode;
 }) {
   return (
     <button
       type="button"
       aria-pressed={pressed}
-      data-house={slug ?? ""}
+      {...data}
       onClick={onClick}
       className={cx(
         "cursor-pointer border px-3 py-[0.45rem] font-mono text-[0.72rem] tracking-[0.06em] uppercase transition-colors duration-[120ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",

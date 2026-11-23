@@ -12,8 +12,10 @@ import { properties as rawProperties } from "./properties";
 import { site as rawSite } from "./site";
 import { z } from "zod";
 import { assertAreaPicksValid, sortPicksNear } from "@/lib/area-travel";
+import { assertTikTokPostersValid } from "@/lib/tiktok-player";
 
 import {
+  type AreaPick,
   AreaPicksSchema,
   FaqRowsSchema,
   HostsSchema,
@@ -22,6 +24,7 @@ import {
   PropertiesSchema,
   type Property,
   SiteConfigSchema,
+  type TikTokClip,
 } from "./types";
 
 export * from "./types";
@@ -56,6 +59,8 @@ assertAreaPicksValid(
   areaPicks,
   properties.map((p) => p.slug),
 );
+
+assertTikTokPostersValid(site.tiktoks, areaPicks);
 
 const licenses: License[] = properties.map((p) => ({
   propertyName: p.name,
@@ -92,6 +97,25 @@ export { getTravel, type Travel } from "@/lib/area-travel";
 /** Picks ordered by how close they are to one house (lib/area-travel.ts). */
 export function getAreaPicksNear(slug: string) {
   return sortPicksNear(areaPicks, slug);
+}
+
+/** A TikTok clip with its poster pick's photo and credit resolved. */
+export type TikTokFeature = TikTokClip & {
+  posterPhoto: NonNullable<AreaPick["photo"]>;
+  posterCredit: AreaPick["photoCredit"];
+};
+
+/** The home page's TikTok clips, in display order, posters resolved. */
+export function getTikToks(): readonly TikTokFeature[] {
+  return site.tiktoks.map((clip) => {
+    // assertTikTokPostersValid above guarantees the pick and its photo.
+    const pick = areaPicks.find((p) => p.id === clip.poster)!;
+    return {
+      ...clip,
+      posterPhoto: pick.photo!,
+      posterCredit: pick.photoCredit,
+    };
+  });
 }
 
 export function getPolicies() {

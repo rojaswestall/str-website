@@ -56,14 +56,30 @@ async function waitForCalendar(widget: Locator) {
   await expect(widget.locator('[role="gridcell"]').first()).toBeVisible();
 }
 
-async function clickDate(widget: Locator, date: string) {
+/*
+ * Pages the calendar to the month holding `date` and returns its cell. The
+ * month on screen can be after `date` (a test that first paged ahead to a
+ * reserved day), so it pages back when `date` is earlier than the first day
+ * shown. ISO dates compare correctly as strings.
+ */
+async function showDate(widget: Locator, date: string): Promise<Locator> {
   await waitForCalendar(widget);
   const cell = widget.locator(`[role="gridcell"][data-date="${date}"]`);
-  for (let i = 0; i < 4 && !(await cell.isVisible()); i++) {
-    await widget.getByRole("button", { name: "Next month" }).click();
+  for (let i = 0; i < 6 && !(await cell.isVisible()); i++) {
+    const shown = await widget
+      .locator('[role="gridcell"][data-date]:visible')
+      .evaluateAll((els) => els.map((el) => el.getAttribute("data-date")!));
+    const back = shown.length > 0 && date < shown.sort()[0]!;
+    await widget
+      .getByRole("button", { name: back ? "Previous month" : "Next month" })
+      .click();
   }
   await expect(cell).toBeVisible();
-  await cell.click();
+  return cell;
+}
+
+async function clickDate(widget: Locator, date: string) {
+  await (await showDate(widget, date)).click();
 }
 
 type RecordedEvent = { type: string; detail: unknown };
@@ -202,9 +218,8 @@ test.describe("native booking widget", () => {
     // The next day cannot be the check-out (2-night minimum). It stays
     // clickable only as a fresh check-in: clicking it restarts the stay
     // there rather than completing a one-night one.
-    const tooSoon = widget.locator(
-      `[role="gridcell"][data-date="${addDays(stay.checkIn, 1)}"]`,
-    );
+    // The check-in can be the last day of a month, so page to the next day.
+    const tooSoon = await showDate(widget, addDays(stay.checkIn, 1));
     await expect(tooSoon).toHaveAttribute("aria-label", /minimum 2 nights/);
     await expect(tooSoon).not.toHaveAttribute("aria-selected", "true");
     await tooSoon.click();
