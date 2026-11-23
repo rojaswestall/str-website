@@ -56,11 +56,23 @@ async function waitForCalendar(widget: Locator) {
   await expect(widget.locator('[role="gridcell"]').first()).toBeVisible();
 }
 
+/*
+ * Pages towards `date` from whatever month is showing, in either direction.
+ * A test may already have paged forward (to find a reserved night, say), so
+ * the target can sit in an earlier month: near the end of a month the
+ * generated weekday stay often does.
+ */
 async function clickDate(widget: Locator, date: string) {
   await waitForCalendar(widget);
   const cell = widget.locator(`[role="gridcell"][data-date="${date}"]`);
-  for (let i = 0; i < 4 && !(await cell.isVisible()); i++) {
-    await widget.getByRole("button", { name: "Next month" }).click();
+  for (let i = 0; i < 6 && !(await cell.isVisible()); i++) {
+    const shown = await widget
+      .locator('[role="gridcell"][data-date]:visible')
+      .first()
+      .getAttribute("data-date");
+    const direction =
+      shown !== null && date < shown ? "Previous month" : "Next month";
+    await widget.getByRole("button", { name: direction }).click();
   }
   await expect(cell).toBeVisible();
   await cell.click();
