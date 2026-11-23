@@ -336,6 +336,11 @@ test.describe("site shell", () => {
     await expect(footer).toContainText(
       "Phone shared with guests after booking",
     );
+    // The colophon links to the public production domain.
+    await expect(
+      footer.getByRole("link", { name: "www.theaustincollection.com" }),
+    ).toHaveAttribute("href", "https://www.theaustincollection.com/");
+    await expect(footer).not.toContainText("domain to confirm");
     // No public email or Instagram; the footer points at the contact form.
     await expect(
       footer.getByRole("link", { name: "Send us a message" }),

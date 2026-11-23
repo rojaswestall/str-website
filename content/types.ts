@@ -250,7 +250,7 @@ export const SiteConfigSchema = z.object({
   tagline: nonEmpty,
   /** One sentence for the root `<meta name="description">`, Open Graph, and the Organization JSON-LD. */
   description: nonEmpty,
-  /** Bare host name, no scheme. Placeholder until the domain is chosen. */
+  /** Bare host name of the public site, no scheme. `[TBC]` renders as a gap. */
   domain: nonEmpty,
   hospitable: z.object({
     /** "stub" renders the placeholder panels; "hospitable" injects the loader; "native" renders the site's own widget. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
