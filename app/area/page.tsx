@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AreaPickCard } from "@/components/area/AreaPickCard";
+import { AreaPickCard, KIND_LABEL } from "@/components/area/AreaPickCard";
 import { AreaPicksBrowser } from "@/components/area/AreaPicksBrowser";
 import { Section, Tbc } from "@/components/ui";
 import {
@@ -31,9 +31,10 @@ export const metadata: Metadata = {
 
 /*
  * The area guide: every pick from content/area.ts with its travel time from
- * each house. Static; reads content at build time. The "Closest to" filter
- * (AreaPicksBrowser) re-sorts the server-rendered cards in the browser using
- * the per-house orders worked out here.
+ * each house. Static; reads content at build time. The "Closest to" and
+ * "Show" filters (AreaPicksBrowser) re-sort and narrow the server-rendered
+ * cards in the browser using the per-house orders and categories worked out
+ * here.
  */
 export default function AreaPage() {
   const picks = getAreaPicks();
@@ -47,6 +48,12 @@ export default function AreaPage() {
       })),
     ]),
   );
+  // Categories in the order they first appear in the content, so the filter
+  // reads the same way the default guide does.
+  const kindOptions = [...new Set(picks.map((pick) => pick.kind))].map(
+    (kind) => ({ kind, label: KIND_LABEL[kind] }),
+  );
+  const kinds = Object.fromEntries(picks.map((pick) => [pick.id, pick.kind]));
   const cards = Object.fromEntries(
     picks.map((pick) => [pick.id, <AreaPickCard key={pick.id} pick={pick} />]),
   );
@@ -93,7 +100,8 @@ export default function AreaPage() {
           are in South Austin, so the same place can be a short hop from one and
           a longer drive from another. Every pick lists the drive time from each
           house, or the walk when it&apos;s close. Choose the house you&apos;re
-          booking to see what&apos;s closest first.
+          booking to see what&apos;s closest first, or narrow it to coffee,
+          food, the outdoors, or local knowledge.
         </p>
       </header>
 
@@ -103,6 +111,8 @@ export default function AreaPage() {
         defaultOrder={picks.map((pick) => pick.id)}
         orders={orders}
         bands={TRAVEL_BANDS}
+        kindOptions={kindOptions}
+        kinds={kinds}
         cards={cards}
       />
     </Section>
