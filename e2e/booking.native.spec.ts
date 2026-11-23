@@ -213,13 +213,13 @@ test.describe("native booking widget", () => {
 
     // The next day cannot be the check-out (2-night minimum). It stays
     // clickable only as a fresh check-in: clicking it restarts the stay
-    // there rather than completing a one-night one.
-    const tooSoon = widget.locator(
-      `[role="gridcell"][data-date="${addDays(stay.checkIn, 1)}"]`,
-    );
+    // there rather than completing a one-night one. It can fall in the next
+    // month, so clickDate pages to it.
+    const nextDay = addDays(stay.checkIn, 1);
+    const tooSoon = widget.locator(`[role="gridcell"][data-date="${nextDay}"]`);
     await expect(tooSoon).toHaveAttribute("aria-label", /minimum 2 nights/);
     await expect(tooSoon).not.toHaveAttribute("aria-selected", "true");
-    await tooSoon.click();
+    await clickDate(widget, nextDay);
     await expect(tooSoon).toHaveAttribute("aria-label", /selected as check-in/);
     await expect(footer).toContainText("Choose a check-out date");
     expect(
