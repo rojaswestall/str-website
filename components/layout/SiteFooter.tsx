@@ -10,7 +10,8 @@ const link =
  * mono contact column, and the City of Austin STR license line, one entry per
  * house, read from the content layer. There is no public email or Instagram:
  * the contact column links to the contact form in the home page's `#direct`
- * section. An unconfirmed domain renders as a dashed `Tbc` gap.
+ * section. The domain links to the public site; an unconfirmed one renders as
+ * a dashed `Tbc` gap.
  */
 export function SiteFooter() {
   const site = getSite();
@@ -22,7 +23,13 @@ export function SiteFooter() {
         <p className="font-display text-[1.35rem] leading-[1.3] text-ink">
           {site.name}
           <span className="mt-[0.4rem] block font-mono text-[0.74rem] tracking-[0.06em] text-muted">
-            {isTbc(site.domain) ? <Tbc>domain to confirm</Tbc> : site.domain}
+            {isTbc(site.domain) ? (
+              <Tbc>domain to confirm</Tbc>
+            ) : (
+              <a href={`https://${site.domain}/`} className={link}>
+                {site.domain}
+              </a>
+            )}
           </span>
         </p>
 

@@ -4,16 +4,19 @@ const HOUSES = [
   {
     slug: "oak-hill",
     name: "An Oak Hill Home",
+    airbnbTitle: "Cozy 3BR Oak Hill Retreat • Fireplace • Fast Wi-Fi",
     airbnb: "https://www.airbnb.com/rooms/1598934202273477463",
   },
   {
     slug: "south-austin",
     name: "South Austin Stay",
+    airbnbTitle: "Fast WiFi |Garage| Yard | 3BR • 5 Beds • Sleeps 8+",
     airbnb: "https://www.airbnb.com/rooms/1655329029936239948",
   },
   {
     slug: "fire-side",
     name: "Fire Side Home",
+    airbnbTitle: "Spacious 3BR Home • Near Radio Coffee • Fast Wi-Fi",
     airbnb: "https://www.airbnb.com/rooms/1598953749522814358",
   },
 ];
@@ -29,6 +32,10 @@ test.describe("property pages", () => {
       await expect(
         page.getByRole("heading", { level: 1, name: house.name }),
       ).toBeVisible();
+      // The Airbnb listing title sits under the name, as a subtitle.
+      await expect(
+        page.getByRole("heading", { level: 1 }).locator("+ p"),
+      ).toHaveText(`On Airbnb: ${house.airbnbTitle}`);
       await expect(
         page.getByRole("link", { name: "Back to all stays" }),
       ).toHaveAttribute("href", "/#stays");

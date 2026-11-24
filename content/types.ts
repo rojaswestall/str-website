@@ -92,6 +92,8 @@ export const PropertySchema = z
     name: nonEmpty,
     /** Short label for nav, map legend, and tight layouts. */
     shortName: nonEmpty,
+    /** The listing's title on Airbnb, shown as a subtitle under `name`. */
+    airbnbTitle: nonEmpty,
     neighborhood: nonEmpty,
     /** The mono line above the name, e.g. "Oak Hill, Austin · off Hwy 290 & 71". */
     locationLine: nonEmpty,
@@ -250,7 +252,7 @@ export const SiteConfigSchema = z.object({
   tagline: nonEmpty,
   /** One sentence for the root `<meta name="description">`, Open Graph, and the Organization JSON-LD. */
   description: nonEmpty,
-  /** Bare host name, no scheme. Placeholder until the domain is chosen. */
+  /** Bare host name of the public site, no scheme. `[TBC]` renders as a gap. */
   domain: nonEmpty,
   hospitable: z.object({
     /** "stub" renders the placeholder panels; "hospitable" injects the loader; "native" renders the site's own widget. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */

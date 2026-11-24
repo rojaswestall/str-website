@@ -74,6 +74,31 @@ test.describe("home page", () => {
     await expect(page.getByRole("list", { name: "Amenities" })).toHaveCount(0);
   });
 
+  test("band photo and name tap through to the house on small screens only", async ({
+    page,
+  }) => {
+    const slug = SLUGS[0];
+
+    // Desktop with a mouse: the photo and name stay inert; the buttons lead on.
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/");
+    const band = page.getByTestId("property-band").first();
+    for (const id of ["property-band-photo-link", "property-band-title-link"]) {
+      await expect(band.getByTestId(id)).toHaveCSS("pointer-events", "none");
+    }
+
+    // Stacked layout below 760px: both are tap targets for the house page.
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const id of ["property-band-photo-link", "property-band-title-link"]) {
+      const link = band.getByTestId(id);
+      await expect(link).toHaveCSS("pointer-events", "auto");
+      await expect(link).toHaveAttribute("href", `/stays/${slug}`);
+      await expect(link).toHaveAttribute("tabindex", "-1");
+    }
+    await band.getByTestId("property-band-photo-link").click();
+    await expect(page).toHaveURL(new RegExp(`/stays/${slug}$`));
+  });
+
   test("hero mounts the search stub and the area guide shows both TikTok posters", async ({
     page,
   }) => {
@@ -168,7 +193,7 @@ test.describe("home page", () => {
     expect(await mapGroundFill(page)).toBe(MAP_GROUND_DARK);
   });
 
-  test("guest reviews sit above the hosts with each house's record", async ({
+  test("guest reviews sit above the area guide and hosts with each house's record", async ({
     page,
   }) => {
     await page.goto("/");
@@ -177,7 +202,7 @@ test.describe("home page", () => {
       reviews.getByRole("heading", { level: 2, name: "What guests say" }),
     ).toBeVisible();
     // Average weighted by review count across the three listings.
-    await expect(reviews).toContainText("4.99 average · 75 reviews");
+    await expect(reviews).toContainText("4.99 average · 90 reviews");
 
     const records = reviews.getByTestId("review-records").locator("li");
     await expect(records).toHaveCount(3);
@@ -234,13 +259,18 @@ test.describe("home page", () => {
       reviews.getByRole("button", { name: "Play slideshow" }),
     ).toHaveAttribute("aria-pressed", "true");
 
-    // Order on the page: Why book direct, then reviews, then hosts.
+    // Order on the page: Why book direct, reviews, the area guide, hosts.
     const ids = await page
       .locator("main section[id], main section[aria-labelledby=hosts-heading]")
       .evaluateAll((sections) =>
         sections.map((s) => s.id || s.getAttribute("aria-labelledby")),
       );
-    expect(ids.slice(-3)).toEqual(["direct", "reviews", "hosts-heading"]);
+    expect(ids.slice(-4)).toEqual([
+      "direct",
+      "reviews",
+      "area",
+      "hosts-heading",
+    ]);
   });
 
   test("the review slideshow starts paused under reduced motion", async ({
@@ -311,6 +341,11 @@ test.describe("site shell", () => {
     await expect(footer).toContainText(
       "Phone shared with guests after booking",
     );
+    // The colophon links to the public production domain.
+    await expect(
+      footer.getByRole("link", { name: "www.theaustincollection.com" }),
+    ).toHaveAttribute("href", "https://www.theaustincollection.com/");
+    await expect(footer).not.toContainText("domain to confirm");
     // No public email or Instagram; the footer points at the contact form.
     await expect(
       footer.getByRole("link", { name: "Send us a message" }),
