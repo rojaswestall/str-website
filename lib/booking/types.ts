@@ -145,6 +145,79 @@ export type CalendarResponse =
 
 export type QuoteResponse = { ok: true; quote: Quote } | BookingErrorBody;
 
+/** A stay to check every house against: the URL contract of /search. */
+export type SearchQuery = {
+  checkIn: string;
+  checkOut: string;
+  adults: number;
+  children: number;
+  infants: number;
+  pets: number;
+};
+
+/**
+ * Why a house is not free for a stay. All but `unknown` come from the
+ * calendar rules the widget uses (`rules.ts`) or the house's capacity;
+ * `unknown` means its calendar could not be read, which is never reported
+ * as free.
+ */
+export type StayReason =
+  | "unavailable"
+  | "min-stay"
+  | "max-nights"
+  | "closed-to-arrival"
+  | "closed-to-departure"
+  | "max-guests"
+  | "pets"
+  | "past"
+  | "unknown";
+
+/**
+ * One house's answer for a stay. The amounts are estimates from the
+ * calendar, each night at the direct preview price the widget shows
+ * (`previewNightlyDollars`, in cents), nights only: no cleaning fee, no
+ * taxes. The quote on the house page is the price.
+ */
+export type StayEvaluation =
+  | {
+      available: true;
+      nights: number;
+      nightly: { min: Cents; max: Cents };
+      estimatedNightlyTotal: Cents;
+    }
+  | {
+      available: false;
+      reason: StayReason;
+      nights: number;
+      /** The check-in day's minimum, on `min-stay` only. */
+      minStay?: number;
+    };
+
+/** What a search result card needs about a house, plus its verdict. */
+export type SearchResult = Pick<
+  BookingProperty,
+  | "id"
+  | "slug"
+  | "name"
+  | "bedrooms"
+  | "bathrooms"
+  | "maxGuests"
+  | "petsAllowed"
+  | "heroImage"
+  | "currency"
+> & { stay: StayEvaluation };
+
+export type SearchAvailability = {
+  checkIn: string;
+  checkOut: string;
+  nights: number;
+  /** Every bookable house, in content order. */
+  results: SearchResult[];
+};
+
+export type SearchResponse =
+  ({ ok: true } & SearchAvailability) | BookingErrorBody;
+
 /**
  * What the server hands the widget at render time so the calendar is in
  * the first HTML instead of two fetches later. `calendar` is null when the

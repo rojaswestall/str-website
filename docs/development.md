@@ -40,56 +40,58 @@ from React's dev tooling (production does not use eval).
 Copy `.env.example` to `.env.local` if you want to change anything; every
 variable is optional locally.
 
-| Variable                                 | Default / unset                 | Effect                                                                                                  |
-| ---------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`                   | `http://localhost:3000`         | Origin for canonical, sitemap, OG, and JSON-LD URLs. Empty counts as unset.                             |
-| `NEXT_PUBLIC_HOSPITABLE_MODE`            | `site.hospitable.mode` (`stub`) | `stub` shows placeholder panels; `live` embeds Hospitable's widget; `native` renders the site's own.    |
-| `RESEND_API_KEY`                         | unset → dry run                 | Without it, `/api/contact` logs the message and returns success.                                        |
-| `CONTACT_FROM`                           | —                               | Sender on the Resend-verified domain. Required once a key is set.                                       |
-| `CONTACT_TO`                             | —                               | Comma-separated recipients. Required once a key is set.                                                 |
-| `NEXT_DIST_DIR`                          | `.next`                         | Build directory; Playwright uses `.next-live` and `.next-native` for its other two builds.              |
-| `HOSPITABLE_PERSONAL_ACCESS_TOKEN`       | unset → booking routes 503      | Public API v2 token (read access). Server-only; never prefix it `NEXT_PUBLIC_`. Alias `HOSPITABLE_PAT`. |
-| `HOSPITABLE_CUSTOM_SITE_ID`              | `site.hospitable.siteUuid`      | Sent with every quote so checkout is attributed to this site.                                           |
-| `AIRBNB_MARKUP_PCT`, `DIRECT_MARKUP_PCT` | `15.5`, `11`                    | Fallback markups for a house whose Hospitable markups are missing.                                      |
-| `AIRBNB_LISTING_URLS`                    | `airbnbUrl` from content        | JSON map of property id → Airbnb URL for the price comparison link.                                     |
-| `COMPARISON_ENABLED`                     | `true`                          | `false` hides the Airbnb price comparison.                                                              |
-| `MAX_NIGHTS`                             | `90`                            | Longest stay `/api/quote` will price.                                                                   |
-| `BOOKING_ADMIN_TOKEN`                    | unset → route is a 404          | Bearer token (16+ chars) for `GET /api/admin/comparison-check`.                                         |
-| `HOSPITABLE_API_BASE_URL`                | the real Public API             | Only the e2e suite sets it, to the stand-in in `e2e/mock-hospitable/`.                                  |
-| `NEXT_PUBLIC_MAPKIT_TOKEN`               | unset → drawn SVG map           | Apple MapKit JS token (domain-restricted, public by design). Set: the city map is a live Apple map.     |
+| Variable                                 | Default / unset                 | Effect                                                                                                                                              |
+| ---------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                   | `http://localhost:3000`         | Origin for canonical, sitemap, OG, and JSON-LD URLs. Empty counts as unset.                                                                         |
+| `NEXT_PUBLIC_HOSPITABLE_MODE`            | `site.hospitable.mode` (`stub`) | `stub` shows placeholder panels; `hospitable` embeds Hospitable's widget (`live` is its old name and still works); `native` renders the site's own. |
+| `RESEND_API_KEY`                         | unset → dry run                 | Without it, `/api/contact` logs the message and returns success.                                                                                    |
+| `CONTACT_FROM`                           | —                               | Sender on the Resend-verified domain. Required once a key is set.                                                                                   |
+| `CONTACT_TO`                             | —                               | Comma-separated recipients. Required once a key is set.                                                                                             |
+| `NEXT_DIST_DIR`                          | `.next`                         | Build directory; Playwright uses `.next-live` and `.next-native` for its other two builds.                                                          |
+| `HOSPITABLE_PERSONAL_ACCESS_TOKEN`       | unset → booking routes 503      | Public API v2 token (read access). Server-only; never prefix it `NEXT_PUBLIC_`. Alias `HOSPITABLE_PAT`.                                             |
+| `HOSPITABLE_CUSTOM_SITE_ID`              | `site.hospitable.siteUuid`      | Sent with every quote so checkout is attributed to this site.                                                                                       |
+| `AIRBNB_MARKUP_PCT`, `DIRECT_MARKUP_PCT` | `15.5`, `11`                    | Fallback markups for a house whose Hospitable markups are missing.                                                                                  |
+| `AIRBNB_LISTING_URLS`                    | `airbnbUrl` from content        | JSON map of property id → Airbnb URL for the price comparison link.                                                                                 |
+| `COMPARISON_ENABLED`                     | `true`                          | `false` hides the Airbnb price comparison.                                                                                                          |
+| `MAX_NIGHTS`                             | `90`                            | Longest stay `/api/quote` will price and `/api/availability` will search; a longer prefilled stay drops its check-out.                              |
+| `BOOKING_ADMIN_TOKEN`                    | unset → route is a 404          | Bearer token (16+ chars) for `GET /api/admin/comparison-check`.                                                                                     |
+| `HOSPITABLE_API_BASE_URL`                | the real Public API             | Only the e2e suite sets it, to the stand-in in `e2e/mock-hospitable/`.                                                                              |
+| `NEXT_PUBLIC_MAPKIT_TOKEN`               | unset → drawn SVG map           | Apple MapKit JS token (domain-restricted, public by design). Set: the city map is a live Apple map.                                                 |
 
 `NEXT_PUBLIC_*` values are inlined at build time; restart `pnpm dev` or
 rebuild after changing them.
 
 **Seeing Hospitable's embedded widgets locally:** set
-`NEXT_PUBLIC_HOSPITABLE_MODE=live` in `.env.local` and open any
+`NEXT_PUBLIC_HOSPITABLE_MODE=hospitable` in `.env.local` and open any
 `/stays/<slug>` (all three houses have property ids) or the home hero search.
 The widgets talk to Hospitable's production services.
 
 **Running the site's own booking widget locally:** set
 `NEXT_PUBLIC_HOSPITABLE_MODE=native` and `HOSPITABLE_PERSONAL_ACCESS_TOKEN`
 in `.env.local` (`HOSPITABLE_CUSTOM_SITE_ID` too if it differs from
-`content/site.ts`), run `pnpm dev`, and open `/stays/south-austin`, the one
-house with markups set in Hospitable. The routes hit the live Hospitable
+`content/site.ts`), run `pnpm dev`, and open any `/stays/<slug>` (all three
+houses have markups set in Hospitable). The routes hit the real Hospitable
 account: every quote creates a quote record there (no reservation, no
 charge), and Reserve really does go to Hospitable's checkout. Without the
-token the widget says online booking is unavailable.
+token the widget says online booking is unavailable. The search route is
+plain `curl` away:
+`curl "http://localhost:3000/api/availability?checkin=2027-03-12&checkout=2027-03-15&adults=2"`.
 
 ## Scripts
 
-| Script               | What it does                                                            |
-| -------------------- | ----------------------------------------------------------------------- |
-| `pnpm dev`           | Development server on port 3000                                         |
-| `pnpm build`         | Production build                                                        |
-| `pnpm start`         | Serve the production build                                              |
-| `pnpm lint`          | ESLint                                                                  |
-| `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                                      |
-| `pnpm check:content` | Parse `content/*.ts` through zod and run the content rules              |
-| `pnpm check:colors`  | Fail on raw colours under `components/` and `app/`                      |
-| `pnpm format`        | Prettier, write mode                                                    |
-| `pnpm format:check`  | Prettier, check only (CI)                                               |
-| `pnpm test:unit`     | `node:test` over `lib/**/*.test.ts`; no server, no network              |
-| `pnpm test`          | Playwright against two fresh production builds (alias: `pnpm test:e2e`) |
+| Script               | What it does                                                                                              |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`           | Development server on port 3000                                                                           |
+| `pnpm build`         | Production build                                                                                          |
+| `pnpm start`         | Serve the production build                                                                                |
+| `pnpm lint`          | ESLint                                                                                                    |
+| `pnpm typecheck`     | `next typegen` then `tsc --noEmit`                                                                        |
+| `pnpm check:content` | Parse `content/*.ts` through zod and run the content rules                                                |
+| `pnpm check:colors`  | Fail on raw colours under `components/` and `app/`                                                        |
+| `pnpm format`        | Prettier, write mode                                                                                      |
+| `pnpm format:check`  | Prettier, check only (CI)                                                                                 |
+| `pnpm test:unit`     | `node:test` over `lib/**/*.test.ts`; no server, no network                                                |
+| `pnpm test`          | Playwright against three fresh production builds and the stand-in Hospitable API (alias: `pnpm test:e2e`) |
 
 Before pushing, run what CI runs:
 
@@ -104,10 +106,11 @@ other file, including these docs, is formatted by Prettier.
 
 Two kinds, plus the content rules in `pnpm check:content`:
 
-- **Unit tests** (`pnpm test:unit`, 76 tests, about a second): Node's built-in
+- **Unit tests** (`pnpm test:unit`, 113 tests, about a second): Node's built-in
   test runner via `tsx` over `lib/**/*.test.ts`. They cover the booking
   code (`lib/booking/*.test.ts`: cache, config, dates, normalizers, calendar
-  rules, quote state, the Airbnb comparison, phone normalisation, retry)
+  rules, search, quote state, the Airbnb comparison, phone normalisation,
+  retry)
   against recorded Hospitable responses in `lib/booking/__fixtures__/`
   (addresses, coordinates, and host names redacted; the repo is public). No
   server, no network, no token.
@@ -122,12 +125,12 @@ Two kinds, plus the content rules in `pnpm check:content`:
 three production builds of the site, one per booking mode, and a stand-in
 Hospitable API for the native one.
 
-| Project           | Port | Build                                                | Runs                                      |
-| ----------------- | ---- | ---------------------------------------------------- | ----------------------------------------- |
-| `chromium`        | 3000 | `.next`, `NEXT_PUBLIC_HOSPITABLE_MODE=stub`          | every spec except `*.live.*`/`*.native.*` |
-| `chromium-live`   | 3001 | `.next-live`, `NEXT_PUBLIC_HOSPITABLE_MODE=live`     | `hospitable.live.spec.ts`, `mapkit.live…` |
-| `chromium-native` | 3002 | `.next-native`, `NEXT_PUBLIC_HOSPITABLE_MODE=native` | `booking.native.spec.ts`                  |
-| (stand-in)        | 3999 | `node e2e/mock-hospitable/server.mjs`                | —                                         |
+| Project           | Port | Build                                                  | Runs                                      |
+| ----------------- | ---- | ------------------------------------------------------ | ----------------------------------------- |
+| `chromium`        | 3000 | `.next`, `NEXT_PUBLIC_HOSPITABLE_MODE=stub`            | every spec except `*.live.*`/`*.native.*` |
+| `chromium-live`   | 3001 | `.next-live`, `NEXT_PUBLIC_HOSPITABLE_MODE=hospitable` | `hospitable.live.spec.ts`, `mapkit.live…` |
+| `chromium-native` | 3002 | `.next-native`, `NEXT_PUBLIC_HOSPITABLE_MODE=native`   | `booking.native…`, `search.native…`       |
+| (stand-in)        | 3999 | `node e2e/mock-hospitable/server.mjs`                  | —                                         |
 
 Every server pins `NEXT_PUBLIC_SITE_URL=""` so a `.env.local` cannot change
 the URLs the SEO spec checks, and each pins its mode. The live build pins a
@@ -140,33 +143,39 @@ pointing at the stand-in, the admin token — so a developer's real token in
 extra builds type-check with `tsconfig.live.json` / `tsconfig.native.json`,
 so a stale `.next-live` or `.next-native` cannot break `pnpm typecheck`.
 
-The stand-in (`e2e/mock-hospitable/server.mjs`, plain Node) serves the
-recorded Dan Jean Unit A property and generates calendars so the tests
-never age: weekdays $112 base, Fridays and Saturdays $150, a 2-night
-minimum, the 10th–12th of each month reserved, the 20th closed to check-in.
-Quotes are priced the way Hospitable prices them. The guest's last name on
-the final quote drives the paths the calendar cannot (`Unavailable`,
-`Changed`, `Upstream`), and the first calendar read of each run answers 503
-so the server's retry is exercised for real. The header comment lists all
-of it.
+The stand-in (`e2e/mock-hospitable/server.mjs`, plain Node) serves all
+three houses, each built from the recorded Dan Jean Unit A property with
+its own id and rules, plus a fourth property content does not list (which
+the server must filter out), and generates calendars so the tests never
+age. South Austin: weekdays $112 base, Fridays and Saturdays $150, a
+2-night minimum, the 10th–12th of each month reserved, the 20th closed to
+check-in. Oak Hill: $130 / $175, a 2-night minimum that is 3 from a Friday
+or Saturday check-in, no markups set (so the configured fallbacks apply).
+Fire Side: $98 / $140, no minimum, pets not allowed, sleeps 4. Quotes are
+priced the way Hospitable prices them. The guest's last name on the final
+quote drives the paths the calendar cannot (`Unavailable`, `Changed`,
+`Upstream`), and the first calendar read of each run answers 503 so the
+server's retry is exercised for real. The header comment lists all of it;
+`e2e/mock-hospitable/stays.ts` has the date helpers the native specs share.
 
-90 tests (75 + 3 + 12); about two minutes locally including the builds.
+112 tests (75 + 9 + 28); a few minutes locally including the three builds.
 
-| Spec                      | Covers                                                                                                                                                                                                                                                                                                                                                         |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `home.spec.ts`            | Title and hero, anchored sections, band links, search stub, both TikTok fallbacks, CityMap pins and recolour, guest reviews and slideshow under reduced motion, hosts, direct section; site shell (header, nav, footer, STR licenses, skip link)                                                                                                               |
-| `stays.spec.ts`           | Each of the three houses (title, h1, booking panel, stub naming the house, Airbnb link attributes, other houses), gallery carousel and pop-up, spec strip, practicals and FAQ, highlighted map, sticky panel by viewport, "Near this house", 404 status for `/stays/nope` and `/does-not-exist`                                                                |
-| `area.spec.ts`            | Every pick with the drive time from each house; linked from the header and home page                                                                                                                                                                                                                                                                           |
-| `theme.spec.ts`           | System preference, live preference flip, toggle cycle and persistence, Newsreader on `font-display`                                                                                                                                                                                                                                                            |
-| `contact-api.spec.ts`     | `POST /api/contact`: 200, honeypot, invalid email, checkout before check-in, unknown slug, non-JSON, 429 with `Retry-After`, GET 405                                                                                                                                                                                                                           |
-| `contact-form.spec.ts`    | Mount and honeypot, full submit against the real route, inline 400 errors, pending + 429, 500, aborted request                                                                                                                                                                                                                                                 |
-| `hospitable.spec.ts`      | Stub mode makes no Hospitable request; report-only CSP header on `/`, a stay, and the 404                                                                                                                                                                                                                                                                      |
-| `hospitable.live.spec.ts` | Live mode with the loaders intercepted: one script and marker, remount across client-side navigation, no missing-id warnings, search bar → `/search`                                                                                                                                                                                                           |
-| `booking.native.spec.ts`  | Native mode against the stand-in: server-rendered calendar with no client fetch, min-stay and blocked nights, quote + Airbnb saving in the footer, hand-off to checkout (intercepted), changed total, just-booked nights, unlisted house, axe in both themes; `/api/properties`, `/api/calendar`, `/api/quote` validation and mapped refusals, the admin check |
-| `seo.spec.ts`             | Sitemap, robots, OG and icon PNG routes, `VacationRental` per stay, `Organization`, canonical and OG tags                                                                                                                                                                                                                                                      |
-| `kitchen-sink.spec.ts`    | `/kitchen-sink` is a 404 in production                                                                                                                                                                                                                                                                                                                         |
-| `a11y.spec.ts`            | axe on `/`, `/stays/oak-hill`, `/area`, `/search`, `/does-not-exist` in light and dark; serious/critical fail, moderate/minor are attached to the report                                                                                                                                                                                                       |
-| `visual.spec.ts`          | Full-page screenshots of `/`, `/stays/oak-hill`, `/search` in both themes into `e2e/__screenshots__/` (review aids, gitignored, no pixel comparison)                                                                                                                                                                                                           |
+| Spec                      | Covers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `home.spec.ts`            | Title and hero, anchored sections, band links, search stub, both TikTok posters (no TikTok request on load) and click to play against a mocked player (ready, error, silent timeout, blocked autoplay), CityMap pins and recolour, guest reviews and slideshow under reduced motion, hosts, direct section; site shell (header, nav, footer, STR licenses, skip link)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `stays.spec.ts`           | Each of the three houses (title, h1, booking panel, stub naming the house, Airbnb link attributes, other houses), gallery carousel and pop-up, spec strip, practicals and FAQ, highlighted map, sticky panel by viewport, "Near this house", 404 status for `/stays/nope` and `/does-not-exist`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `area.spec.ts`            | Every pick with the drive time from each house; linked from the header and home page                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `theme.spec.ts`           | System preference, live preference flip, toggle cycle and persistence, Newsreader on `font-display`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `contact-api.spec.ts`     | `POST /api/contact`: 200, honeypot, invalid email, checkout before check-in, unknown slug, non-JSON, 429 with `Retry-After`, GET 405                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `contact-form.spec.ts`    | Mount and honeypot, full submit against the real route, inline 400 errors, pending + 429, 500, aborted request                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `hospitable.spec.ts`      | Stub mode makes no Hospitable request; report-only CSP header on `/`, a stay, and the 404                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `hospitable.live.spec.ts` | Live mode with the loaders intercepted: one script and marker, remount across client-side navigation, no missing-id warnings, search bar → `/search`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `booking.native.spec.ts`  | Native mode against the stand-in: server-rendered calendar with no client fetch, min-stay and blocked nights, quote + Airbnb saving in the footer, hand-off to checkout (intercepted), changed total, just-booked nights, axe in both themes; `/api/properties` (three houses, the stranger filtered out), `/api/calendar`, `/api/quote` validation and mapped refusals, the admin check                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `search.native.spec.ts`   | `GET /api/availability`: three results with calendar estimates and `no-store`, every refusal reason over the three generated calendars, field errors, 405, the 60-a-minute limit; a house page prefilled from the URL quotes the stay without a click, drops a check-out it cannot use (bad format, or refused by the calendar), ignores a past check-in, clamps the guests; the home-page search bar replaces the embed and never calls Hospitable's hosts, submits dates and three adults to `/search` with exactly those parameters (an empty submit opens the calendar instead), submits the same URL in a `javaScriptEnabled: false` context (where `/search` keeps its skeleton and `noscript` note), axe on `/` in both themes with the picker open; the `/search` results page: hero bar → results → card → house page with the total already in the footer, results in the server's HTML with no `/api/` or Hospitable request, each refusal with its reason and ordering (blocked range, minimum stay, six adults, a pet, every house refused), the "no dates" URLs (none, `checkin=bad`, past, backwards, over `MAX_NIGHTS`) with the bar keeping what is valid, a new search showing the skeleton while pending and back/forward restoring bar and results, axe in both themes with results and with the invitation |
+| `seo.spec.ts`             | Sitemap, robots, OG and icon PNG routes, `VacationRental` per stay, `Organization`, canonical and OG tags                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `kitchen-sink.spec.ts`    | `/kitchen-sink` is a 404 in production                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `a11y.spec.ts`            | axe on `/`, `/stays/oak-hill`, `/area`, `/search`, `/does-not-exist` in light and dark; serious/critical fail, moderate/minor are attached to the report                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `visual.spec.ts`          | Full-page screenshots of `/`, `/stays/oak-hill`, `/search` in both themes into `e2e/__screenshots__/` (review aids, gitignored, no pixel comparison)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 No test ever loads a real third party: TikTok requests are aborted, the
 Hospitable loaders are intercepted with stand-ins, the native build talks to
@@ -190,15 +199,22 @@ pnpm exec playwright test --list                    # list without running
 
 - **Stale servers.** Outside CI, Playwright reuses whatever is already
   listening on ports 3000, 3001, 3002 and 3999, including another worktree's
-  `next dev` (then `/kitchen-sink` answers 200 and the suite fails) or an
-  old stand-in whose one-time 503 has already been spent. Before a run that
-  must prove anything: `lsof -iTCP:3000 -sTCP:LISTEN` and
-  `pkill -f next-server` (`next-server` outlives a pkill of the pnpm
-  wrapper).
+  `next dev` (then `/kitchen-sink` answers 200 and the suite fails), another
+  worktree's `next start` (then your branch is never built: a route it adds
+  answers 404 and a prefill it adds is ignored, with no hint why) or an old
+  stand-in whose one-time 503 has already been spent. Before a run that
+  must prove anything: `lsof -iTCP:3000 -sTCP:LISTEN` (and the other three
+  ports) and `pkill -f next-server` (`next-server` outlives a pkill of the
+  pnpm wrapper).
 - **Quote rate limit.** `/api/quote` allows 20 per minute per address and
   `next start` adds no `x-forwarded-for`, so every browser quote in the
   native project shares one bucket. The route tests send their own
   addresses; keep browser-driven quotes in a spec to a handful.
+- **Availability rate limit.** `/api/availability` allows 60 per minute per
+  address in its own bucket. `search.native.spec.ts` sends every request
+  with its own `x-forwarded-for`, and its limit test spends a whole bucket,
+  so rerunning that test within a minute against a reused server fails at
+  the first request; wait a minute or restart the server.
 - **Rate limiter addresses.** `next start` adds no `x-forwarded-for`, so
   browser posts would share one limiter bucket (5 per 10 minutes per server
   process). `contact-api.spec.ts` uses per-process IPv6 documentation
@@ -208,9 +224,23 @@ pnpm exec playwright test --list                    # list without running
   both ranges.
 - **Honeypot visibility.** Playwright treats the off-screen honeypot as
   visible; assert `not.toBeInViewport()` instead of `toBeHidden()`.
-- **TikTok.** Specs that render the area row abort `tiktok.com` and
-  `tiktokcdn-us.com` so the styled fallback stays put; do the same in any new
-  spec that loads `/`.
+- **Hidden pages.** After a client-side navigation Next keeps the previous
+  page in the DOM, hidden (React `Activity`), so a test id that both pages
+  render matches twice: the hero's `search-bar` is still there on `/search`.
+  Scope such a locator with `:visible`, as `visibleBar` in
+  `search.native.spec.ts` does.
+- **`noscript` under `javaScriptEnabled: false`.** Playwright only stops
+  scripts running; Chromium still parses the page with scripting on, so
+  `noscript` content is text, not elements, and is never visible. Check it
+  in `page.content()`.
+- **Holding a navigation.** To see a pending state, hold the router's
+  request (`page.route(/\/search\?.*_rsc=/, …)` awaiting a promise the test
+  resolves) rather than sleeping.
+- **TikTok.** Nothing loads from TikTok until play is pressed. Specs that
+  press play serve a stand-in page at `tiktok.com/player/v1/…` that posts the
+  player's messages (see the "TikTok click to play" block in
+  `home.spec.ts`); the other specs that load `/` still abort `tiktok.com` as
+  a guard.
 - When adding a spec, update the comment at the top of `playwright.config.ts`
   that lists which spec runs in which project.
 
@@ -256,6 +286,71 @@ you changed something a spec asserts, such as a name or a count).
   real-looking value. The text after `[TBC]` is the brief for the real copy.
 - Changing a slug changes the URL; update `content/properties.ts`, the
   property URL in the Hospitable dashboard, and any inbound links.
+
+## Working on the booking code
+
+These hold for every change under `lib/booking/`, `app/api/`,
+`components/booking/`, `components/search/`, and `components/hospitable/`.
+The code keeps them today and a change must not loosen them.
+
+- **The Hospitable token never reaches the browser, logs, or git.** Every
+  Hospitable call goes through `lib/booking/client.ts` on the server.
+- **Read and quote only.** Nothing writes a reservation, calendar, or
+  message to Hospitable. A change that seems to need a write stops and is
+  raised with the hosts first.
+- **The quote is the source of truth for anything the guest pays.**
+  Anything else, the calendar's nightly preview or a search estimate, is
+  labelled as an estimate.
+- **Never state an Airbnb price as fact.** The comparison is the
+  config-driven formula, labelled as an estimate, with a link to the listing.
+- **Hospitable's response wins over these docs.** If the API contradicts
+  something written here, fix the docs.
+- **Hospitable's own search is never called.** There is no search endpoint
+  in the Public API v2; availability comes from the cached calendars.
+- **Never change a Vercel environment variable as part of a code change.**
+  Production and Preview have run `native` since 2026-11-05; the hosts
+  flipped the switch themselves, and flipping it back is theirs too.
+- **`stub` and `hospitable` modes keep behaving exactly as they do.** New
+  booking work is the `native` branch of the mode switch.
+- Tailwind token utilities only (`check:colors` enforces it), the existing
+  hairline / paper / ink / muted / mono-eyebrow vocabulary, both themes,
+  axe-clean, no new runtime dependencies.
+- Before every commit, run what CI runs (above). If Chromium crashes under
+  Playwright's default worker count on a small machine, add `--workers=1`.
+
+## Documentation
+
+The docs are the brief. Work is specified, tracked, and recorded in `docs/`
+and never in prompt files: whoever picks up a piece of work, a person or a
+coding agent, reads the docs, and the pull request that ships the work
+updates them. There is no `docs/prompts/`; do not create one. A brief for a
+session is a pointer at the sections below, not a copy of them.
+
+Where each kind of change is written up:
+
+- **A feature doc** per area of work in progress (the native search had
+  `search.md` while its three checkpoints shipped): the decisions, what is
+  built, and the remaining steps as a checklist with decisions already made
+  and open questions with their defaults. Start one when a piece of work
+  spans more than one PR; the PR that ships a step moves it from
+  "remaining" to "built" in the same file and describes the result in the
+  files below. Once the feature is complete, fold the doc into
+  `architecture.md` and delete it, as `search.md` was.
+- [`architecture.md`](architecture.md) — what is built and why: routes,
+  components, data flow, the decisions behind them. New behaviour is
+  described here in the PR that adds it.
+- `development.md` (this file) — how to run, check, and test. A new
+  environment variable, script, spec, or gotcha goes in its table or list.
+- `README.md` — the short version: the route list, the events list, the
+  rules the code keeps.
+- `CHANGELOG.md` — one entry per PR under "Unreleased", dated when it merges.
+- [`hospitable-discovery.md`](hospitable-discovery.md) — what the Public
+  API actually returns; add to it when a new call or field is used.
+- [`plan.md`](plan.md) is the original go-live checklist from building the
+  site and is no longer maintained; do not add work to it.
+
+A PR is not finished while a doc still describes the old behaviour. When
+reviewing one, read the docs diff against the code diff.
 
 ## Agent notes
 

@@ -46,6 +46,16 @@ export function formatShortDate(date: string): string {
   }).format(at(date));
 }
 
+/** "Fri, Mar 12" */
+export function formatWeekdayDate(date: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(at(date));
+}
+
 /** "October 2026" */
 export function formatMonth(date: string): string {
   return new Intl.DateTimeFormat("en-US", {

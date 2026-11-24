@@ -53,10 +53,7 @@ export type MapKitMap = {
   colorScheme: string;
   selectedAnnotation: MapKitAnnotation | null;
   addAnnotations(annotations: MapKitAnnotation[]): void;
-  showItems(
-    items: MapKitAnnotation[],
-    options?: { animate?: boolean; padding?: unknown; minimumSpan?: unknown },
-  ): void;
+  setRegionAnimated(region: unknown, animate?: boolean): void;
   destroy(): void;
 };
 
@@ -76,12 +73,7 @@ export type MapKit = {
     latitudeDelta: number,
     longitudeDelta: number,
   ) => unknown;
-  Padding: new (
-    top: number,
-    right: number,
-    bottom: number,
-    left: number,
-  ) => unknown;
+  CoordinateRegion: new (center: MapKitCoordinate, span: unknown) => unknown;
   CameraZoomRange: new (minDistance: number, maxDistance: number) => unknown;
   FeatureVisibility: { Hidden: string; Visible: string; Adaptive: string };
   addEventListener(

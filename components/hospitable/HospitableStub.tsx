@@ -2,8 +2,8 @@ import { Button, Eyebrow } from "@/components/ui";
 import { StubField } from "./StubField";
 
 /**
- * Placeholder booking panel shown in stub mode, and in live mode when a house
- * has no Hospitable property id yet. Same hairline surface as the live widget
+ * Placeholder booking panel shown in stub mode, and in hospitable mode when a house
+ * has no Hospitable property id yet. Same hairline surface as the embedded widget
  * so the page does not jump when the real calendar replaces it.
  */
 export function HospitableStub({

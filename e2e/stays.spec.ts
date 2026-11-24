@@ -4,16 +4,19 @@ const HOUSES = [
   {
     slug: "oak-hill",
     name: "An Oak Hill Home",
+    airbnbTitle: "Cozy 3BR Oak Hill Retreat • Fireplace • Fast Wi-Fi",
     airbnb: "https://www.airbnb.com/rooms/1598934202273477463",
   },
   {
     slug: "south-austin",
     name: "South Austin Stay",
+    airbnbTitle: "Fast WiFi |Garage| Yard | 3BR • 5 Beds • Sleeps 8+",
     airbnb: "https://www.airbnb.com/rooms/1655329029936239948",
   },
   {
     slug: "fire-side",
     name: "Fire Side Home",
+    airbnbTitle: "Spacious 3BR Home • Near Radio Coffee • Fast Wi-Fi",
     airbnb: "https://www.airbnb.com/rooms/1598953749522814358",
   },
 ];
@@ -29,6 +32,10 @@ test.describe("property pages", () => {
       await expect(
         page.getByRole("heading", { level: 1, name: house.name }),
       ).toBeVisible();
+      // The Airbnb listing title sits under the name, as a subtitle.
+      await expect(
+        page.getByRole("heading", { level: 1 }).locator("+ p"),
+      ).toHaveText(`On Airbnb: ${house.airbnbTitle}`);
       await expect(
         page.getByRole("link", { name: "Back to all stays" }),
       ).toHaveAttribute("href", "/#stays");
@@ -235,6 +242,22 @@ test.describe("property pages", () => {
     });
   }
 
+  test("lists walkable area picks first under Near this house", async ({
+    page,
+  }) => {
+    // The South Austin houses have picks within walking distance.
+    await page.goto("/stays/south-austin");
+    const items = page.getByTestId("nearby-picks").locator("li");
+    await expect(items.first()).toContainText(/\d+ min walk/);
+    // Once the walks end, no later item is a walk.
+    const texts = await items.allTextContents();
+    const firstDrive = texts.findIndex((t) => !/min walk/.test(t));
+    if (firstDrive !== -1) {
+      for (const t of texts.slice(firstDrive))
+        expect(t).not.toMatch(/min walk/);
+    }
+  });
+
   test("lists the closest area picks with this house's drive time and links to /area", async ({
     page,
   }) => {
@@ -245,14 +268,18 @@ test.describe("property pages", () => {
     ).toBeVisible();
     const items = nearby.locator("li");
     await expect(items).toHaveCount(3);
-    // Each pick links to its entry on the guide page.
-    for (const id of ["eat", "outdoors", "local"]) {
-      await expect(nearby.locator(`a[href="/area#${id}"]`)).toHaveCount(1);
+    // Each pick links to its entry on the guide page, sorted for this house,
+    // and shows this house's drive time (a number, or the t.b.c. gap).
+    for (const item of await items.all()) {
+      await expect(
+        item.locator('a[href^="/area?house=oak-hill#"]'),
+      ).toHaveCount(1);
+      await expect(item).toContainText(
+        /\d+ min (drive|walk)|drive time t\.b\.c\./,
+      );
     }
-    // Drive times are open items: one t.b.c. gap per pick, never a number.
-    await expect(items.filter({ hasText: "drive time t.b.c." })).toHaveCount(3);
     await expect(
       nearby.getByRole("link", { name: /full area guide/ }),
-    ).toHaveAttribute("href", "/area");
+    ).toHaveAttribute("href", "/area?house=oak-hill");
   });
 });

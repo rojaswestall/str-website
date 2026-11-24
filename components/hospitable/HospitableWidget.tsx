@@ -25,7 +25,7 @@ export type HospitableWidgetProps = {
 };
 
 /*
- * Per-property booking widget. In live mode it recreates the dashboard snippet
+ * Per-property booking widget. In hospitable mode it recreates the dashboard snippet
  * inside a hairline frame: the loader script goes into the container and the
  * loader inserts its iframe right after it. Everything inside the container is
  * owned by the loader; React only renders the frame around it.
@@ -46,19 +46,19 @@ export function HospitableWidget({
   mode,
 }: HospitableWidgetProps) {
   const resolvedMode = resolveHospitableMode(mode);
-  const live =
-    resolvedMode === "live" && propertyId !== null && siteUuid !== null;
+  const embedded =
+    resolvedMode === "hospitable" && propertyId !== null && siteUuid !== null;
 
-  if (resolvedMode === "live" && !live) {
+  if (resolvedMode === "hospitable" && !embedded) {
     warnOnce(
       `booking:${propertyName}`,
-      `[Hospitable] live mode, but ${propertyName} has no ${
+      `[Hospitable] hospitable mode, but ${propertyName} has no ${
         siteUuid === null ? "site uuid" : "property id"
       } in content; rendering the stub.`,
     );
   }
 
-  if (!live) {
+  if (!embedded) {
     return <HospitableStub propertyName={propertyName} airbnbUrl={airbnbUrl} />;
   }
 

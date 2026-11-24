@@ -1,14 +1,20 @@
 import { PhotoFrame, TbcText } from "@/components/ui";
 import type { AreaPick } from "@/content";
 import { DriveTimes } from "./DriveTimes";
+import { PhotoCredit } from "./PhotoCredit";
 
 const KIND_LABEL: Record<AreaPick["kind"], string> = {
+  coffee: "Coffee",
   eat: "Eat",
   outdoors: "Outdoors",
   local: "Local knowledge",
 };
 
-/** One area-guide pick on /area: photo, kind, title, blurb, drive time from each house. */
+/**
+ * One area-guide pick on /area: photo (3:2, framed like the property
+ * gallery) with its credit line, kind, title, blurb, and the travel time
+ * from each house.
+ */
 export function AreaPickCard({ pick }: { pick: AreaPick }) {
   return (
     <article
@@ -18,8 +24,13 @@ export function AreaPickCard({ pick }: { pick: AreaPick }) {
     >
       <PhotoFrame
         image={pick.photo ?? null}
-        ratio="1:1"
-        sizes="(min-width: 1180px) 360px, (min-width: 760px) 33vw, 100vw"
+        ratio="3:2"
+        sizes="(min-width: 1180px) 360px, (min-width: 600px) 50vw, 100vw"
+        caption={
+          pick.photo && pick.photoCredit ? (
+            <PhotoCredit credit={pick.photoCredit} />
+          ) : undefined
+        }
       />
       <p className="font-mono text-[0.74rem] tracking-[0.06em] text-muted uppercase">
         {KIND_LABEL[pick.kind]}

@@ -13,20 +13,224 @@ test.describe("area guide", () => {
     ).toBeVisible();
 
     const picks = page.getByTestId("area-picks").locator("article");
-    await expect(picks).toHaveCount(3);
-    for (const [index, id] of ["eat", "outdoors", "local"].entries()) {
+    await expect(picks.first()).toBeVisible();
+    const count = await picks.count();
+    for (let index = 0; index < count; index++) {
       const pick = picks.nth(index);
-      await expect(pick).toHaveAttribute("id", id);
+      await expect(pick).toHaveAttribute("id", /^[a-z0-9-]+$/);
       const times = pick.getByTestId("drive-times");
       // One row per house, in content order.
       await expect(times.locator("dt")).toHaveText(HOUSES);
-      // Unconfirmed times render as the dashed t.b.c. gap, never a number.
-      await expect(times.locator("dd")).toHaveText([
-        "t.b.c.",
-        "t.b.c.",
-        "t.b.c.",
-      ]);
+      // Each time is a confirmed number or the dashed t.b.c. gap.
+      for (const dd of await times.locator("dd").all()) {
+        await expect(dd).toHaveText(/^(\d+ min( drive| walk)?|t\.b\.c\.)$/);
+      }
     }
+  });
+
+  test("shows a walk time instead of the drive for a house that is close", async ({
+    page,
+  }) => {
+    await page.goto("/area");
+    const walks = page.locator(
+      '[data-testid="drive-times"] [data-mode="walk"]',
+    );
+    // At least one pick is listed as walkable from some house.
+    await expect(walks.first()).toBeVisible();
+    for (const row of await walks.all()) {
+      await expect(row.locator("dd")).toHaveText(/^\d+ min walk$/);
+    }
+    // Drive rows never read as walks.
+    for (const row of await page
+      .locator('[data-testid="drive-times"] [data-mode="drive"] dd')
+      .all()) {
+      await expect(row).not.toHaveText(/walk/);
+    }
+  });
+
+  test("pick photos load at 3:2 and carry a credit line", async ({ page }) => {
+    await page.goto("/area");
+    const cards = page.getByTestId("area-picks").locator("article");
+    const withPhoto = cards.filter({ has: page.locator("img") });
+    await expect(withPhoto.first()).toBeVisible();
+    for (const card of await withPhoto.all()) {
+      const img = card.locator("img").first();
+      await img.scrollIntoViewIfNeeded();
+      // Loaded, not a broken image.
+      await expect
+        .poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
+        .toBeGreaterThan(0);
+      // The frame is 3:2 (within a pixel of rounding).
+      const box = await img.boundingBox();
+      expect(box).not.toBeNull();
+      expect(Math.abs(box!.width / box!.height - 1.5)).toBeLessThan(0.02);
+      await expect(img).toHaveAttribute("alt", /\S/);
+      const credit = card.getByTestId("photo-credit");
+      await expect(credit).toContainText(/^Photo:/);
+      await expect(credit.locator("a")).toHaveAttribute("href", /^https:\/\//);
+    }
+  });
+
+  test("Closest to sorts the picks for the chosen house", async ({ page }) => {
+    await page.goto("/area");
+    const filter = page.getByTestId("area-filter");
+    const any = filter.getByRole("button", { name: "Any house" });
+    await expect(any).toHaveAttribute("aria-pressed", "true");
+    const ids = () =>
+      page
+        .getByTestId("area-picks")
+        .locator("article")
+        .evaluateAll((els) => els.map((el) => el.id));
+    const contentOrder = await ids();
+
+    await filter.getByRole("button", { name: "An Oak Hill Home" }).click();
+    await expect(page).toHaveURL(/\?house=oak-hill$/);
+    await expect(
+      filter.getByRole("button", { name: "An Oak Hill Home" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(any).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByTestId("area-filter-status")).toContainText(
+      "Sorted by travel time from An Oak Hill Home, walkable places first.",
+    );
+
+    // Same picks, new order: walks first, then drives in rising order.
+    const sorted = await ids();
+    expect([...sorted].sort()).toEqual([...contentOrder].sort());
+    expect(sorted).not.toEqual(contentOrder);
+    const rows = page
+      .getByTestId("area-picks")
+      .locator('article [data-testid="drive-times"] [data-slug="oak-hill"]');
+    const travel = await rows.evaluateAll((els) =>
+      els.map((el) => ({
+        walk: el.getAttribute("data-mode") === "walk",
+        minutes: Number(el.querySelector("dd")?.textContent?.match(/\d+/)?.[0]),
+      })),
+    );
+    const rank = (t: { walk: boolean; minutes: number }) =>
+      (t.walk ? 0 : 1000) + t.minutes;
+    travel.slice(1).forEach((t, i) => {
+      expect(rank(t)).toBeGreaterThanOrEqual(rank(travel[i]!));
+    });
+    // Each card shows only the chosen house's row, highlighted.
+    await expect(rows.first().locator("dt")).toHaveCSS("font-weight", "600");
+    const cards = page.getByTestId("area-picks").locator("article");
+    const visibleRows = cards
+      .first()
+      .locator('[data-testid="drive-times"] > [data-slug]:visible');
+    await expect(visibleRows).toHaveCount(1);
+    await expect(visibleRows).toHaveAttribute("data-slug", "oak-hill");
+
+    // Grouped under closeness headings, closest group first.
+    const headings = page.getByTestId("area-picks").getByRole("heading", {
+      level: 2,
+    });
+    await expect(headings.first()).toHaveText(
+      /^(A short walk|Under 10 minutes)/,
+    );
+
+    // A reload keeps the choice; Any house restores the content order.
+    await page.reload();
+    await expect(
+      filter.getByRole("button", { name: "An Oak Hill Home" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(await ids()).toEqual(sorted);
+    await any.click();
+    await expect(page).toHaveURL(/\/area$/);
+    expect(await ids()).toEqual(contentOrder);
+    // With no house chosen, every house's row is back.
+    await expect(
+      cards
+        .first()
+        .locator('[data-testid="drive-times"] > [data-slug]:visible'),
+    ).toHaveCount(HOUSES.length);
+  });
+
+  test("Show narrows the picks to one category", async ({ page }) => {
+    await page.goto("/area");
+    const filter = page.getByTestId("area-filter");
+    const everything = filter.getByRole("button", { name: "Everything" });
+    await expect(everything).toHaveAttribute("aria-pressed", "true");
+    const cards = page.getByTestId("area-picks").locator("article");
+    const total = await cards.count();
+    const kindsShown = () =>
+      cards.evaluateAll((els) => [
+        ...new Set(els.map((el) => el.getAttribute("data-kind"))),
+      ]);
+    expect((await kindsShown()).sort()).toEqual([
+      "coffee",
+      "eat",
+      "local",
+      "outdoors",
+    ]);
+
+    await filter.getByRole("button", { name: "Coffee" }).click();
+    await expect(page).toHaveURL(/\?kind=coffee$/);
+    await expect(
+      filter.getByRole("button", { name: "Coffee" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(everything).toHaveAttribute("aria-pressed", "false");
+    await expect.poll(kindsShown).toEqual(["coffee"]);
+    const coffee = await cards.count();
+    expect(coffee).toBeGreaterThan(0);
+    expect(coffee).toBeLessThan(total);
+
+    // Combines with Closest to: still only coffee, now under closeness headings.
+    await filter.getByRole("button", { name: "South Austin Stay" }).click();
+    await expect(page).toHaveURL(/\?kind=coffee&house=south-austin$/);
+    await expect.poll(kindsShown).toEqual(["coffee"]);
+    await expect(cards).toHaveCount(coffee);
+    await expect(
+      page.getByTestId("area-picks").getByRole("heading", { level: 2 }).first(),
+    ).toHaveText(/^A short walk$/);
+
+    // A reload keeps both; Everything brings the other categories back.
+    await page.reload();
+    await expect.poll(kindsShown).toEqual(["coffee"]);
+    await everything.click();
+    await expect(page).toHaveURL(/\?house=south-austin$/);
+    await expect(cards).toHaveCount(total);
+  });
+
+  test("opens filtered for the category named in the link", async ({
+    page,
+  }) => {
+    await page.goto("/area?kind=outdoors");
+    await expect(
+      page.getByTestId("area-filter").getByRole("button", { name: "Outdoors" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    // Polled: the server renders every pick and the browser filters on hydration.
+    await expect
+      .poll(() =>
+        page
+          .getByTestId("area-picks")
+          .locator("article")
+          .evaluateAll((els) => [
+            ...new Set(els.map((el) => el.getAttribute("data-kind"))),
+          ]),
+      )
+      .toEqual(["outdoors"]);
+  });
+
+  test("an unknown category in the link shows everything", async ({ page }) => {
+    await page.goto("/area?kind=nightlife");
+    await expect(
+      page
+        .getByTestId("area-filter")
+        .getByRole("button", { name: "Everything" }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("opens sorted for the house named in the link", async ({ page }) => {
+    await page.goto("/area?house=south-austin");
+    await expect(
+      page
+        .getByTestId("area-filter")
+        .getByRole("button", { name: "South Austin Stay" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    // The South Austin houses have picks within walking distance.
+    await expect(
+      page.getByTestId("area-picks").getByRole("heading", { level: 2 }).first(),
+    ).toHaveText(/^A short walk$/);
   });
 
   test("is linked from the header nav and the home page", async ({ page }) => {

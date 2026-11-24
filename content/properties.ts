@@ -15,12 +15,14 @@ import type { Property } from "./types";
  * Photos live in content/photos.ts. Guest quotes, names, and months are from
  * the Airbnb reviews (whitespace and stray typos tidied; the month is when
  * the review was posted). Ratings and review counts were copied from the
- * listings on 2026-10-12.
+ * listings on 2026-11-24.
  *
- * `mapArea` places each house on the Apple map at neighbourhood precision
- * (rounded to roughly half a kilometre and kept off the real address, which
- * is internal). The two South Austin houses are drawn apart on purpose; the
- * map never shows them as neighbours. The map also caps how far it zooms in.
+ * `mapArea` places each house on the Apple map at a nearby intersection, never
+ * the street address (which stays internal); the map also caps how far it
+ * zooms in. South Austin Stay and Fire Side Home are Dan Jean Units A and B,
+ * one building near Manchaca Rd & William Cannon Dr: their pins sit about
+ * 500 m apart, either side of that intersection, so each can be tapped on its
+ * own on the zoomed-out map.
  */
 
 export const properties: Property[] = [
@@ -28,6 +30,7 @@ export const properties: Property[] = [
     slug: "oak-hill",
     name: "An Oak Hill Home",
     shortName: "Oak Hill",
+    airbnbTitle: "Cozy 3BR Oak Hill Retreat • Fireplace • Fast Wi-Fi",
     neighborhood: "Oak Hill",
     locationLine: "Oak Hill, Austin · off Hwy 290 & 71",
     summary:
@@ -49,7 +52,7 @@ export const properties: Property[] = [
       "pets allowed",
     ],
     rating: 5.0,
-    reviewCount: 25,
+    reviewCount: 30,
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598934202273477463",
     strLicense: "OL2026086598",
@@ -76,12 +79,14 @@ export const properties: Property[] = [
       },
     ],
     mapPin: { x: 85, y: 299 },
-    mapArea: { latitude: 30.234, longitude: -97.858 },
+    // Parkwood Dr near School Rd, East Oak Hill.
+    mapArea: { latitude: 30.238, longitude: -97.855 },
   },
   {
     slug: "south-austin",
     name: "South Austin Stay",
     shortName: "South Austin",
+    airbnbTitle: "Fast WiFi |Garage| Yard | 3BR • 5 Beds • Sleeps 8+",
     neighborhood: "South Austin",
     locationLine: "South Austin · garage and yard",
     summary:
@@ -102,8 +107,8 @@ export const properties: Property[] = [
       "sofa bed",
       "pets allowed",
     ],
-    rating: 4.95,
-    reviewCount: 20,
+    rating: 4.96,
+    reviewCount: 26,
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1655329029936239948",
     strLicense: "OL2026040319",
@@ -131,12 +136,14 @@ export const properties: Property[] = [
     ],
     // Both South Austin houses sit near (266, 299); offset so the dots read apart.
     mapPin: { x: 258, y: 292 },
-    mapArea: { latitude: 30.225, longitude: -97.792 },
+    // Dan Jean Unit A: Manchaca Rd & William Cannon Dr, set 250 m west.
+    mapArea: { latitude: 30.2025, longitude: -97.8071 },
   },
   {
     slug: "fire-side",
     name: "Fire Side Home",
     shortName: "Fire Side",
+    airbnbTitle: "Spacious 3BR Home • Near Radio Coffee • Fast Wi-Fi",
     neighborhood: "South Austin",
     locationLine: "South Austin · near Radio Coffee & Beer",
     summary:
@@ -159,7 +166,7 @@ export const properties: Property[] = [
       "pets allowed",
     ],
     rating: 5.0,
-    reviewCount: 30,
+    reviewCount: 34,
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598953749522814358",
     strLicense: "OL2026031718",
@@ -186,6 +193,7 @@ export const properties: Property[] = [
       },
     ],
     mapPin: { x: 274, y: 306 },
-    mapArea: { latitude: 30.219, longitude: -97.784 },
+    // Dan Jean Unit B: Manchaca Rd & William Cannon Dr, set 250 m east.
+    mapArea: { latitude: 30.2025, longitude: -97.8019 },
   },
 ];

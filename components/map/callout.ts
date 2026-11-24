@@ -10,6 +10,8 @@
 export type MapHouse = {
   slug: string;
   name: string;
+  /** The label under the pin ("Oak Hill"). */
+  shortName: string;
   neighborhood: string;
   sleeps: number;
   bedrooms: number;

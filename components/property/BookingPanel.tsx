@@ -5,6 +5,9 @@ import { BookingAnalytics, BookingWidget } from "@/components/booking";
 import { PropertyWidget } from "@/components/hospitable";
 import { Button } from "@/components/ui";
 import { getSite, type Property } from "@/content";
+import { getBookingConfig } from "@/lib/booking/config";
+import { todayInBookingZone } from "@/lib/booking/dates";
+import { parsePrefill } from "@/lib/booking/search";
 import { loadInitialBookingData } from "@/lib/booking/server";
 import { cx } from "@/lib/cx";
 import { resolveHospitableMode } from "@/lib/hospitable";
@@ -19,13 +22,19 @@ import { resolveHospitableMode } from "@/lib/hospitable";
  * so under Cache Components it must sit in its own Suspense boundary: the
  * prerendered page carries the fallback and the boundary streams in once
  * the server has the data. Without the boundary `next build` fails
- * prerendering the page.
+ * prerendering the page. The page's `searchParams` (a search hand-off:
+ * `?checkin&checkout&adults&children&infants&pets`) are read inside the
+ * same boundary, for the same reason; they are awaited only in native mode,
+ * since Hospitable's embed reads them from the URL itself.
  */
 export function BookingPanel({
   property,
+  searchParams,
   className,
 }: {
   property: Property;
+  /** The page's `searchParams`, for prefilling the stay; optional. */
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
   className?: string;
 }) {
   const native =
@@ -52,7 +61,10 @@ export function BookingPanel({
       {native ? (
         <BookingAnalytics>
           <Suspense fallback={<WidgetFallback />}>
-            <NativeWidget propertyId={property.hospitable.uuid!} />
+            <NativeWidget
+              propertyId={property.hospitable.uuid!}
+              searchParams={searchParams}
+            />
           </Suspense>
         </BookingAnalytics>
       ) : (
@@ -78,12 +90,36 @@ export function BookingPanel({
  * HTML already holds the priced calendar; the widget then makes no request
  * until the guest picks dates. `connection()` marks this as request-time
  * work (today's date, a live calendar) so it is never prerendered at build.
+ *
+ * A stay in the URL is parsed leniently (`parsePrefill`): a bad or past
+ * value is dropped, never an error. The widget then checks what is left
+ * against the calendar and quotes it if it holds.
  */
-async function NativeWidget({ propertyId }: { propertyId: string }) {
+async function NativeWidget({
+  propertyId,
+  searchParams,
+}: {
+  propertyId: string;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   await connection();
-  const initial = await loadInitialBookingData(propertyId);
+  const [initial, params] = await Promise.all([
+    loadInitialBookingData(propertyId),
+    searchParams,
+  ]);
+  const prefill = params
+    ? parsePrefill(params, {
+        today: todayInBookingZone(),
+        maxNights: getBookingConfig().maxNights,
+      })
+    : undefined;
   return (
-    <BookingWidget propertyId={propertyId} initial={initial ?? undefined} />
+    <BookingWidget
+      propertyId={propertyId}
+      initial={initial ?? undefined}
+      initialSelection={prefill?.selection}
+      initialGuests={prefill?.guests}
+    />
   );
 }
 

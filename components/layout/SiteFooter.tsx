@@ -2,13 +2,17 @@ import { MessageDialog } from "@/components/contact";
 import { Container, Tbc } from "@/components/ui";
 import { getAllProperties, getLicenses, getSite, isTbc } from "@/content";
 
+const link =
+  "border-b border-hairline pb-px text-ink no-underline transition-[border-color] duration-[120ms] hover:border-ink";
+
 /**
  * The artifact's footer: display-font colophon with the domain under it, a
  * mono contact column, and the City of Austin STR license line, one entry per
  * house, read from the content layer. There is no public email or Instagram:
  * the contact column's "Send us a message" button opens the contact form in a
  * pop-up on any page (`MessageDialog`), with the house pre-selected on a house
- * page. An unconfirmed domain renders as a dashed `Tbc` gap.
+ * page. The domain links to the public site; an unconfirmed one renders as a
+ * dashed `Tbc` gap.
  */
 export function SiteFooter() {
   const site = getSite();
@@ -25,7 +29,13 @@ export function SiteFooter() {
         <p className="font-display text-[1.35rem] leading-[1.3] text-ink">
           {site.name}
           <span className="mt-[0.4rem] block font-mono text-[0.74rem] tracking-[0.06em] text-muted">
-            {isTbc(site.domain) ? <Tbc>domain to confirm</Tbc> : site.domain}
+            {isTbc(site.domain) ? (
+              <Tbc>domain to confirm</Tbc>
+            ) : (
+              <a href={`https://${site.domain}/`} className={link}>
+                {site.domain}
+              </a>
+            )}
           </span>
         </p>
 

@@ -23,18 +23,22 @@ import { defineConfig, devices } from "@playwright/test";
  *                         (gitignored; CI uploads them as an artifact)
  *
  * `chromium-live` (port 3001, a second build with
- * NEXT_PUBLIC_HOSPITABLE_MODE=live into .next-live) runs only
+ * NEXT_PUBLIC_HOSPITABLE_MODE=hospitable into .next-live) runs only
  * hospitable.live.spec.ts: the one place the real loader shape is covered
  * (script attributes, remount on client-side navigation, no missing-id
  * warnings, the search bar and /search). The real loaders are intercepted,
  * never fetched.
  *
  * `chromium-native` (port 3002, a third build with
- * NEXT_PUBLIC_HOSPITABLE_MODE=native into .next-native) runs only
- * booking.native.spec.ts: the site's own booking widget and the /api/*
- * routes behind it, end to end. The build is pointed at the stand-in
- * Hospitable API in e2e/mock-hospitable/server.mjs (port 3999) with a
- * throwaway token, so nothing reaches Hospitable and no secret is needed.
+ * NEXT_PUBLIC_HOSPITABLE_MODE=native into .next-native) runs
+ * booking.native.spec.ts (the site's own booking widget and the /api/*
+ * routes behind it, end to end) and search.native.spec.ts (the
+ * availability route, the house page prefilled from the URL, the
+ * home-page search bar with and without JavaScript, and the /search
+ * results page rendered on the server). The build
+ * is pointed at the stand-in Hospitable API in e2e/mock-hospitable/server.mjs
+ * (port 3999) with a throwaway token, so nothing reaches Hospitable and no
+ * secret is needed.
  */
 
 const port = 3000;
@@ -112,7 +116,7 @@ export default defineConfig({
       command: `pnpm build && pnpm start --port ${livePort}`,
       url: liveBaseURL,
       env: {
-        NEXT_PUBLIC_HOSPITABLE_MODE: "live",
+        NEXT_PUBLIC_HOSPITABLE_MODE: "hospitable",
         NEXT_PUBLIC_SITE_URL: "",
         NEXT_PUBLIC_MAPKIT_TOKEN: "e2e-mapkit-token",
         NEXT_DIST_DIR: ".next-live",

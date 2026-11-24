@@ -86,7 +86,10 @@ export async function generateMetadata({
  */
 export const instant = false;
 
-export default async function StayPage({ params }: PageProps<"/stays/[slug]">) {
+export default async function StayPage({
+  params,
+  searchParams,
+}: PageProps<"/stays/[slug]">) {
   const { slug } = await params;
   const property = getProperty(slug);
   if (!property) notFound();
@@ -156,7 +159,11 @@ export default async function StayPage({ params }: PageProps<"/stays/[slug]">) {
             <NearbyPicks property={property} />
           </div>
 
-          <BookingPanel property={property} className="lg:sticky lg:top-8" />
+          <BookingPanel
+            property={property}
+            searchParams={searchParams}
+            className="lg:sticky lg:top-8"
+          />
         </div>
       </Section>
 

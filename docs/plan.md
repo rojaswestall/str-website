@@ -27,7 +27,7 @@ later item depends on the earlier ones.
   | Variable                      | Production              | Preview                    |
   | ----------------------------- | ----------------------- | -------------------------- |
   | `NEXT_PUBLIC_SITE_URL`        | `https://<domain>`      | the preview origin or prod |
-  | `NEXT_PUBLIC_HOSPITABLE_MODE` | `live` → `native` (1b)  | `native`                   |
+  | `NEXT_PUBLIC_HOSPITABLE_MODE` | `hospitable` → `native` (1b)  | `native`                   |
   | `RESEND_API_KEY`              | Resend key              | optional (dry run without) |
   | `CONTACT_FROM`                | `Name <addr@<domain>>`  | same as prod if key set    |
   | `CONTACT_TO`                  | comma-separated inboxes | same as prod if key set    |
@@ -56,13 +56,16 @@ later item depends on the earlier ones.
         in the page text. If the live widget refuses to load on a house,
         compare its Hospitable listing name with `name` in
         `content/properties.ts`.
-- [ ] **Apple Maps token.** Once the Apple Developer membership is active:
-      Certificates, Identifiers & Profiles → Services → Maps → Tokens → (+),
-      type **MapKit JS**, restriction **Domain** (the production domain,
-      the Vercel preview domain, and `localhost` if wanted). Set it as
-      `NEXT_PUBLIC_MAPKIT_TOKEN` for Production (and Preview) and redeploy.
-      Until then the city map is the drawn SVG. Check the three `mapArea`
-      positions in `content/properties.ts` look right on the real map.
+- [ ] **Apple Maps token for Production.** Preview has its own MapKit JS
+      token (domain-restricted to the map branch's preview), and the map
+      works there. Production needs a **separate** token: Certificates,
+      Identifiers & Profiles → Services → Maps → Tokens → (+), type
+      **MapKit JS**, restriction **Domain**, listing the production domain
+      (and `www.` if used). The allowed domains are baked into the token, so
+      a token made for a preview address is refused on the real domain
+      (401 in the console; the site falls back to the drawn SVG). Set it as
+      `NEXT_PUBLIC_MAPKIT_TOKEN` for Production and redeploy. Check in the
+      console that MapKit loads with no 401.
 - [ ] **CSP to enforcing.** Deploy with the current report-only header, open
       `/`, `/search`, `/area`, each `/stays/<slug>`, and a 404 on the
       production domain with the live widgets, and collect console
@@ -85,8 +88,8 @@ later item depends on the earlier ones.
         all carry the real `https://` origin.
   - [ ] Theme toggle persists; analytics events appear in Vercel.
   - [ ] Run axe (browser extension) on a stay page with the real booking
-        iframe and confirm the iframe has a title; confirm the TikTok
-        fallback hides once the player loads and the player does not trap
+        iframe and confirm the iframe has a title; press play on a
+        TikTok and confirm the poster hides once the player loads and the player does not trap
         keyboard focus. CI never loads either third party.
   - [ ] Re-scrape `/` and the three stay pages in the Facebook Sharing
         Debugger, X card validator, and Slack once the final share cards
@@ -101,10 +104,10 @@ already runs `NEXT_PUBLIC_HOSPITABLE_MODE=native`. Production still embeds
 Hospitable's widget; flipping it is a deliberate step, in this order, and
 only with a go from the hosts.
 
-- [ ] **Hospitable (human).** Set per-channel markups on Parkwood A
-      (Oak Hill) and Dan Jean B (Fire Side); only Dan Jean Unit A (South
-      Austin) has them, so it is the only house the price comparison is
-      right for today (the other two show no comparison line, correctly).
+- [x] **Hospitable markups.** All three houses are listed on the Direct
+      site with direct 11% / Airbnb 15.5% markups (checked 2026-11-03), so
+      the price comparison is right for every house.
+- [ ] **Hospitable (human).**
       Check the Direct site's booking settings: the checkout currently says
       "This booking is non-refundable once accepted" while the API reports
       a refund-within-24-hours policy, and bookings are "Request to book"
@@ -121,7 +124,10 @@ only with a go from the hosts.
       and Feb 25 2027.
 - [ ] **Vercel Production env.** `HOSPITABLE_PERSONAL_ACCESS_TOKEN`,
       `HOSPITABLE_CUSTOM_SITE_ID` and `BOOKING_ADMIN_TOKEN` present;
-      `COMPARISON_ENABLED` unset or `true`. Then set
+      `COMPARISON_ENABLED` unset or `true`. Production's
+      `NEXT_PUBLIC_HOSPITABLE_MODE` is still the old value `live`, which the
+      code treats as `hospitable`; change it to `hospitable` whenever
+      convenient (no behaviour change). Then set
       `NEXT_PUBLIC_HOSPITABLE_MODE=native` for Production and redeploy
       (`NEXT_PUBLIC_*` is inlined at build time).
 - [ ] **After the deploy.** On the production domain: pick dates on each
@@ -130,7 +136,7 @@ only with a go from the hosts.
       Vercel Web Analytics; the function log shows `[hospitable] GET …`
       lines and no `[booking:*]` errors. Keep the Airbnb link under the
       widget.
-- [ ] **Rollback.** Set `NEXT_PUBLIC_HOSPITABLE_MODE=live` on Production and
+- [ ] **Rollback.** Set `NEXT_PUBLIC_HOSPITABLE_MODE=hospitable` on Production and
       redeploy; the embedded widget returns and nothing else changes. The
       routes keep working either way.
 - [ ] CSP: add `public.api.hospitable.com` only if the browser ever calls it
@@ -162,11 +168,14 @@ named, then run `pnpm check:content`. See "Editing content" in
       Hospitable Direct payment setup).
 - [ ] Host bios: one line each for Alexis, Gabe, and Aaron, and whether to
       show photos (`content/hosts.ts`).
-- [ ] Area-guide picks: name, one or two sentences, a 1:1 photo you own, and
-      drive minutes from **each** house (`content/area.ts`, `driveMinutes`
-      keyed by slug; `null` renders t.b.c.). More than three is fine. The
-      three photos under `public/photos/area/` are still striped
-      placeholders.
+- [x] Area-guide picks: 24 hosts' picks with drive minutes from each house
+      and walk minutes where close (`content/area.ts`).
+- [x] Area-guide photos: all 31 picks have a licensed photo with a credit
+      line. Eleven are representative shots, not taken at the place (alt text
+      says so): Cannon Coffee, Radix House, Bee Dumpling, Shore, La Popular,
+      Jack Allen's, CARVE, Escuela, Garrison Park, Pieous, Oak Hill Social; Terry Black's plate
+      is unconfirmed as theirs. Swap in the hosts' own photos when they have
+      them (set `photoOwned: true` and drop `photoCredit`).
 - [ ] The live domain in `site.domain` (`content/site.ts`; still `[TBC]`).
 - [ ] Confirm you hold the rights to every photo in `public/photos/`.
 - [ ] Brand assets: wordmark (text-only is fine), favicon, default OG image.

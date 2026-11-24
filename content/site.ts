@@ -1,9 +1,9 @@
 import type { SiteConfig } from "./types";
 
 /*
- * Site-wide configuration. The domain is an open item (docs/plan.md, "Go
- * live"); it is a `[TBC]` placeholder and should render as
- * such, never as a live link.
+ * Site-wide configuration. `domain` is the public production host; the footer
+ * shows it as a link to the live site. (Canonical URLs come from
+ * NEXT_PUBLIC_SITE_URL per environment, not from here.)
  *
  * Hospitable: `siteUuid` and `theme` come from the real embed snippet. The
  * per-house `propertyId` lives on each property. `mode` is the default for
@@ -11,14 +11,15 @@ import type { SiteConfig } from "./types";
  *
  * TikTok clips: the artifact's Barton Springs clip (@exploretex) and an
  * Austin BBQ comparison (@gabynjohnny), shown in this order in the area
- * guide. An empty list drops the row.
+ * guide. Each poster is an area pick's licensed photo. An empty list drops
+ * the row.
  */
 export const site: SiteConfig = {
   name: "The Austin Collection",
   tagline: "Places we look after, properly.",
   description:
     "Three short-term rental houses in Austin, Texas, booked directly with the hosts who look after them.",
-  domain: "[TBC] domain",
+  domain: "www.theaustincollection.com",
   hospitable: {
     mode: "stub",
     // From the dashboard snippet (docs/architecture.md, "Hospitable integration").
@@ -31,6 +32,7 @@ export const site: SiteConfig = {
     {
       url: "https://www.tiktok.com/@exploretex/video/7648810803109367053",
       handle: "exploretex",
+      poster: "barton-springs",
       title: "Barton Springs, and the river through the middle of it",
       body: [
         "Sixty-eight degrees year round, spring-fed, and busy from the first warm weekend onward. The clip runs the length of the river as it cuts through the city — the stretch of Austin most people come here for, and a short drive from all three houses.",
@@ -39,6 +41,7 @@ export const site: SiteConfig = {
     {
       url: "https://www.tiktok.com/@gabynjohnny/video/7693314476384275725",
       handle: "gabynjohnny",
+      poster: "terry-blacks",
       title: "Three of Austin's best-known BBQ spots, side by side",
       body: [
         "Franklin's brisket, Terry Black's dino ribs, and Interstellar, tried back to back. Worth a watch before you decide which line to stand in.",

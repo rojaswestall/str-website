@@ -12,6 +12,7 @@ import {
   monthWeeks,
   previewNightlyDollars,
   previewTotalDollars,
+  resolveSelection,
   selectDate,
   toDayMap,
 } from "./rules";
@@ -250,6 +251,54 @@ describe("preview prices", () => {
     assert.equal(previewTotalDollars("2026-11-02", "2026-11-04", map, 0), 263);
     assert.equal(previewTotalDollars("2026-12-23", "2026-12-26", map, 0), null);
     assert.equal(previewTotalDollars("2026-11-02", "2026-11-02", map, 0), null);
+  });
+});
+
+describe("resolveSelection", () => {
+  it("keeps a stay the calendar allows", () => {
+    assert.deepEqual(
+      resolveSelection(
+        { checkIn: "2026-11-02", checkOut: "2026-11-06" },
+        map,
+        limits,
+      ),
+      { checkIn: "2026-11-02", checkOut: "2026-11-06" },
+    );
+  });
+
+  it("drops a check-out the stay cannot reach, keeping the check-in", () => {
+    // Nov 2–8 crosses the Nov 6–7 reservation; Nov 28 → 30 is under its minimum.
+    assert.deepEqual(
+      resolveSelection(
+        { checkIn: "2026-11-02", checkOut: "2026-11-08" },
+        map,
+        limits,
+      ),
+      { checkIn: "2026-11-02", checkOut: null },
+    );
+    assert.deepEqual(
+      resolveSelection(
+        { checkIn: "2026-11-28", checkOut: "2026-11-30" },
+        map,
+        limits,
+      ),
+      { checkIn: "2026-11-28", checkOut: null },
+    );
+  });
+
+  it("drops everything when the check-in is not one", () => {
+    assert.deepEqual(
+      resolveSelection(
+        { checkIn: "2026-10-30", checkOut: "2026-11-03" },
+        map,
+        limits,
+      ),
+      { checkIn: null, checkOut: null },
+    );
+    assert.deepEqual(
+      resolveSelection({ checkIn: null, checkOut: "2026-11-03" }, map, limits),
+      { checkIn: null, checkOut: null },
+    );
   });
 });
 

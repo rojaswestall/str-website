@@ -74,11 +74,41 @@ test.describe("home page", () => {
     await expect(page.getByRole("list", { name: "Amenities" })).toHaveCount(0);
   });
 
-  test("hero mounts the search stub and the area guide mounts both TikTok embeds", async ({
+  test("band photo and name tap through to the house on small screens only", async ({
     page,
   }) => {
-    // Keep TikTok off the network: the fallback must stay visible for the
-    // assertions below, and the real player would hide it once it loads.
+    const slug = SLUGS[0];
+
+    // Desktop with a mouse: the photo and name stay inert; the buttons lead on.
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/");
+    const band = page.getByTestId("property-band").first();
+    for (const id of ["property-band-photo-link", "property-band-title-link"]) {
+      await expect(band.getByTestId(id)).toHaveCSS("pointer-events", "none");
+    }
+
+    // Stacked layout below 760px: both are tap targets for the house page.
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const id of ["property-band-photo-link", "property-band-title-link"]) {
+      const link = band.getByTestId(id);
+      await expect(link).toHaveCSS("pointer-events", "auto");
+      await expect(link).toHaveAttribute("href", `/stays/${slug}`);
+      await expect(link).toHaveAttribute("tabindex", "-1");
+    }
+    await band.getByTestId("property-band-photo-link").click();
+    await expect(page).toHaveURL(new RegExp(`/stays/${slug}$`));
+  });
+
+  test("hero mounts the search stub and the area guide shows both TikTok posters", async ({
+    page,
+  }) => {
+    // Click to play: opening the page must not ask TikTok for anything.
+    const tiktokRequests: string[] = [];
+    page.on("request", (request) => {
+      if (/tiktok(cdn-us)?\.com/.test(request.url())) {
+        tiktokRequests.push(request.url());
+      }
+    });
     await page.route(/tiktok(cdn-us)?\.com/, (route) => route.abort());
     await page.goto("/");
 
@@ -100,23 +130,29 @@ test.describe("home page", () => {
     ).entries()) {
       const clip = clips.nth(index);
       const tiktok = clip.getByTestId("tiktok-embed");
+      await expect(tiktok).toHaveAttribute("data-state", "idle");
+      // The play control is a real link to the clip, for no-JS and new tabs.
       await expect(
-        tiktok.getByRole("link", { name: "Watch on TikTok" }),
+        tiktok.getByRole("link", { name: `Play the TikTok from @${handle}` }),
       ).toHaveAttribute(
         "href",
         new RegExp(`tiktok\\.com/@${handle}/video/\\d+`),
       );
-      // The heading and text sit in the same column as the player.
+      // The poster is an area pick's licensed photo, credited.
+      const poster = tiktok.getByTestId("tiktok-poster").locator("img");
+      await poster.scrollIntoViewIfNeeded();
+      await expect
+        .poll(() =>
+          poster.evaluate((img: HTMLImageElement) => img.naturalWidth),
+        )
+        .toBeGreaterThan(0);
+      await expect(tiktok.getByTestId("photo-credit")).toContainText("Photo:");
+      await expect(tiktok.locator("iframe")).toHaveCount(0);
       await expect(
         clip.getByRole("heading", { level: 3, name: heading }),
       ).toBeVisible();
-      // embed.js is injected into the leaf container and scans for the blockquote it finds there
-      // (blocked above, so the fallback stays and the blockquote is never swapped).
-      await expect(tiktok.locator("blockquote.tiktok-embed")).toHaveCount(1);
-      await expect(
-        tiktok.locator('script[src="https://www.tiktok.com/embed.js"]'),
-      ).toHaveCount(1);
     }
+    expect(tiktokRequests).toEqual([]);
 
     // The picks themselves live on /area (e2e/area.spec.ts); home links there.
     await expect(page.getByTestId("area-picks")).toHaveCount(0);
@@ -157,7 +193,7 @@ test.describe("home page", () => {
     expect(await mapGroundFill(page)).toBe(MAP_GROUND_DARK);
   });
 
-  test("guest reviews sit above the hosts with each house's record", async ({
+  test("guest reviews sit above the area guide and hosts with each house's record", async ({
     page,
   }) => {
     await page.goto("/");
@@ -166,7 +202,7 @@ test.describe("home page", () => {
       reviews.getByRole("heading", { level: 2, name: "What guests say" }),
     ).toBeVisible();
     // Average weighted by review count across the three listings.
-    await expect(reviews).toContainText("4.99 average · 75 reviews");
+    await expect(reviews).toContainText("4.99 average · 90 reviews");
 
     const records = reviews.getByTestId("review-records").locator("li");
     await expect(records).toHaveCount(3);
@@ -223,13 +259,18 @@ test.describe("home page", () => {
       reviews.getByRole("button", { name: "Play slideshow" }),
     ).toHaveAttribute("aria-pressed", "true");
 
-    // Order on the page: Why book direct, then reviews, then hosts.
+    // Order on the page: Why book direct, reviews, the area guide, hosts.
     const ids = await page
       .locator("main section[id], main section[aria-labelledby=hosts-heading]")
       .evaluateAll((sections) =>
         sections.map((s) => s.id || s.getAttribute("aria-labelledby")),
       );
-    expect(ids.slice(-3)).toEqual(["direct", "reviews", "hosts-heading"]);
+    expect(ids.slice(-4)).toEqual([
+      "direct",
+      "reviews",
+      "area",
+      "hosts-heading",
+    ]);
   });
 
   test("the review slideshow starts paused under reduced motion", async ({
@@ -300,6 +341,11 @@ test.describe("site shell", () => {
     await expect(footer).toContainText(
       "Phone shared with guests after booking",
     );
+    // The colophon links to the public production domain.
+    await expect(
+      footer.getByRole("link", { name: "www.theaustincollection.com" }),
+    ).toHaveAttribute("href", "https://www.theaustincollection.com/");
+    await expect(footer).not.toContainText("domain to confirm");
     // No public email or Instagram; the footer opens the contact form.
     await expect(
       footer.getByRole("button", { name: "Send us a message" }),
@@ -389,5 +435,101 @@ test.describe("site shell", () => {
     const skip = page.getByRole("link", { name: "Skip to content" });
     await expect(skip).toBeFocused();
     await expect(skip).toHaveAttribute("href", "#main");
+  });
+});
+
+/*
+ * The TikTok player is mocked: each test serves its own page at TikTok's
+ * player URL that posts what the real player would (lib/tiktok-player.ts).
+ */
+test.describe("TikTok click to play", () => {
+  function fakePlayer(page: Page, message: object | null) {
+    const script = message
+      ? `<script>parent.postMessage(${JSON.stringify(JSON.stringify(message))}, "*")</script>`
+      : "";
+    return page.route(/tiktok\.com\/player\/v1\//, (route) =>
+      route.fulfill({
+        contentType: "text/html",
+        body: `<!doctype html><title>player</title>${script}`,
+      }),
+    );
+  }
+
+  async function pressPlay(page: Page) {
+    await page.goto("/");
+    const tiktok = page.getByTestId("tiktok-embed").first();
+    await tiktok.scrollIntoViewIfNeeded();
+    await tiktok.getByRole("link", { name: /^Play the TikTok/ }).click();
+    return tiktok;
+  }
+
+  test("pressing play loads the player and drops the poster once it is ready", async ({
+    page,
+  }) => {
+    await fakePlayer(page, { type: "onPlayerReady", "x-tiktok-player": true });
+    const tiktok = await pressPlay(page);
+    await expect(tiktok).toHaveAttribute("data-state", "ready");
+    const frame = tiktok.locator("iframe");
+    await expect(frame).toHaveAttribute(
+      "src",
+      /^https:\/\/www\.tiktok\.com\/player\/v1\/\d+\?autoplay=1/,
+    );
+    await expect(frame).toHaveAttribute(
+      "title",
+      /TikTok video from @exploretex/,
+    );
+    await expect(tiktok.getByTestId("tiktok-poster")).toHaveCount(0);
+    // Only the clip that was pressed loads.
+    await expect(
+      page.locator('[data-testid="tiktok-embed"] iframe'),
+    ).toHaveCount(1);
+  });
+
+  test("a player error shows Watch on TikTok instead of TikTok's error screen", async ({
+    page,
+  }) => {
+    await fakePlayer(page, {
+      type: "onPlayerError",
+      value: { errorCode: 2001, errorType: "SERVER_ERROR" },
+      "x-tiktok-player": true,
+    });
+    const tiktok = await pressPlay(page);
+    await expect(tiktok).toHaveAttribute("data-state", "failed");
+    await expect(tiktok.locator("iframe")).toHaveCount(0);
+    await expect(tiktok).toContainText("TikTok isn't loading here right now.");
+    const watch = tiktok.getByRole("link", { name: "Watch on TikTok" });
+    await expect(watch).toHaveAttribute(
+      "href",
+      /tiktok\.com\/@exploretex\/video\/\d+/,
+    );
+    await expect(watch).toBeFocused();
+  });
+
+  test("a player that never reports ready (rate limited) falls back too", async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await fakePlayer(page, null);
+    const tiktok = await pressPlay(page);
+    await expect(tiktok).toHaveAttribute("data-state", "loading");
+    await expect(tiktok.getByRole("status")).toHaveText("Loading the player…");
+    await page.clock.fastForward(10_000);
+    await expect(tiktok).toHaveAttribute("data-state", "failed");
+    await expect(
+      tiktok.getByRole("link", { name: "Watch on TikTok" }),
+    ).toBeVisible();
+  });
+
+  test("blocked autoplay is not a failure: the player shows its own play button", async ({
+    page,
+  }) => {
+    await fakePlayer(page, {
+      type: "onPlayerError",
+      value: { errorCode: 3002, errorType: "AUTOPLAY_ERROR" },
+      "x-tiktok-player": true,
+    });
+    const tiktok = await pressPlay(page);
+    await expect(tiktok).toHaveAttribute("data-state", "ready");
+    await expect(tiktok.locator("iframe")).toHaveCount(1);
   });
 });

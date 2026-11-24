@@ -20,6 +20,7 @@ import {
   EMPTY_SELECTION,
   type Guests,
   previewTotalDollars,
+  resolveSelection,
   type Selection,
   toDayMap,
 } from "@/lib/booking/rules";
@@ -51,6 +52,15 @@ export type BookingWidgetProps = {
    * without it the widget fetches both on mount.
    */
   initial?: InitialBookingData;
+  /**
+   * A stay handed over in the URL (`parsePrefill` on the server). Checked
+   * against the calendar before it is adopted: a check-in the calendar
+   * refuses clears both dates, a check-out the stay cannot reach is dropped
+   * on its own. A complete stay that holds is quoted at once.
+   */
+  initialSelection?: Selection;
+  /** Guests from the same hand-off; clamped to the house like any change. */
+  initialGuests?: Guests;
   className?: string;
 };
 
@@ -87,6 +97,8 @@ type FormErrors = Partial<Record<keyof GuestFormValues, string>>;
 export function BookingWidget({
   propertyId,
   initial,
+  initialSelection,
+  initialGuests,
   className,
 }: BookingWidgetProps) {
   const root = useRef<HTMLDivElement>(null);
@@ -116,8 +128,21 @@ export function BookingWidget({
         }
       : { status: "loading" },
   );
-  const [selection, setSelection] = useState<Selection>(EMPTY_SELECTION);
-  const [guests, setGuests] = useState<Guests>(DEFAULT_GUESTS);
+  // With a seeded calendar the hand-off is resolved before the first render,
+  // so the server HTML already carries the selection; otherwise it waits in
+  // `pendingPrefill` for the calendar to arrive.
+  const [selection, setSelection] = useState<Selection>(() =>
+    initialSelection && seededCalendar
+      ? resolveSelection(initialSelection, toDayMap(seededCalendar.days), {
+          today: seededCalendar.start,
+          maxNights: initial?.catalog.maxNights ?? 90,
+        })
+      : EMPTY_SELECTION,
+  );
+  const pendingPrefill = useRef<Selection | null>(
+    initialSelection && !seededCalendar ? initialSelection : null,
+  );
+  const [guests, setGuests] = useState<Guests>(initialGuests ?? DEFAULT_GUESTS);
   const [reload, setReload] = useState(0);
   const [calendarReload, setCalendarReload] = useState(0);
   const [form, setForm] = useState<GuestFormValues>(EMPTY_GUEST_FORM);
@@ -214,6 +239,14 @@ export function BookingWidget({
     () => toDayMap(calendar.status === "ready" ? calendar.data.days : []),
     [calendar],
   );
+
+  // A hand-off that arrived before the calendar is applied once it is here.
+  useEffect(() => {
+    const pending = pendingPrefill.current;
+    if (!pending || calendar.status !== "ready") return;
+    pendingPrefill.current = null;
+    setSelection(resolveSelection(pending, dayMap, limits));
+  }, [calendar.status, dayMap, limits]);
   const boundedGuests = property
     ? clampGuests(guests, {
         maxGuests: property.maxGuests,

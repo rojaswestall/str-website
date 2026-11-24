@@ -92,6 +92,8 @@ export const PropertySchema = z
     name: nonEmpty,
     /** Short label for nav, map legend, and tight layouts. */
     shortName: nonEmpty,
+    /** The listing's title on Airbnb, shown as a subtitle under `name`. */
+    airbnbTitle: nonEmpty,
     neighborhood: nonEmpty,
     /** The mono line above the name, e.g. "Oak Hill, Austin · off Hwy 290 & 71". */
     locationLine: nonEmpty,
@@ -164,7 +166,7 @@ export const AreaPickSchema = z.object({
     message: "id is lowercase letters, digits, and hyphens",
   }),
   title: nonEmpty,
-  kind: z.enum(["eat", "outdoors", "local"]),
+  kind: z.enum(["coffee", "eat", "outdoors", "local"]),
   blurb: nonEmpty,
   /**
    * Drive time in minutes from each house, keyed by property slug. Every
@@ -172,8 +174,30 @@ export const AreaPickSchema = z.object({
    * "t.b.c." until the hosts confirm it.
    */
   driveMinutes: z.record(z.string(), z.number().int().positive().nullable()),
+  /**
+   * Walking time in minutes, keyed by property slug, for houses the place is
+   * a short walk from. Where set it is shown instead of the drive time for
+   * that house. Leave a house out when it is not a comfortable walk.
+   */
+  walkMinutes: z.record(z.string(), z.number().int().positive()).optional(),
   link: z.url().optional(),
+  /** 3:2 photo under /photos/area/; omit for the striped placeholder slot. */
   photo: ImageSchema.optional(),
+  /**
+   * Credit for a photo the hosts did not take, as its licence requires
+   * (CC BY and CC BY-SA need the author, the licence and a link to the
+   * source). Shown under the photo. Required whenever `photo` is set,
+   * unless `photoOwned` is true.
+   */
+  photoCredit: z
+    .object({
+      author: nonEmpty,
+      license: nonEmpty,
+      source: z.url(),
+    })
+    .optional(),
+  /** True when the hosts own the photo, so it needs no credit line. */
+  photoOwned: z.boolean().optional(),
 });
 export type AreaPick = z.infer<typeof AreaPickSchema>;
 export const AreaPicksSchema = z.array(AreaPickSchema).min(1);
@@ -214,6 +238,12 @@ export const TikTokClipSchema = z.object({
   title: nonEmpty,
   /** One or two short paragraphs under the heading; keep them brief, the column is narrow. */
   body: z.array(nonEmpty).min(1),
+  /**
+   * Id of the area pick (content/area.ts) whose photo and credit fill the
+   * poster shown before the visitor presses play. The pick needs a credited
+   * or owned photo (checked in content/index.ts).
+   */
+  poster: nonEmpty,
 });
 export type TikTokClip = z.infer<typeof TikTokClipSchema>;
 
@@ -222,11 +252,11 @@ export const SiteConfigSchema = z.object({
   tagline: nonEmpty,
   /** One sentence for the root `<meta name="description">`, Open Graph, and the Organization JSON-LD. */
   description: nonEmpty,
-  /** Bare host name, no scheme. Placeholder until the domain is chosen. */
+  /** Bare host name of the public site, no scheme. `[TBC]` renders as a gap. */
   domain: nonEmpty,
   hospitable: z.object({
-    /** "stub" renders the placeholder panels; "live" injects the loader. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
-    mode: z.enum(["stub", "live", "native"]),
+    /** "stub" renders the placeholder panels; "hospitable" injects the loader; "native" renders the site's own widget. `NEXT_PUBLIC_HOSPITABLE_MODE` overrides it. */
+    mode: z.enum(["stub", "hospitable", "native"]),
     /** `data-site-uuid` from the dashboard snippet; shared by every widget on the site. */
     siteUuid: z.uuid().nullable(),
     /** `data-theme` from the dashboard snippet (the widget style configured there). */

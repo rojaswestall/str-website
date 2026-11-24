@@ -4,7 +4,159 @@ Notable changes to The Austin Collection site. Dates are when the pull
 request merged to `main`. The direct-booking widget shipped in five
 checkpoints, each its own PR, so a reader can see what each one added.
 
-## Unreleased — direct-booking widget, checkpoint 5: hardening and docs
+## Unreleased — Airbnb listing titles as subtitles
+
+- Each house's Airbnb listing title (`airbnbTitle` in
+  `content/properties.ts`) appears as a subtitle under its short name on the
+  home-page cards and bands, the house page header, and the `/search` result
+  cards. The short names stay the headings, titles and URLs.
+
+## Unreleased — live on the native widget
+
+- **Apple Maps city map.** With `NEXT_PUBLIC_MAPKIT_TOKEN` set, "Where we
+  are" on the home page and each house page is a live Apple map: pins
+  labelled with each house's short name, the site's own callout card on
+  tap, and an opening view that frames the houses against downtown and the
+  river. On the home page its top lines up with the search box. Without a
+  token, or if Apple refuses it, the drawn SVG map shows as before.
+
+- **Production runs the native widget.** On 2026-11-05 the hosts switched
+  Production's `NEXT_PUBLIC_HOSPITABLE_MODE` to `native`, so the home-page
+  bar, the house pages and `/search` are now the site's own for guests, as
+  they already were on Preview. No code changed for it; the `hospitable`
+  embed stays in the codebase and the test suite.
+- **Docs.** The native search is complete, so `docs/search.md` was folded
+  into the "Search" section of `docs/architecture.md` (decisions and open
+  questions) and deleted. The status paragraphs in `README.md` and
+  `docs/architecture.md` say the site is live; the four entries below that
+  merged to `main` together in #47 are dated.
+
+## 2026-11-05 — native search, checkpoint 3: the `/search` results page (#50, to `main` in #47)
+
+The last of three checkpoints replacing Hospitable's embedded search with
+the site's own, in `native` mode only (`docs/search.md`). `stub` and
+`hospitable` modes are unchanged: `/search` there is still the stub or the
+embed inside the same page, fully static.
+
+- **`/search` renders its results on the server in `native` mode.** The bar
+  on top is prefilled from the URL; under it `SearchResults` reads the same
+  cached calendars as `/api/availability` (`searchAvailability`, called
+  directly) and lists a card per house, free houses first. No request
+  leaves the browser for the first paint and none goes to Hospitable's
+  hosts. The page keeps its heading, lede, `noindex` and "Or go straight to
+  a house" nav in every mode.
+- **Cards.** Hero photo, name, "N bed · N bath · up to N guests". Free:
+  "from $Y / night", "about $X for N nights, before fees and taxes" and
+  "See the price and book", which carries the whole stay to the house page
+  so it is quoted on arrival. Not free: the reason in one line (booked
+  nights, the minimum stay, "Sleeps up to 4", "No pets at this house", …)
+  and "See the calendar" with the guests only. The figures are labelled
+  estimates; the quote on the house page is the price.
+- **Everything else is said plainly.** No dates, bad or past dates, or a
+  check-out not after the check-in: an invitation to pick dates over the
+  three houses as plain cards, the bar keeping whatever was valid; a stay
+  over `MAX_NIGHTS` also says so. Every house refused: said so, with the
+  calendars on offer. Nothing could be checked: said so, houses listed
+  with no claim.
+- **A new search shows it is working.** Searching again from the bar is a
+  client-side navigation to the same route; the results give way to the
+  skeleton while it is pending. Back and forward restore the bar and the
+  results, because the URL is the state.
+- **Headline dates are month-first** ("Fri, Mar 12 → Mon, Mar 15 · 3
+  nights"), matching the bar and the booking widget, where the brief's
+  example was day-first.
+- **Without JavaScript** `/search` cannot show results (a streamed Suspense
+  boundary needs a script to be revealed); it says so and points at the
+  house links.
+- **Tests.** The page end to end in `search.native.spec.ts` (hero bar →
+  results → card → quoted house page; every refusal the stand-in's three
+  calendars produce; the "no dates" URLs; the pending skeleton and
+  back/forward; axe in both themes), and the URL parsing, links, ordering
+  and copy in `search.test.ts`. Two checkpoint 1 tests that built a stay
+  across the stand-in's reserved nights started it yesterday on the 10th of
+  a month and failed that day; they now use the same always-future stay as
+  the new tests.
+
+## 2026-11-05 — native search, checkpoint 2: the home-page search bar (#49, to `main` in #47)
+
+The second of three checkpoints replacing Hospitable's embedded search with
+the site's own, in `native` mode only (`docs/search.md`). `stub` and
+`hospitable` modes are unchanged; `/search` still mounts the embed until
+checkpoint 3.
+
+- **The hero's search bar is the site's own in `native` mode.**
+  `components/search/SearchBar.tsx`, mounted by `SearchWidget` in place of
+  `<hospitable-direct-mps>`: a real GET form to `/search` in the URL
+  contract's parameter names, so it works before hydration and without
+  JavaScript (date inputs with `min` set to today, a disclosure of number
+  inputs for the guests). Hydrated, the fields open the booking widget's own
+  `Calendar` (dates only: no prices, no availability, today-forward and
+  `MAX_NIGHTS`) and `GuestPicker` in a non-modal dialog that closes on
+  Escape and returns focus, and submit is a client-side navigation to the
+  identical URL. One row on a wide container, stacked on a phone, in the
+  stub's hairline frame; both themes; axe-clean with the picker open.
+- **`search_submitted`** joins the booking events `BookingAnalytics`
+  forwards to Vercel, as `booking_search_submitted`, with the six
+  parameters and nothing else.
+- **Prerendered, not streamed.** The bar's floor, today's date, is a
+  `"use cache"` value with the `hours` profile (`lib/booking/today.ts`)
+  rather than a `connection()` read: a streamed Suspense boundary is only
+  revealed by a script, so the form has to be in the static HTML to work
+  without JavaScript. `/` stays static in every mode.
+- **Widget pieces grew small options** for the bar: `Calendar`'s
+  `showPrices`, `GuestPicker`'s `alwaysOpen`; `CALENDAR_WINDOW_MONTHS` moved
+  to `lib/booking/dates.ts` (still exported from `server.ts`).
+- **Tests.** `guestSummary`, `searchQueryString`/`searchHref` and `openDays`
+  in `search.test.ts`; the bar end to end in `search.native.spec.ts`,
+  including a `javaScriptEnabled: false` context.
+
+## 2026-11-05 — checkpoint 1 written up to the documentation pattern (#48, to `main` in #47)
+
+- Docs only. `docs/architecture.md` no longer says the widget's API is
+  "three routes", and the `/api/availability` entry now records what a
+  result carries and the bounds the query is held to. `docs/development.md`
+  gains the search in the `MAX_NIGHTS` row, the right e2e count, and two
+  gotchas learned building checkpoint 1 (another worktree's `next start`
+  masquerading as your build; the availability limit test and reused
+  servers).
+
+## 2026-11-05 — the docs are the brief (#47)
+
+- The native-search brief moved out of `docs/prompts/` into
+  `docs/search.md`, the feature's doc: decisions, what is built, the
+  remaining checkpoints and open questions. The rules for booking code are
+  under "Working on the booking code" in `docs/development.md`, and a new
+  "Documentation" section there says which file each kind of change is
+  written up in. `docs/plan.md` is the original go-live checklist and is
+  no longer maintained. There are no prompt files.
+
+## 2026-11-04 — native search, checkpoint 1: availability API and house-page prefill (#46)
+
+The first of three checkpoints replacing Hospitable's embedded search with
+the site's own, in `native` mode only (the remaining two are specified in
+`docs/search.md`). `stub` and `hospitable` modes are unchanged.
+
+- **`GET /api/availability?checkin&checkout&adults&children&infants&pets`.**
+  Which of the three houses are free for a stay, judged from the cached
+  calendars by the widget's own rules (`lib/booking/search.ts` imports them
+  from `rules.ts`, so search and calendar cannot disagree) plus capacity and
+  pets, with an estimate of the nights at the calendar's direct preview,
+  labelled as such and never presented as the price. Hospitable has no
+  search endpoint and none is called; no quote is created by a search. A
+  house whose calendar could not be read is reported `unknown`, never free.
+  60 per minute per client, `no-store`.
+- **House pages accept the same parameters.** `/stays/<slug>?checkin=…&checkout=…&adults=…`
+  prefills the widget: a stay the calendar allows is quoted on arrival, a
+  check-out the calendar refuses is dropped and the check-in kept, a bad or
+  past value is ignored. In `hospitable` mode nothing changes; the embed
+  reads these parameters itself.
+- **Test bed.** The stand-in Hospitable API now serves all three houses with
+  calendars that differ (a monthly blocked range, a weekend 3-night minimum,
+  a no-pets house that sleeps four) plus a property content does not list,
+  which the server filters out. `search.native.spec.ts` covers the route and
+  the prefill; `search.test.ts` the rules and the URL parsing.
+
+## 2026-10-31 — direct-booking widget, checkpoint 5: hardening and docs (#40, mode rename #45 on 2026-11-04)
 
 - **First paint from the server.** In native mode the house page now reads
   the catalog and the house's calendar on the server and renders the priced
@@ -22,6 +174,10 @@ checkpoints, each its own PR, so a reader can see what each one added.
 - **Docs.** README section on the widget, `docs/architecture.md` and
   `docs/development.md` brought up to date, go-live steps for switching
   Production to the native widget in `docs/plan.md`.
+- **Mode renamed.** `NEXT_PUBLIC_HOSPITABLE_MODE=live` is now `hospitable`,
+  so the three values name what renders: `stub`, `hospitable` (the embedded
+  widget) or `native` (the site's own). `live` still resolves to
+  `hospitable`, so an un-updated Vercel environment is unaffected.
 
 ## 2026-10-31 — checkpoint 4: Airbnb price comparison (#39)
 

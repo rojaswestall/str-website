@@ -3,8 +3,9 @@ import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 /*
- * Full-page screenshots of the home page, one stay, and /search in both themes at
- * 1400px, written to e2e/__screenshots__/<route>-<theme>.png as review aids.
+ * Full-page screenshots of the home page, one stay, /search and /area in both
+ * themes at 1400px (plus /area at phone width), written to
+ * e2e/__screenshots__/<route>-<theme>.png as review aids.
  * This is `page.screenshot`, not `toHaveScreenshot`: there is no pixel
  * comparison yet because font rasterisation differs across operating systems.
  * The files are regenerated on every run.
@@ -16,6 +17,7 @@ const ROUTES = [
   { name: "home", path: "/" },
   { name: "stays-oak-hill", path: "/stays/oak-hill" },
   { name: "search", path: "/search" },
+  { name: "area", path: "/area" },
 ] as const;
 
 const THEMES = ["light", "dark"] as const;
@@ -77,3 +79,20 @@ for (const route of ROUTES) {
     });
   }
 }
+
+/* The area guide's card grid collapses to one column on a phone. */
+test.describe("phone width", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("captures /area in light", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/area");
+    await settle(page);
+    mkdirSync(DIR, { recursive: true });
+    await page.screenshot({
+      path: path.join(DIR, "area-phone-light.png"),
+      fullPage: true,
+      animations: "disabled",
+    });
+  });
+});

@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 /*
  * Runs in the "chromium-live" project only, against the second build made
- * with NEXT_PUBLIC_HOSPITABLE_MODE=live. The real loader is never fetched: the
+ * with NEXT_PUBLIC_HOSPITABLE_MODE=hospitable. The real loader is never fetched: the
  * route below answers for cdn.hsptb.com with a tiny stand-in that behaves like
  * the real one (reads its own data-* attributes, inserts its output right
  * after the script element).
@@ -85,7 +85,7 @@ const SEARCH_WIDGET_ID = "178e46fc-3dbb-4433-ac2d-3ebe9d9cca07";
 const SEARCH_SCRIPT_SRC =
   "https://hospitable.b-cdn.net/direct-property-search-widget/hospitable-search-widget.prod.js";
 
-test.describe("hospitable widgets (live mode)", () => {
+test.describe("hospitable widgets (hospitable mode)", () => {
   // This build has a MapKit token; keep Apple's CDN out of these tests
   // (mapkit.live.spec.ts covers the map). The map falls back to the SVG.
   test.beforeEach(async ({ page }) => {
@@ -154,7 +154,7 @@ test.describe("hospitable widgets (live mode)", () => {
     expect(loads).toHaveLength(3);
   });
 
-  test("no house warns about missing Hospitable config in live mode", async ({
+  test("no house warns about missing Hospitable config in hospitable mode", async ({
     page,
   }) => {
     await interceptLoader(page);
@@ -167,7 +167,7 @@ test.describe("hospitable widgets (live mode)", () => {
       await expect(page.getByTestId("hospitable-live-marker")).toHaveCount(1);
     }
     expect(
-      warnings.filter((text) => text.includes("[Hospitable] live mode")),
+      warnings.filter((text) => text.includes("[Hospitable] hospitable mode")),
     ).toEqual([]);
   });
 
