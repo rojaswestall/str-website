@@ -99,6 +99,25 @@ test.describe("home page", () => {
     await expect(page).toHaveURL(new RegExp(`/stays/${slug}$`));
   });
 
+  test("sections run stays, book direct, reviews, area guide, hosts", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const order = [
+      "stays-heading",
+      "direct-heading",
+      "reviews-heading",
+      "area-heading",
+      "hosts-heading",
+    ];
+    const labels = await page
+      .locator("main section[aria-labelledby]")
+      .evaluateAll((sections) =>
+        sections.map((s) => s.getAttribute("aria-labelledby")),
+      );
+    expect(labels.filter((id) => order.includes(id ?? ""))).toEqual(order);
+  });
+
   test("hero mounts the search stub and the area guide shows both TikTok posters", async ({
     page,
   }) => {

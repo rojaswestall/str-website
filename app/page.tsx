@@ -30,7 +30,8 @@ export const metadata: Metadata = {
 };
 
 /*
- * The landing page, section by section in the artifact's order. Everything
+ * The landing page, section by section. The area guide sits after the
+ * reviews and before the hosts (moved there 2026-11-24). Everything
  * reads from `@/content` at build time; nothing here is dynamic, so the route
  * prerenders as a static page.
  */
@@ -40,9 +41,9 @@ export default function Home() {
       <JsonLd data={organizationJsonLd()} />
       <Hero />
       <Stays />
-      <AreaGuide />
       <WhyBookDirect />
       <GuestReviews />
+      <AreaGuide />
       <HostsStrip />
     </>
   );
