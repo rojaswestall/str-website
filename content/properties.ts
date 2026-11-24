@@ -15,7 +15,7 @@ import type { Property } from "./types";
  * Photos live in content/photos.ts. Guest quotes, names, and months are from
  * the Airbnb reviews (whitespace and stray typos tidied; the month is when
  * the review was posted). Ratings and review counts were copied from the
- * listings on 2026-10-12.
+ * listings on 2026-11-24.
  *
  * `mapArea` places each house on the Apple map at a nearby intersection, never
  * the street address (which stays internal); the map also caps how far it
@@ -51,7 +51,7 @@ export const properties: Property[] = [
       "pets allowed",
     ],
     rating: 5.0,
-    reviewCount: 25,
+    reviewCount: 30,
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598934202273477463",
     strLicense: "OL2026086598",
@@ -105,8 +105,8 @@ export const properties: Property[] = [
       "sofa bed",
       "pets allowed",
     ],
-    rating: 4.95,
-    reviewCount: 20,
+    rating: 4.96,
+    reviewCount: 26,
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1655329029936239948",
     strLicense: "OL2026040319",
@@ -163,7 +163,7 @@ export const properties: Property[] = [
       "pets allowed",
     ],
     rating: 5.0,
-    reviewCount: 30,
+    reviewCount: 34,
     guestFavorite: true,
     airbnbUrl: "https://www.airbnb.com/rooms/1598953749522814358",
     strLicense: "OL2026031718",

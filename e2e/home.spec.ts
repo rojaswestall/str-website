@@ -202,7 +202,7 @@ test.describe("home page", () => {
       reviews.getByRole("heading", { level: 2, name: "What guests say" }),
     ).toBeVisible();
     // Average weighted by review count across the three listings.
-    await expect(reviews).toContainText("4.99 average · 75 reviews");
+    await expect(reviews).toContainText("4.99 average · 90 reviews");
 
     const records = reviews.getByTestId("review-records").locator("li");
     await expect(records).toHaveCount(3);
