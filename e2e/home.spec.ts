@@ -99,25 +99,6 @@ test.describe("home page", () => {
     await expect(page).toHaveURL(new RegExp(`/stays/${slug}$`));
   });
 
-  test("sections run stays, book direct, reviews, area guide, hosts", async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const order = [
-      "stays-heading",
-      "direct-heading",
-      "reviews-heading",
-      "area-heading",
-      "hosts-heading",
-    ];
-    const labels = await page
-      .locator("main section[aria-labelledby]")
-      .evaluateAll((sections) =>
-        sections.map((s) => s.getAttribute("aria-labelledby")),
-      );
-    expect(labels.filter((id) => order.includes(id ?? ""))).toEqual(order);
-  });
-
   test("hero mounts the search stub and the area guide shows both TikTok posters", async ({
     page,
   }) => {
@@ -212,7 +193,7 @@ test.describe("home page", () => {
     expect(await mapGroundFill(page)).toBe(MAP_GROUND_DARK);
   });
 
-  test("guest reviews sit above the hosts with each house's record", async ({
+  test("guest reviews sit above the area guide and hosts with each house's record", async ({
     page,
   }) => {
     await page.goto("/");
@@ -278,13 +259,18 @@ test.describe("home page", () => {
       reviews.getByRole("button", { name: "Play slideshow" }),
     ).toHaveAttribute("aria-pressed", "true");
 
-    // Order on the page: Why book direct, then reviews, then hosts.
+    // Order on the page: Why book direct, reviews, the area guide, hosts.
     const ids = await page
       .locator("main section[id], main section[aria-labelledby=hosts-heading]")
       .evaluateAll((sections) =>
         sections.map((s) => s.id || s.getAttribute("aria-labelledby")),
       );
-    expect(ids.slice(-3)).toEqual(["direct", "reviews", "hosts-heading"]);
+    expect(ids.slice(-4)).toEqual([
+      "direct",
+      "reviews",
+      "area",
+      "hosts-heading",
+    ]);
   });
 
   test("the review slideshow starts paused under reduced motion", async ({
