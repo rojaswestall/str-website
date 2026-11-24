@@ -9,7 +9,7 @@ import type { Host } from "./types";
 export const hosts: Host[] = [
   {
     name: "Alexis",
-    line: "A coffee lover who's probably at a local café right now.",
+    line: "The detail person: if something's out of place, she's already fixed it.",
   },
   { name: "Gabe", line: "[TBC] One sentence about Gabe." },
   {
