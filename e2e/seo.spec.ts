@@ -124,6 +124,21 @@ test.describe("seo", () => {
     expect(JSON.stringify(json)).not.toContain("[TBC]");
   });
 
+  test("the home page's search and share description calls them homes", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const description =
+      "Three short-term rental homes in Austin, Texas, booked directly with the hosts who look after them.";
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      description,
+    );
+    await expect(
+      page.locator('meta[property="og:description"]'),
+    ).toHaveAttribute("content", description);
+  });
+
   for (const [path, title] of [
     ["/", "The Austin Collection"],
     ["/stays/fire-side", "Fire Side Home"],

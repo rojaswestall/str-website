@@ -18,7 +18,7 @@ export const site: SiteConfig = {
   name: "The Austin Collection",
   tagline: "Places we look after, properly.",
   description:
-    "Three short-term rental houses in Austin, Texas, booked directly with the hosts who look after them.",
+    "Three short-term rental homes in Austin, Texas, booked directly with the hosts who look after them.",
   domain: "www.theaustincollection.com",
   hospitable: {
     mode: "stub",

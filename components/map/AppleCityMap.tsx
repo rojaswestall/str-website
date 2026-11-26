@@ -229,7 +229,7 @@ export function AppleCityMap({
         <div
           ref={containerRef}
           data-testid="apple-map"
-          aria-label="Map of the houses in Austin"
+          aria-label="Map of the homes in Austin"
           className="absolute inset-0"
         />
         {status === "loading" ? (
