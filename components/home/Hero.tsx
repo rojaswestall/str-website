@@ -46,10 +46,10 @@ export function Hero() {
         </h1>
         <p className="mt-[1.4rem] max-w-measure text-[clamp(1.02rem,1.6vw,1.18rem)] text-ink-soft">
           {houseCount[0]?.toUpperCase()}
-          {houseCount.slice(1)} houses in Austin, looked after by the{" "}
-          {hostCount} of us — {listNames(hosts.map((host) => host.name))} —
-          rather than by a management company. The same standard at every one,
-          and a real person on the other end of every message.
+          {houseCount.slice(1)} homes in Austin, looked after by the {hostCount}{" "}
+          of us — {listNames(hosts.map((host) => host.name))} — rather than by a
+          management company. The same standard at every one, and a real person
+          on the other end of every message.
         </p>
 
         <PhotoFrame

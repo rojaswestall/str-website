@@ -18,6 +18,9 @@ test.describe("home page", () => {
       "Places we look after, properly.",
     );
     await expect(page.getByText("Three homes · one small team")).toBeVisible();
+    await expect(
+      page.getByText("Three homes in Austin, looked after by the three of us"),
+    ).toBeVisible();
     // The lede names every host.
     const lede = page.locator("#hero-heading + p");
     for (const host of ["Alexis", "Gabe", "Aaron"]) {
