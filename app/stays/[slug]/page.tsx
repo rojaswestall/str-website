@@ -125,7 +125,7 @@ export default async function StayPage({
               aria-labelledby="house-heading"
               className="flex flex-col gap-4"
             >
-              <MonoHeading id="house-heading">The house</MonoHeading>
+              <MonoHeading id="house-heading">The home</MonoHeading>
               <Prose>
                 <p>{property.description}</p>
               </Prose>

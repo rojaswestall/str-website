@@ -428,7 +428,7 @@ export function stayLabel(checkIn: string, checkOut: string): string {
   return `${formatWeekdayDate(checkIn)} → ${formatWeekdayDate(checkOut)} · ${plural(nights, "night")}`;
 }
 
-/** "2 of 3 houses are free for Fri, Mar 12 → Mon, Mar 15 · 3 nights" */
+/** "2 of 3 homes are free for Fri, Mar 12 → Mon, Mar 15 · 3 nights" */
 export function resultsHeadline(
   results: readonly { stay: StayEvaluation }[],
   checkIn: string,
@@ -437,13 +437,13 @@ export function resultsHeadline(
   const total = results.length;
   const free = results.filter((r) => r.stay.available).length;
   const stay = stayLabel(checkIn, checkOut);
-  if (free === 0) return `No house is free for ${stay}`;
+  if (free === 0) return `No home is free for ${stay}`;
   if (free === total) {
     return total === 1
-      ? `The house is free for ${stay}`
-      : `All ${total} houses are free for ${stay}`;
+      ? `The home is free for ${stay}`
+      : `All ${total} homes are free for ${stay}`;
   }
-  return `${free} of ${total} houses ${free === 1 ? "is" : "are"} free for ${stay}`;
+  return `${free} of ${total} homes ${free === 1 ? "is" : "are"} free for ${stay}`;
 }
 
 /** Why a house is not free, in one plain line for its result card. */
@@ -467,10 +467,10 @@ export function refusalText(
     case "max-guests":
       return `Sleeps up to ${house.maxGuests}`;
     case "pets":
-      return "No pets at this house";
+      return "No pets at this home";
     case "past":
       return "Those dates are in the past";
     case "unknown":
-      return "Couldn't check this house just now";
+      return "Couldn't check this home just now";
   }
 }

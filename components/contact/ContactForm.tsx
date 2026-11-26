@@ -211,7 +211,7 @@ export function ContactForm({
 
       <Field
         id={fieldId("property")}
-        label="House"
+        label="Home"
         error={fieldErrors.property}
         control={(props) => (
           <select
@@ -306,7 +306,7 @@ export function ContactForm({
           {pending ? "Sending…" : "Send message"}
         </Button>
         <p className="font-mono text-[0.72rem] text-muted">
-          House and dates are optional.
+          Home and dates are optional.
         </p>
       </div>
 

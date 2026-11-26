@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
   try {
     const property = await getBookingProperty(propertyId);
     if (!property) {
-      return bookingError("NOT_FOUND", "We don't have that house.", 404);
+      return bookingError("NOT_FOUND", "We don't have that home.", 404);
     }
     const day = (await getCalendarWindow(property.id)).days.find(
       (d) => d.date === date,

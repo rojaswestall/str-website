@@ -38,7 +38,7 @@ async function fillForm(page: Page, values = inquiry) {
   const f = form(page);
   await f.getByLabel("Name").fill(values.name);
   await f.getByLabel("Email").fill(values.email);
-  await f.getByLabel("House").selectOption(values.property);
+  await f.getByLabel("Home").selectOption(values.property);
   await f.getByLabel("Check-in").fill(values.checkIn);
   await f.getByLabel("Check-out").fill(values.checkOut);
   await f.getByLabel("Message").fill(values.message);
@@ -66,8 +66,8 @@ test.describe("contact form", () => {
       page.getByRole("dialog", { name: "Send us a message" }),
     ).toBeVisible();
     const f = form(page);
-    await expect(f.getByLabel("House")).toHaveValue("");
-    await expect(f.getByLabel("House").locator("option")).toHaveText([
+    await expect(f.getByLabel("Home")).toHaveValue("");
+    await expect(f.getByLabel("Home").locator("option")).toHaveText([
       "General",
       "An Oak Hill Home",
       "South Austin Stay",

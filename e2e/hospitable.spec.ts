@@ -46,12 +46,12 @@ test.describe("hospitable widgets (stub mode)", () => {
     expect(response?.status()).toBe(200);
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Which house is free?" }),
+      page.getByRole("heading", { level: 1, name: "Which home is free?" }),
     ).toBeVisible();
     const stub = page.getByTestId("hospitable-search-stub");
     await expect(stub).toBeVisible();
     await expect(stub).toHaveAttribute("data-variant", "results");
-    await expect(stub).toContainText("Search all 3 houses");
+    await expect(stub).toContainText("Search all 3 homes");
     await expect(page.locator("hospitable-direct-mps")).toHaveCount(0);
 
     // Client-rendered results: kept out of the index, links still followed.
@@ -64,7 +64,7 @@ test.describe("hospitable widgets (stub mode)", () => {
       /follow/,
     );
 
-    const houses = page.getByRole("navigation", { name: "The houses" });
+    const houses = page.getByRole("navigation", { name: "The homes" });
     for (const [name, slug] of [
       ["An Oak Hill Home", "oak-hill"],
       ["South Austin Stay", "south-austin"],

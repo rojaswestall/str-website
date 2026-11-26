@@ -19,7 +19,7 @@ export function HospitableSearchStub({
       <div className="flex flex-col gap-[0.35rem]">
         <Eyebrow>Check dates</Eyebrow>
         <p className="font-display text-[1.35rem] leading-[1.25] text-ink">
-          Search all {propertyCount} houses
+          Search all {propertyCount} homes
         </p>
       </div>
       <div className="grid gap-[0.75rem] sm:grid-cols-3">
@@ -28,11 +28,11 @@ export function HospitableSearchStub({
         <StubField label="Guests" value="2 guests" />
       </div>
       <p className="max-w-[40ch] font-mono text-[0.72rem] leading-[1.5] tracking-[0.04em] text-muted">
-        Searching across the houses opens with direct booking. For now, pick a
-        house and check its dates there.
+        Searching across the homes opens with direct booking. For now, pick a
+        home and check its dates there.
       </p>
       <Button href="/#stays" variant="ghost" className="self-start">
-        See the houses
+        See the homes
       </Button>
     </div>
   );

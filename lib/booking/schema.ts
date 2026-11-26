@@ -44,7 +44,7 @@ export const GuestDetailsSchema = z.object({
 
 export const QuoteRequestSchema = z
   .object({
-    propertyId: z.uuid({ error: "Choose one of our houses." }),
+    propertyId: z.uuid({ error: "Choose one of our homes." }),
     checkIn: isoDate,
     checkOut: isoDate,
     adults: z

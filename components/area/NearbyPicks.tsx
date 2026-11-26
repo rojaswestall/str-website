@@ -25,7 +25,7 @@ export function NearbyPicks({
       data-testid="nearby-picks"
       className="flex flex-col gap-4"
     >
-      <MonoHeading id="nearby-heading">Near this house</MonoHeading>
+      <MonoHeading id="nearby-heading">Near this home</MonoHeading>
       <ul className="m-0 list-none border-t border-hairline p-0">
         {picks.map((pick) => (
           <li

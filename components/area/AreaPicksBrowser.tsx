@@ -131,7 +131,7 @@ export function AreaPicksBrowser({
               pressed={!active}
               onClick={() => writeParam(HOUSE_PARAM, null)}
             >
-              Any house
+              Any home
             </FilterButton>
             {houses.map((house) => (
               <FilterButton
@@ -151,7 +151,7 @@ export function AreaPicksBrowser({
           >
             {active
               ? `Sorted by travel time from ${active.name}, walkable places first.`
-              : "Pick a house to sort by how close each place is."}
+              : "Pick a home to sort by how close each place is."}
           </p>
         </div>
         <div className="flex flex-col gap-3 min-[720px]:flex-row min-[720px]:items-center min-[720px]:gap-5">

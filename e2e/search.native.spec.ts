@@ -397,7 +397,7 @@ test.describe("home-page search bar", () => {
     await expect(bar).toHaveRole("search");
     await expect(bar).toHaveAttribute("action", "/search");
     await expect(bar).toHaveAttribute("method", "get");
-    await expect(bar).toContainText("Search all 3 houses");
+    await expect(bar).toContainText("Search all 3 homes");
     for (const name of ["Check-in", "Checkout", "Guests"]) {
       await expect(bar.getByRole("button", { name })).toBeVisible();
     }
@@ -473,7 +473,7 @@ test.describe("home-page search bar", () => {
     await expect(page).toHaveURL(searchUrl(stay));
     // The results page itself is covered in its own block below.
     await expect(
-      page.getByRole("heading", { level: 1, name: "Which house is free?" }),
+      page.getByRole("heading", { level: 1, name: "Which home is free?" }),
     ).toBeVisible();
 
     expect(events).toEqual([
@@ -518,7 +518,7 @@ test.describe("home-page search bar", () => {
 
       await expect(page).toHaveURL(searchUrl(stay));
       await expect(
-        page.getByRole("heading", { level: 1, name: "Which house is free?" }),
+        page.getByRole("heading", { level: 1, name: "Which home is free?" }),
       ).toBeVisible();
       // The results stream into a Suspense boundary, which only a script
       // reveals: without one the page says so and offers the houses.
@@ -531,7 +531,7 @@ test.describe("home-page search bar", () => {
       expect(await page.content()).toContain("The results need JavaScript");
       await expect(
         page
-          .getByRole("navigation", { name: "The houses" })
+          .getByRole("navigation", { name: "The homes" })
           .getByRole("link", { name: "South Austin Stay" }),
       ).toBeVisible();
     } finally {
@@ -645,7 +645,7 @@ test.describe("/search results page", () => {
 
     // The page keeps its frame around the native results.
     await expect(
-      page.getByRole("heading", { level: 1, name: "Which house is free?" }),
+      page.getByRole("heading", { level: 1, name: "Which home is free?" }),
     ).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
       "content",
@@ -653,7 +653,7 @@ test.describe("/search results page", () => {
     );
     await expect(
       page
-        .getByRole("navigation", { name: "The houses" })
+        .getByRole("navigation", { name: "The homes" })
         .getByRole("link", { name: "Fire Side Home" }),
     ).toHaveAttribute("href", "/stays/fire-side");
     await expect(page.locator("hospitable-direct-mps")).toHaveCount(0);
@@ -671,12 +671,12 @@ test.describe("/search results page", () => {
     const results = page.getByTestId("search-results");
     await expect(results).toHaveAttribute("data-state", "results");
     await expect(results.getByRole("heading", { level: 2 })).toHaveText(
-      `All 3 houses are free for ${weekdayDate(stay.checkIn)} → ${weekdayDate(stay.checkOut)} · 3 nights`,
+      `All 3 homes are free for ${weekdayDate(stay.checkIn)} → ${weekdayDate(stay.checkOut)} · 3 nights`,
     );
     // Estimates, said to be estimates; the price is on the house page.
     await expect(results).toContainText("The figures are estimates");
     await expect(results).toContainText(
-      "The price is the quote on the house page.",
+      "The price is the quote on that home’s page.",
     );
     expect(await slugs(results)).toEqual(ORDER);
 
@@ -734,7 +734,7 @@ test.describe("/search results page", () => {
     const html = (
       await (await request.get(`/search?${query}`)).text()
     ).replaceAll("<!-- -->", "");
-    expect(html).toContain("All 3 houses are free for");
+    expect(html).toContain("All 3 homes are free for");
     expect(html).toContain("See the price and book");
     expect(html).toContain("from $124 / night");
   });
@@ -751,7 +751,7 @@ test.describe("/search results page", () => {
       `checkin=${blocked.checkIn}&checkout=${blocked.checkOut}`,
     );
     await expect(results.getByRole("heading", { level: 2 })).toContainText(
-      "2 of 3 houses are free for",
+      "2 of 3 homes are free for",
     );
     expect(await slugs(results)).toEqual([
       "oak-hill",
@@ -779,7 +779,7 @@ test.describe("/search results page", () => {
     const oneNight = `checkin=${friday}&checkout=${addDays(friday, 1)}`;
     results = await openSearch(page, oneNight);
     await expect(results.getByRole("heading", { level: 2 })).toHaveText(
-      `1 of 3 houses is free for ${weekdayDate(friday)} → ${weekdayDate(addDays(friday, 1))} · 1 night`,
+      `1 of 3 homes is free for ${weekdayDate(friday)} → ${weekdayDate(addDays(friday, 1))} · 1 night`,
     );
     expect(await slugs(results)).toEqual([
       "fire-side",
@@ -820,7 +820,7 @@ test.describe("/search results page", () => {
     // A pet: Fire Side takes none.
     results = await openSearch(page, `${midweek}&pets=1`);
     await expect(card(results, "fire-side")).toContainText(
-      "No pets at this house",
+      "No pets at this home",
     );
     await expect(
       card(results, "oak-hill").getByRole("link", {
@@ -834,7 +834,7 @@ test.describe("/search results page", () => {
     // Every house refused: said plainly, with the calendars on offer.
     results = await openSearch(page, `${oneNight}&adults=5`);
     await expect(results.getByRole("heading", { level: 2 })).toContainText(
-      "No house is free for",
+      "No home is free for",
     );
     await expect(results).toContainText("Try other dates above");
     await expect(results).not.toContainText("estimates");
@@ -855,7 +855,7 @@ test.describe("/search results page", () => {
     async function expectInvitation(results: Locator) {
       await expect(results).toHaveAttribute("data-state", "invitation");
       await expect(results.getByRole("heading", { level: 2 })).toHaveText(
-        "Pick your dates to see which houses are free",
+        "Pick your dates to see which homes are free",
       );
       expect(await slugs(results)).toEqual(ORDER);
       // No claim either way: no verdict, no figure, only the calendars.
@@ -927,7 +927,7 @@ test.describe("/search results page", () => {
       `checkin=${first.checkIn}&checkout=${first.checkOut}`,
     );
     const heading = results.getByRole("heading", { level: 2 });
-    await expect(heading).toContainText("All 3 houses are free for");
+    await expect(heading).toContainText("All 3 homes are free for");
 
     const bar = visibleBar(page);
     const checkIn = bar.getByRole("button", { name: /Check-in/ });
@@ -959,7 +959,7 @@ test.describe("/search results page", () => {
     release();
     await expect(page).toHaveURL(searchUrl(second, 2));
     await expect(heading).toHaveText(
-      `2 of 3 houses are free for ${weekdayDate(second.checkIn)} → ${weekdayDate(second.checkOut)} · 2 nights`,
+      `2 of 3 homes are free for ${weekdayDate(second.checkIn)} → ${weekdayDate(second.checkOut)} · 2 nights`,
     );
     await expect(bar).not.toHaveAttribute("data-pending");
     await expect(skeleton).toHaveCount(0);
@@ -975,12 +975,12 @@ test.describe("/search results page", () => {
     await expect(page).toHaveURL(
       `/search?checkin=${first.checkIn}&checkout=${first.checkOut}`,
     );
-    await expect(heading).toContainText("All 3 houses are free for");
+    await expect(heading).toContainText("All 3 homes are free for");
     await expect(checkIn).toContainText(shortDate(first.checkIn));
 
     await page.goForward();
     await expect(page).toHaveURL(searchUrl(second, 2));
-    await expect(heading).toContainText("2 of 3 houses are free for");
+    await expect(heading).toContainText("2 of 3 homes are free for");
     await expect(checkIn).toContainText(shortDate(second.checkIn));
   });
 

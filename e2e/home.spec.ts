@@ -63,7 +63,7 @@ test.describe("home page", () => {
         band.getByRole("link", { name: "Book direct" }),
       ).toHaveAttribute("href", `/stays/${slug}#book`);
       await expect(
-        band.getByRole("link", { name: "See the whole house" }),
+        band.getByRole("link", { name: "See the whole home" }),
       ).toHaveAttribute("href", `/stays/${slug}`);
       await expect(band.getByRole("heading", { level: 3 })).toBeVisible();
     }
@@ -117,9 +117,9 @@ test.describe("home page", () => {
 
     await expect(page.getByText("Check dates across all three")).toBeVisible();
     const search = page.getByTestId("hospitable-search-stub");
-    await expect(search).toContainText("Search all 3 houses");
+    await expect(search).toContainText("Search all 3 homes");
     await expect(
-      search.getByRole("link", { name: "See the houses" }),
+      search.getByRole("link", { name: "See the homes" }),
     ).toHaveAttribute("href", "/#stays");
 
     const feature = page.getByTestId("video-feature");
@@ -174,14 +174,14 @@ test.describe("home page", () => {
 
     const map = page.getByTestId("city-map");
     await expect(
-      map.getByRole("img", { name: /Where the houses are/ }),
+      map.getByRole("img", { name: /Where the homes are/ }),
     ).toBeVisible();
     await expect(map.locator("[data-map-pin]")).toHaveCount(3);
     for (const slug of SLUGS) {
       await expect(map.locator(`[data-map-pin="${slug}"]`)).toHaveCount(1);
     }
-    await expect(map).toContainText("Oak Hill · one house");
-    await expect(map).toContainText("South Austin · two houses");
+    await expect(map).toContainText("Oak Hill · one home");
+    await expect(map).toContainText("South Austin · two homes");
 
     expect(await mapGroundFill(page)).toBe(MAP_GROUND_LIGHT);
 
@@ -432,7 +432,7 @@ test.describe("site shell", () => {
     // Opens with the full form; on the home page the house is "General".
     await open.click();
     await expect(popup).toBeVisible();
-    await expect(form.getByLabel("House")).toHaveValue("");
+    await expect(form.getByLabel("Home")).toHaveValue("");
     await expect(
       form.getByRole("button", { name: "Send message" }),
     ).toBeVisible();
@@ -483,7 +483,7 @@ test.describe("site shell", () => {
       .getByRole("button", { name: "Contact us" })
       .click();
     const popup = page.getByRole("dialog", { name: "Send us a message" });
-    await expect(popup.getByLabel("House")).toHaveValue("south-austin");
+    await expect(popup.getByLabel("Home")).toHaveValue("south-austin");
   });
 
   test("footer lists the three STR licenses", async ({ page }) => {

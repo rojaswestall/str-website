@@ -63,7 +63,7 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
         <div className="flex flex-wrap gap-[0.6rem]">
           <Button href="/stays/oak-hill">Check availability</Button>
           <Button href="/stays/oak-hill" variant="ghost">
-            See the whole house
+            See the whole home
           </Button>
           <Button href={house.airbnbUrl} variant="ghost" external>
             Also on Airbnb
@@ -155,7 +155,7 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
               "No platform service fee on the guest's side",
               "Returning guests get first refusal on holiday weeks",
               "Longer stays priced by the week, not by the night",
-              "Requests handled by the person who owns the house",
+              "Requests handled by the person who owns the home",
             ]}
           />
           <Ledger
@@ -171,7 +171,7 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
                 term: "Pets",
                 detail: (
                   <>
-                    Welcome at all three houses.{" "}
+                    Welcome at all three homes.{" "}
                     <Tbc>Fee per stay to confirm.</Tbc>
                   </>
                 ),

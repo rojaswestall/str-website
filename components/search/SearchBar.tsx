@@ -264,7 +264,7 @@ export function SearchBar({
     <form
       ref={root}
       role="search"
-      aria-label="Search the houses"
+      aria-label="Search the homes"
       method="get"
       action={SEARCH_RESULTS_PATH}
       data-testid="search-bar"
@@ -278,7 +278,7 @@ export function SearchBar({
       <div className="flex flex-col gap-[0.35rem]">
         <Eyebrow>Check dates</Eyebrow>
         <p className="font-display text-[1.35rem] leading-[1.25] text-ink">
-          Search all {propertyCount} houses
+          Search all {propertyCount} homes
         </p>
       </div>
 
@@ -440,7 +440,7 @@ export function SearchBar({
       {/* A live region from the start, so a hint replacing the note is announced. */}
       <p role="status" className={cx(NOTE_CLASS, hint && "text-ink")}>
         {hint ??
-          "The same calendars as the house pages; the price is quoted there."}
+          "The same calendars as each home\u2019s page; the price is quoted there."}
       </p>
     </form>
   );

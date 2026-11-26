@@ -6,7 +6,7 @@ const LEDGER_ITEMS = [
   "No platform service fee on the guest's side",
   "Returning guests get first refusal on holiday weeks",
   "Longer stays priced by the week, not by the night",
-  "Requests handled by the person who owns the house",
+  "Requests handled by the person who owns the home",
 ] as const;
 
 /*

@@ -40,7 +40,7 @@ export const ContactInquirySchema = z
       z
         .string()
         .refine((slug) => getPropertySlugs().includes(slug), {
-          error: "Choose one of our houses or leave this blank.",
+          error: "Choose one of our homes or leave this blank.",
         })
         .optional(),
     ),

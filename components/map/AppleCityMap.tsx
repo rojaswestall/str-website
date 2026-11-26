@@ -261,7 +261,7 @@ export function AppleCityMap({
                   )}
                 />
                 {house === highlighted ? (
-                  <span>{house.name} · this house</span>
+                  <span>{house.name} · this home</span>
                 ) : (
                   <Link
                     href={`/stays/${house.slug}`}

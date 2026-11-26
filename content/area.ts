@@ -90,7 +90,7 @@ export const areaPicks: AreaPick[] = [
     id: "bee-dumpling",
     kind: "eat",
     blurb:
-      "Handmade soup dumplings, potstickers and noodle soups in the same shopping center as Cannon Coffee. Easy for takeout back to the house.",
+      "Handmade soup dumplings, potstickers and noodle soups in the same shopping center as Cannon Coffee. Easy for takeout back to the home.",
     driveMinutes: { "oak-hill": 16, "south-austin": 2, "fire-side": 2 },
     walkMinutes: { "south-austin": 7, "fire-side": 7 },
     link: "https://beedumplingtx.com/",

@@ -622,21 +622,21 @@ describe("the results page", () => {
     const dates = "Fri, Mar 12 → Mon, Mar 15 · 3 nights";
     assert.equal(
       headline([free, refused("unavailable"), free]),
-      `2 of 3 houses are free for ${dates}`,
+      `2 of 3 homes are free for ${dates}`,
     );
     assert.equal(
       headline([refused("pets"), refused("unavailable"), free]),
-      `1 of 3 houses is free for ${dates}`,
+      `1 of 3 homes is free for ${dates}`,
     );
     assert.equal(
       headline([free, free, free]),
-      `All 3 houses are free for ${dates}`,
+      `All 3 homes are free for ${dates}`,
     );
     assert.equal(
       headline([refused("pets"), refused("unknown")]),
-      `No house is free for ${dates}`,
+      `No home is free for ${dates}`,
     );
-    assert.equal(headline([free]), `The house is free for ${dates}`);
+    assert.equal(headline([free]), `The home is free for ${dates}`);
   });
 
   it("says why a house is not free in one plain line", () => {
@@ -654,14 +654,14 @@ describe("the results page", () => {
       "Needs a longer stay on those dates",
     );
     assert.equal(refusalText(refused("max-guests"), house), "Sleeps up to 4");
-    assert.equal(refusalText(refused("pets"), house), "No pets at this house");
+    assert.equal(refusalText(refused("pets"), house), "No pets at this home");
     assert.equal(
       refusalText(refused("past"), house),
       "Those dates are in the past",
     );
     assert.equal(
       refusalText(refused("unknown"), house),
-      "Couldn't check this house just now",
+      "Couldn't check this home just now",
     );
     for (const reason of [
       "max-nights",

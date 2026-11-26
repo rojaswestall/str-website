@@ -30,7 +30,7 @@ export function generateStaticParams() {
 
 // Inert today: the page's explicit `openGraph.images` entry carries the house
 // name as alt. Kept because the file convention expects it for the fallback.
-export const alt = "A house in The Austin Collection";
+export const alt = "A home in The Austin Collection";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

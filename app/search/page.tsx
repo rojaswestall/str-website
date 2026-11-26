@@ -25,7 +25,7 @@ import { canonicalUrl } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Check dates",
   description:
-    "Search all three houses at once and see which is free for your dates.",
+    "Search all three homes at once and see which is free for your dates.",
   alternates: { canonical: canonicalUrl("/search") },
   robots: { index: false, follow: true },
 };
@@ -34,29 +34,28 @@ export default function SearchPage({ searchParams }: PageProps<"/search">) {
   const properties = getAllProperties();
   return (
     <Section className="flex-1" aria-labelledby="search-heading">
-      <Eyebrow className="mb-[1.1rem]">Check dates · all three houses</Eyebrow>
+      <Eyebrow className="mb-[1.1rem]">Check dates · all three homes</Eyebrow>
       <h1
         id="search-heading"
         className="max-w-[16ch] font-display text-[clamp(2.4rem,6.4vw,4.4rem)] leading-[1.04] font-light tracking-[-0.015em] text-balance"
       >
-        Which house is free?
+        Which home is free?
       </h1>
       <Prose className="mt-[1.4rem] text-[clamp(1.02rem,1.6vw,1.18rem)]">
         <p>
-          Pick your dates and the houses with those nights open are listed
-          below, with the same calendar the listings use. Choose one to book it
-          direct.
+          Pick your dates and the homes with those nights open are listed below,
+          with the same calendar the listings use. Choose one to book it direct.
         </p>
       </Prose>
       <div className="mt-[clamp(2rem,4vw,3rem)]">
         <SearchWidget variant="results" searchParams={searchParams} />
       </div>
       <nav
-        aria-label="The houses"
+        aria-label="The homes"
         className="mt-[clamp(2rem,4vw,3rem)] border-t border-hairline pt-[1.25rem]"
       >
         <p className="font-mono text-[0.72rem] tracking-[0.13em] text-muted uppercase">
-          Or go straight to a house
+          Or go straight to a home
         </p>
         <ul className="mt-[0.8rem] flex flex-wrap gap-x-[1.5rem] gap-y-[0.5rem]">
           {properties.map((property) => (

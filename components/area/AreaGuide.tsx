@@ -60,7 +60,7 @@ export function AreaGuide() {
       <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-4">
         <p className="max-w-[52ch] text-ink-soft">
           Where to eat, where to get outside, and what locals know, with the
-          drive time from each house.
+          drive time from each home.
         </p>
         <Button href="/area" variant="ghost">
           Open the area guide

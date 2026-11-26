@@ -58,7 +58,7 @@ export async function SearchResults({
     return (
       <Results
         state="invitation"
-        heading="Pick your dates to see which houses are free"
+        heading="Pick your dates to see which homes are free"
         houses={contentHouses()}
         guests={guests}
       >
@@ -76,7 +76,7 @@ export async function SearchResults({
           </p>
         ) : null}
         <p className={NOTE_CLASS}>
-          Choose a check-in and a check-out above. Until then the houses are
+          Choose a check-in and a check-out above. Until then the homes are
           listed below, each with its own calendar.
         </p>
       </Results>
@@ -103,7 +103,7 @@ export async function SearchResults({
         guests={guests}
       >
         <p className={NOTE_CLASS}>
-          Please try again in a moment. The houses are listed below without an
+          Please try again in a moment. The homes are listed below without an
           answer for those dates; each one&rsquo;s page has its own calendar.
         </p>
       </Results>
@@ -119,14 +119,14 @@ export async function SearchResults({
     >
       {noneFree ? (
         <p className={NOTE_CLASS}>
-          Try other dates above, or open a house&rsquo;s calendar to see which
+          Try other dates above, or open a home&rsquo;s calendar to see which
           nights are open.
         </p>
       ) : (
         <p className={NOTE_CLASS}>
-          The figures are estimates: the nightly rates on each house&rsquo;s
+          The figures are estimates: the nightly rates on each home&rsquo;s
           calendar for those nights, before the cleaning fee and taxes. The
-          price is the quote on the house page.
+          price is the quote on that home&rsquo;s page.
         </p>
       )}
       <ul className={GRID_CLASS}>
@@ -230,7 +230,7 @@ export function ResultsSkeleton({ count }: { count: number }) {
       </p>
       <noscript>
         <p className={NOTE_CLASS}>
-          The results need JavaScript. Without it, go straight to a house below:
+          The results need JavaScript. Without it, go straight to a home below:
           each page has its own calendar.
         </p>
       </noscript>

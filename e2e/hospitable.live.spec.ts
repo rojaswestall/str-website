@@ -127,7 +127,7 @@ test.describe("hospitable widgets (hospitable mode)", () => {
 
     // Client-side navigation to another house: the first mount is torn down
     // and exactly one fresh marker and one fresh script carry the new id.
-    const others = page.getByRole("navigation", { name: "Other houses" });
+    const others = page.getByRole("navigation", { name: "Other homes" });
     await others.getByRole("link", { name: "An Oak Hill Home" }).click();
     await expect(page).toHaveURL(/\/stays\/oak-hill$/);
     await expect(marker).toHaveCount(1);
