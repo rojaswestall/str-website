@@ -303,6 +303,13 @@ test.describe("home page", () => {
     const hosts = page.getByTestId("hosts-strip").locator("li");
     await expect(hosts).toHaveCount(3);
     await expect(hosts).toContainText(["Alexis", "Gabe", "Aaron"]);
+    // Each host has a photo and a confirmed line (no [TBC] gaps left).
+    for (const name of ["Alexis", "Gabe", "Aaron"]) {
+      await expect(
+        page.getByTestId("hosts-strip").getByRole("img", { name }),
+      ).toBeVisible();
+    }
+    await expect(page.getByTestId("hosts-strip")).not.toContainText("[TBC]");
 
     const direct = page.locator("section#direct");
     await expect(direct).toContainText("What direct booking changes");
