@@ -41,7 +41,6 @@ export function SiteFooter() {
 
         <address className="flex flex-col items-start gap-[0.75rem] font-mono text-[0.8rem] text-ink-soft not-italic">
           <MessageDialog properties={properties} />
-          <span>Phone shared with guests after booking</span>
         </address>
 
         <p

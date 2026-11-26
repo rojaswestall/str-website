@@ -36,7 +36,7 @@ export function Hero() {
       <Container>
         <Eyebrow className="mb-[1.1rem]">
           {houseCount[0]?.toUpperCase()}
-          {houseCount.slice(1)} houses · one small team
+          {houseCount.slice(1)} homes · one small team
         </Eyebrow>
         <h1
           id="hero-heading"

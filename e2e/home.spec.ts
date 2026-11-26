@@ -17,7 +17,7 @@ test.describe("home page", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Places we look after, properly.",
     );
-    await expect(page.getByText("Three houses · one small team")).toBeVisible();
+    await expect(page.getByText("Three homes · one small team")).toBeVisible();
     // The lede names every host.
     const lede = page.locator("#hero-heading + p");
     for (const host of ["Alexis", "Gabe", "Aaron"]) {
@@ -345,9 +345,7 @@ test.describe("site shell", () => {
 
     await expect(page.getByRole("main")).toHaveAttribute("id", "main");
     const footer = page.getByRole("contentinfo");
-    await expect(footer).toContainText(
-      "Phone shared with guests after booking",
-    );
+    await expect(footer).not.toContainText("Phone shared with guests");
     // The colophon links to the public production domain.
     await expect(
       footer.getByRole("link", { name: "www.theaustincollection.com" }),
