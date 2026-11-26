@@ -3,6 +3,7 @@ import { AreaGuide } from "@/components/area/AreaGuide";
 import { Hero } from "@/components/home/Hero";
 import { GuestReviews } from "@/components/home/GuestReviews";
 import { HostsStrip } from "@/components/home/HostsStrip";
+import { SearchAndMap } from "@/components/home/SearchAndMap";
 import { Stays } from "@/components/home/Stays";
 import { WhyBookDirect } from "@/components/home/WhyBookDirect";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -30,8 +31,9 @@ export const metadata: Metadata = {
 };
 
 /*
- * The landing page, section by section. The area guide sits after the
- * reviews and before the hosts (moved there 2026-11-24). Everything
+ * The landing page, section by section. "Why book direct" sits between the
+ * hero's collage and the search and map (moved there 2026-11-26); the area
+ * guide sits after the reviews and before the hosts (moved there 2026-11-24). Everything
  * reads from `@/content` at build time; nothing here is dynamic, so the route
  * prerenders as a static page.
  */
@@ -40,8 +42,9 @@ export default function Home() {
     <>
       <JsonLd data={organizationJsonLd()} />
       <Hero />
-      <Stays />
       <WhyBookDirect />
+      <SearchAndMap />
+      <Stays />
       <GuestReviews />
       <AreaGuide />
       <HostsStrip />

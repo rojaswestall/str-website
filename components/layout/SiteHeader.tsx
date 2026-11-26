@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { MessageDialog } from "@/components/contact";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Container } from "@/components/ui";
-import { getSite } from "@/content";
+import { getAllProperties, getSite } from "@/content";
 
 /** Home-page section anchors, plus the area guide page. */
 const NAV = [
@@ -12,11 +13,17 @@ const NAV = [
 
 /**
  * The artifact's masthead: wordmark on the left, mono uppercase nav on the
- * right, theme toggle last. Everything sits on one baseline and wraps onto
- * further lines at narrow widths; there is no hamburger.
+ * right, then the "Contact us" button (opens the contact form in a pop-up) and
+ * the theme toggle. Everything sits on one baseline and wraps onto further
+ * lines at narrow widths; there is no hamburger.
  */
 export function SiteHeader() {
   const site = getSite();
+  // MessageDialog is a Client Component: pass only the slug/name pairs.
+  const properties = getAllProperties().map(({ slug, name }) => ({
+    slug,
+    name,
+  }));
   return (
     <header className="border-b border-hairline">
       <Container className="flex flex-wrap items-baseline justify-between gap-6 py-6">
@@ -41,6 +48,11 @@ export function SiteHeader() {
               ))}
             </ul>
           </nav>
+          <MessageDialog
+            properties={properties}
+            placement="header"
+            className="self-center"
+          />
           <ThemeToggle className="self-center" />
         </div>
       </Container>

@@ -262,14 +262,18 @@ test.describe("home page", () => {
       reviews.getByRole("button", { name: "Play slideshow" }),
     ).toHaveAttribute("aria-pressed", "true");
 
-    // Order on the page: Why book direct, reviews, the area guide, hosts.
+    // Order on the page: the hero's collage, Why book direct, the search and
+    // map, the stays, reviews, the area guide, hosts.
     const ids = await page
-      .locator("main section[id], main section[aria-labelledby=hosts-heading]")
+      .locator("main > section")
       .evaluateAll((sections) =>
         sections.map((s) => s.id || s.getAttribute("aria-labelledby")),
       );
-    expect(ids.slice(-4)).toEqual([
+    expect(ids).toEqual([
+      "hero-heading",
       "direct",
+      "search",
+      "stays",
       "reviews",
       "area",
       "hosts-heading",
@@ -317,7 +321,8 @@ test.describe("home page", () => {
     const direct = page.locator("section#direct");
     await expect(direct).toContainText("What direct booking changes");
     await expect(direct.locator("li")).toHaveCount(4);
-    await expect(direct.getByTestId("contact-form-slot")).toBeVisible();
+    // The contact form moved to the Contact us pop-up.
+    await expect(direct.getByRole("form")).toHaveCount(0);
   });
 });
 
@@ -345,6 +350,9 @@ test.describe("site shell", () => {
       );
     }
     await expect(header.locator("[data-theme-toggle]")).toBeVisible();
+    await expect(
+      header.getByRole("button", { name: "Contact us" }),
+    ).toHaveAttribute("aria-haspopup", "dialog");
 
     await expect(page.getByRole("main")).toHaveAttribute("id", "main");
     const footer = page.getByRole("contentinfo");
@@ -356,18 +364,18 @@ test.describe("site shell", () => {
     await expect(footer).not.toContainText("domain to confirm");
     // No public email or Instagram; the footer opens the contact form.
     await expect(
-      footer.getByRole("button", { name: "Send us a message" }),
+      footer.getByRole("button", { name: "Contact us" }),
     ).toHaveAttribute("aria-haspopup", "dialog");
     await expect(footer.locator('a[href^="mailto:"]')).toHaveCount(0);
   });
 
-  test("the footer's Send us a message opens the contact form in a pop-up", async ({
+  test("the footer's Contact us opens the contact form in a pop-up", async ({
     page,
   }) => {
     await page.goto("/");
     const open = page
       .getByRole("contentinfo")
-      .getByRole("button", { name: "Send us a message" });
+      .getByRole("button", { name: "Contact us" });
     const popup = page.getByRole("dialog", { name: "Send us a message" });
     const form = popup.getByRole("form", { name: "Send us a message" });
 
@@ -422,7 +430,7 @@ test.describe("site shell", () => {
     await page.goto("/stays/south-austin");
     await page
       .getByRole("contentinfo")
-      .getByRole("button", { name: "Send us a message" })
+      .getByRole("button", { name: "Contact us" })
       .click();
     const popup = page.getByRole("dialog", { name: "Send us a message" });
     await expect(popup.getByLabel("House")).toHaveValue("south-austin");

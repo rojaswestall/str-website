@@ -9,7 +9,7 @@ const link =
  * The artifact's footer: display-font colophon with the domain under it, a
  * mono contact column, and the City of Austin STR license line, one entry per
  * house, read from the content layer. There is no public email or Instagram:
- * the contact column's "Send us a message" button opens the contact form in a
+ * the contact column's "Contact us" button opens the contact form in a
  * pop-up on any page (`MessageDialog`), with the house pre-selected on a house
  * page. The domain links to the public site; an unconfirmed one renders as a
  * dashed `Tbc` gap.

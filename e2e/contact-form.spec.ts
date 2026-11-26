@@ -30,7 +30,9 @@ const inquiry = {
 };
 
 const form = (page: Page) =>
-  page.getByRole("form", { name: "Ask us anything before you book" });
+  page
+    .getByRole("dialog", { name: "Send us a message" })
+    .getByRole("form", { name: "Send us a message" });
 
 async function fillForm(page: Page, values = inquiry) {
   const f = form(page);
@@ -50,20 +52,18 @@ const json = (route: Route, status: number, body: unknown) =>
   });
 
 test.describe("contact form", () => {
+  // The form lives in the pop-up that "Contact us" in the header opens.
   test.beforeEach(async ({ page }) => {
-    await page.goto("/#direct");
+    await page.goto("/");
+    await page
+      .getByRole("banner")
+      .getByRole("button", { name: "Contact us" })
+      .click();
   });
 
-  test("sits under the mono heading in Why book direct", async ({ page }) => {
-    const slot = page
-      .locator("section#direct")
-      .getByTestId("contact-form-slot");
-    await expect(slot).toBeVisible();
+  test("opens from Contact us in the header", async ({ page }) => {
     await expect(
-      slot.getByRole("heading", {
-        level: 3,
-        name: "Ask us anything before you book",
-      }),
+      page.getByRole("dialog", { name: "Send us a message" }),
     ).toBeVisible();
     const f = form(page);
     await expect(f.getByLabel("House")).toHaveValue("");
