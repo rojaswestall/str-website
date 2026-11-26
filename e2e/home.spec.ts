@@ -345,6 +345,7 @@ test.describe("site shell", () => {
     // Desktop: name, nav, Contact us, and the toggle on one centre line.
     await page.setViewportSize({ width: 1400, height: 900 });
     await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
     const line = await centre(name);
     for (const item of [stays, contact, toggle]) {
       expect(Math.abs((await centre(item)) - line)).toBeLessThan(2);
@@ -352,6 +353,12 @@ test.describe("site shell", () => {
 
     // A 360px phone: the name and both buttons on the top row, the nav below.
     await page.setViewportSize({ width: 360, height: 800 });
+    await page.evaluate(() => document.fonts.ready);
+    const width = async (locator: Locator) =>
+      Math.round((await locator.boundingBox())!.width);
+    console.log(
+      `[header@360] name ${await width(name)} contact ${await width(contact)} toggle ${await width(toggle)} container ${await width(header.locator("> div"))}`,
+    );
     const top = await centre(name);
     expect(Math.abs((await centre(contact)) - top)).toBeLessThan(2);
     expect(Math.abs((await centre(toggle)) - top)).toBeLessThan(2);
