@@ -329,6 +329,20 @@ test.describe("home page", () => {
 // The shell (header, footer, skip link) is the same on every route; it is
 // asserted once here, on the home page. The 404 shell is in stays.spec.ts.
 test.describe("site shell", () => {
+  test("the nav marks the area guide as the current page only on /area", async ({
+    page,
+  }) => {
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    await page.goto("/area");
+    await expect(nav.getByRole("link", { name: "The area" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(nav.locator("[aria-current]")).toHaveCount(1);
+    await page.goto("/");
+    await expect(nav.locator("[aria-current]")).toHaveCount(0);
+  });
+
   test("header items share one centre line, and fit two rows on a phone", async ({
     page,
   }) => {
@@ -349,6 +363,11 @@ test.describe("site shell", () => {
     const line = await centre(name);
     for (const item of [stays, contact, toggle]) {
       expect(Math.abs((await centre(item)) - line)).toBeLessThan(2);
+    }
+
+    // Every header control is at least WCAG 2.2's 24px minimum target.
+    for (const item of await header.locator("a, button").all()) {
+      expect((await item.boundingBox())!.height).toBeGreaterThanOrEqual(24);
     }
 
     // A 360px phone: the name and both buttons on the top row, the nav below.

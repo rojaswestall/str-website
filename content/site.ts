@@ -35,7 +35,7 @@ export const site: SiteConfig = {
       poster: "barton-springs",
       title: "Barton Springs, and the river through the middle of it",
       body: [
-        "Sixty-eight degrees year round, spring-fed, and busy from the first warm weekend onward. The clip runs the length of the river as it cuts through the city — the stretch of Austin most people come here for, and a short drive from all three houses.",
+        "Sixty-eight degrees year round, spring-fed, and busy from the first warm weekend onward. The clip runs the length of the river as it cuts through the city — the stretch of Austin most people come here for, and a short drive from all three homes.",
       ],
     },
     {
@@ -49,10 +49,10 @@ export const site: SiteConfig = {
     },
   ],
   staysLede:
-    "All three are three-bedroom houses that sleep eight, so the choice is mostly about which side of town you want and what you need out back — a fireplace and a patio, a garage to park in, or a fire pit out back.",
+    "All three are three-bedroom homes that sleep eight, so the choice is mostly about which side of town you want and what you need out back — a fireplace and a patio, a garage to park in, or a fire pit out back.",
   directPitch: [
     "Book through a platform and roughly 15% of what you pay is a service fee that goes to the platform, not to the house. Booking here, that fee simply isn’t there.",
-    "Everything else is the same: the same calendar the listings use, the same houses, and the same three people answering your messages before and during the stay.",
+    "Everything else is the same: the same calendar the listings use, the same homes, and the same three people answering your messages before and during the stay.",
   ],
   heroCollage: {
     src: "/photos/home/hero-collage.jpg",
