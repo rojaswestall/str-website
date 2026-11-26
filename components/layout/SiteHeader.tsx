@@ -30,7 +30,7 @@ export function SiteHeader() {
       <Container className="flex flex-wrap items-center justify-between gap-x-3 gap-y-4 py-5 min-[760px]:gap-x-[clamp(1rem,3vw,2.2rem)]">
         <Link
           href="/"
-          className="font-display text-[clamp(1.15rem,3vw,1.5rem)] font-normal tracking-[0.005em] whitespace-nowrap text-ink no-underline"
+          className="font-display text-[clamp(1.1rem,3vw,1.5rem)] font-normal tracking-[0.005em] whitespace-nowrap text-ink no-underline"
         >
           {site.name}
         </Link>

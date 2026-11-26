@@ -354,11 +354,6 @@ test.describe("site shell", () => {
     // A 360px phone: the name and both buttons on the top row, the nav below.
     await page.setViewportSize({ width: 360, height: 800 });
     await page.evaluate(() => document.fonts.ready);
-    const width = async (locator: Locator) =>
-      Math.round((await locator.boundingBox())!.width);
-    console.log(
-      `[header@360] name ${await width(name)} contact ${await width(contact)} toggle ${await width(toggle)} container ${await width(header.locator("> div"))}`,
-    );
     const top = await centre(name);
     expect(Math.abs((await centre(contact)) - top)).toBeLessThan(2);
     expect(Math.abs((await centre(toggle)) - top)).toBeLessThan(2);

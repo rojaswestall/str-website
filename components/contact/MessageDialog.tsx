@@ -42,7 +42,7 @@ export function MessageDialog({
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
           className={cx(
-            "inline-flex h-[2.25rem] shrink-0 items-center border border-ink bg-ink px-[0.65rem] font-mono text-[0.72rem] tracking-[0.06em] whitespace-nowrap text-paper uppercase transition-[background-color,border-color] duration-[120ms] hover:border-muted hover:bg-muted min-[760px]:px-3",
+            "inline-flex h-[2.25rem] shrink-0 items-center border border-ink bg-ink px-[0.55rem] font-mono text-[0.72rem] tracking-[0.04em] whitespace-nowrap text-paper uppercase transition-[background-color,border-color] duration-[120ms] hover:border-muted hover:bg-muted min-[760px]:px-3 min-[760px]:tracking-[0.06em]",
             className,
           )}
         >
