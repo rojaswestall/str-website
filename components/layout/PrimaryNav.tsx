@@ -2,21 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { MessageDialog, type ContactFormProperty } from "@/components/contact";
 
-/** Home-page section anchors, plus the area guide page. */
+/** A home-page section anchor and the area guide page; "Contact us" follows. */
 const NAV = [
   { label: "Stays", href: "/#stays" },
   { label: "The area", href: "/area" },
-  { label: "Book direct", href: "/#direct" },
 ] as const;
 
 /**
- * The header's mono uppercase links. A Client Component only to mark the link
- * for the page you're on with `aria-current="page"` (the area guide; the other
- * two are anchors on the home page, so none of them is "current" there).
- * Each link is at least 24px tall, WCAG 2.2's minimum target size.
+ * The header's mono uppercase links, then "Contact us", which looks like them
+ * but is a button opening the contact form pop-up. A Client Component to mark
+ * the link for the page you're on with `aria-current="page"` (the area guide;
+ * Stays is an anchor on the home page, so it is never "current"). Each item is
+ * at least 24px tall, WCAG 2.2's minimum target size.
  */
-export function PrimaryNav({ className }: { className?: string }) {
+export function PrimaryNav({
+  properties,
+  className,
+}: {
+  properties: readonly ContactFormProperty[];
+  className?: string;
+}) {
   const pathname = usePathname();
   return (
     <nav aria-label="Primary" className={className}>
@@ -35,6 +42,9 @@ export function PrimaryNav({ className }: { className?: string }) {
             </li>
           );
         })}
+        <li>
+          <MessageDialog properties={properties} placement="nav" />
+        </li>
       </ul>
     </nav>
   );

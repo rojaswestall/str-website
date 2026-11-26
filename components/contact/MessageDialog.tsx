@@ -23,8 +23,8 @@ export function MessageDialog({
   className,
 }: {
   properties: readonly ContactFormProperty[];
-  /** "header": solid, the toggle's height. "footer": the ghost button. */
-  placement?: "header" | "footer";
+  /** "nav": styled like the header's nav links. "footer": the ghost button. */
+  placement?: "nav" | "footer";
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -36,13 +36,13 @@ export function MessageDialog({
 
   return (
     <>
-      {placement === "header" ? (
+      {placement === "nav" ? (
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
           className={cx(
-            "inline-flex h-[2.25rem] shrink-0 items-center border border-ink bg-ink px-[0.55rem] font-mono text-[0.72rem] tracking-[0.04em] whitespace-nowrap text-paper uppercase transition-[background-color,border-color] duration-[120ms] hover:border-muted hover:bg-muted min-[760px]:px-3 min-[760px]:tracking-[0.06em]",
+            "inline-flex min-h-6 cursor-pointer items-center border-b border-transparent bg-transparent p-0 font-mono text-[0.78rem] tracking-[0.04em] text-muted uppercase transition-[color,border-color] duration-[120ms] hover:border-accent hover:text-ink",
             className,
           )}
         >

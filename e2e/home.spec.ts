@@ -354,14 +354,16 @@ test.describe("site shell", () => {
     const name = header.getByRole("link", { name: "The Austin Collection" });
     const stays = header.getByRole("link", { name: "Stays" });
     const contact = header.getByRole("button", { name: "Contact us" });
+    const book = header.getByRole("link", { name: "Book direct" });
     const toggle = header.locator("[data-theme-toggle]");
 
-    // Desktop: name, nav, Contact us, and the toggle on one centre line.
+    // Desktop: name, nav (with Contact us), Book direct, and the toggle on
+    // one centre line.
     await page.setViewportSize({ width: 1400, height: 900 });
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
     const line = await centre(name);
-    for (const item of [stays, contact, toggle]) {
+    for (const item of [stays, contact, book, toggle]) {
       expect(Math.abs((await centre(item)) - line)).toBeLessThan(2);
     }
 
@@ -370,13 +372,17 @@ test.describe("site shell", () => {
       expect((await item.boundingBox())!.height).toBeGreaterThanOrEqual(24);
     }
 
-    // A 360px phone: the name and both buttons on the top row, the nav below.
+    // A 360px phone: the name, Book direct, and the toggle on the top row;
+    // the nav, Contact us included, on the row below.
     await page.setViewportSize({ width: 360, height: 800 });
     await page.evaluate(() => document.fonts.ready);
     const top = await centre(name);
-    expect(Math.abs((await centre(contact)) - top)).toBeLessThan(2);
+    expect(Math.abs((await centre(book)) - top)).toBeLessThan(2);
     expect(Math.abs((await centre(toggle)) - top)).toBeLessThan(2);
     expect(await centre(stays)).toBeGreaterThan(top + 20);
+    expect(
+      Math.abs((await centre(contact)) - (await centre(stays))),
+    ).toBeLessThan(2);
   });
 
   test("header, nav, and footer render on the home page", async ({ page }) => {
@@ -388,11 +394,10 @@ test.describe("site shell", () => {
     ).toHaveAttribute("href", "/");
 
     const nav = header.getByRole("navigation", { name: "Primary" });
-    await expect(nav.getByRole("link")).toHaveCount(3);
+    await expect(nav.getByRole("link")).toHaveCount(2);
     for (const [label, href] of [
       ["Stays", "/#stays"],
       ["The area", "/area"],
-      ["Book direct", "/#direct"],
     ]) {
       await expect(nav.getByRole("link", { name: label })).toHaveAttribute(
         "href",
@@ -400,9 +405,15 @@ test.describe("site shell", () => {
       );
     }
     await expect(header.locator("[data-theme-toggle]")).toBeVisible();
+    // Contact us sits in the nav and opens the pop-up; Book direct is the
+    // solid button beside the theme toggle, outside the nav.
     await expect(
-      header.getByRole("button", { name: "Contact us" }),
+      nav.getByRole("button", { name: "Contact us" }),
     ).toHaveAttribute("aria-haspopup", "dialog");
+    await expect(
+      header.getByRole("link", { name: "Book direct" }),
+    ).toHaveAttribute("href", "/#direct");
+    await expect(nav.getByRole("link", { name: "Book direct" })).toHaveCount(0);
 
     await expect(page.getByRole("main")).toHaveAttribute("id", "main");
     const footer = page.getByRole("contentinfo");
