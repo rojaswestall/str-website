@@ -22,8 +22,11 @@ function useMounted() {
 }
 
 /**
- * Cycles light → dark → system. The current mode is only rendered after mount
- * because next-themes reads it from localStorage, which the server cannot see.
+ * Cycles light → dark → system, as an outlined icon-only square (sun, moon,
+ * or screen) so it reads as a setting beside the header's solid "Contact us".
+ * The mode is in the accessible name and the hover title. The current mode is
+ * only rendered after mount because next-themes reads it from localStorage,
+ * which the server cannot see.
  */
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const { theme, setTheme } = useTheme();
@@ -39,14 +42,14 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       aria-label={
         mounted ? `Theme: ${current}. Switch to ${next}.` : "Switch theme"
       }
+      title={mounted ? `Theme: ${current}` : "Theme"}
       data-theme-toggle
       data-mode={mounted ? current : undefined}
-      className={`inline-flex min-w-[7.5rem] items-center gap-2 border border-hairline bg-transparent px-3 py-2 font-mono text-[0.72rem] tracking-[0.06em] text-ink uppercase transition-[border-color] duration-[120ms] hover:border-muted ${className}`}
+      className={`inline-grid size-[2.25rem] shrink-0 place-items-center border border-hairline bg-transparent text-ink transition-[border-color] duration-[120ms] hover:border-muted ${className}`}
     >
       <span aria-hidden="true" className="inline-flex size-3.5 items-center">
         {mounted ? <ModeIcon mode={current} /> : null}
       </span>
-      <span>{mounted ? current : "theme"}</span>
     </button>
   );
 }

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const SLUGS = ["oak-hill", "south-austin", "fire-side"] as const;
 const LICENSES = ["OL2026086598", "OL2026040319", "OL2026031718"];
@@ -329,6 +329,35 @@ test.describe("home page", () => {
 // The shell (header, footer, skip link) is the same on every route; it is
 // asserted once here, on the home page. The 404 shell is in stays.spec.ts.
 test.describe("site shell", () => {
+  test("header items share one centre line, and fit two rows on a phone", async ({
+    page,
+  }) => {
+    const centre = async (locator: Locator) => {
+      const box = await locator.boundingBox();
+      return box!.y + box!.height / 2;
+    };
+    const header = page.getByRole("banner");
+    const name = header.getByRole("link", { name: "The Austin Collection" });
+    const stays = header.getByRole("link", { name: "Stays" });
+    const contact = header.getByRole("button", { name: "Contact us" });
+    const toggle = header.locator("[data-theme-toggle]");
+
+    // Desktop: name, nav, Contact us, and the toggle on one centre line.
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.goto("/");
+    const line = await centre(name);
+    for (const item of [stays, contact, toggle]) {
+      expect(Math.abs((await centre(item)) - line)).toBeLessThan(2);
+    }
+
+    // A 360px phone: the name and both buttons on the top row, the nav below.
+    await page.setViewportSize({ width: 360, height: 800 });
+    const top = await centre(name);
+    expect(Math.abs((await centre(contact)) - top)).toBeLessThan(2);
+    expect(Math.abs((await centre(toggle)) - top)).toBeLessThan(2);
+    expect(await centre(stays)).toBeGreaterThan(top + 20);
+  });
+
   test("header, nav, and footer render on the home page", async ({ page }) => {
     await page.goto("/");
 
