@@ -46,7 +46,7 @@ export function propertySpecItems(property: Property): SpecItem[] {
  * 760px. Elsewhere they stay inert, as on desktop the two buttons do the job.
  * Both links are out of the tab order and the photo link is hidden from
  * assistive tech, so keyboard and screen-reader users meet each destination
- * once, through "See the whole house".
+ * once, through "See the whole home".
  */
 const tapOnly =
   "pointer-events-none max-[759px]:pointer-events-auto pointer-coarse:pointer-events-auto";
@@ -56,7 +56,7 @@ const tapOnly =
  * Photo left, body right; `flip` puts the photo on the right at ≥760px (the
  * artifact's `nth-child(even)` rule) and stacks photo-first below that.
  * Deliberately brief: rooms only. Rate, minimum nights, and amenities are on
- * the house page ("See the whole house").
+ * the house page ("See the whole home").
  */
 export function PropertyBand({
   property,
@@ -131,7 +131,7 @@ export function PropertyBand({
         <div className="mt-[0.35rem] flex flex-wrap gap-[0.6rem]">
           <Button href={`/stays/${property.slug}#book`}>Book direct</Button>
           <Button href={`/stays/${property.slug}`} variant="ghost">
-            See the whole house
+            See the whole home
           </Button>
         </div>
       </div>

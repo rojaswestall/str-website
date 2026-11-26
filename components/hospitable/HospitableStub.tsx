@@ -30,7 +30,7 @@ export function HospitableStub({
         <StubField label="Guests" value="2 guests" />
       </div>
       <p className="max-w-[40ch] font-mono text-[0.72rem] leading-[1.5] tracking-[0.04em] text-muted">
-        The direct booking calendar for this house is still being set up. Until
+        The direct booking calendar for this home is still being set up. Until
         it opens, check dates on Airbnb.
       </p>
       <Button href={airbnbUrl} variant="ghost" external className="self-start">

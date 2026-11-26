@@ -1,5 +1,3 @@
-import { CityMap } from "@/components/map/CityMap";
-import { SearchWidget } from "@/components/hospitable";
 import { Container, Eyebrow, PhotoFrame } from "@/components/ui";
 import { getAllProperties, getHosts, getSite } from "@/content";
 
@@ -10,12 +8,13 @@ function listNames(names: readonly string[]) {
   return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
 }
 
-const COUNT_WORDS = ["no", "one", "two", "three", "four", "five", "six"];
+export const COUNT_WORDS = ["no", "one", "two", "three", "four", "five", "six"];
 
 /*
  * The artifact's hero: eyebrow, the tagline as the h1 with its last word in
- * italics, the lede naming the hosts, the 21:9 collage, then a row with the
- * cross-property search widget beside the circular city map.
+ * italics, the lede naming the hosts, and the 21:9 collage. "Why book direct"
+ * follows it, then `SearchAndMap` (the cross-property search beside the city
+ * map), which used to close this section.
  */
 export function Hero() {
   const site = getSite();
@@ -36,7 +35,7 @@ export function Hero() {
       <Container>
         <Eyebrow className="mb-[1.1rem]">
           {houseCount[0]?.toUpperCase()}
-          {houseCount.slice(1)} houses · one small team
+          {houseCount.slice(1)} homes · one small team
         </Eyebrow>
         <h1
           id="hero-heading"
@@ -46,10 +45,10 @@ export function Hero() {
         </h1>
         <p className="mt-[1.4rem] max-w-measure text-[clamp(1.02rem,1.6vw,1.18rem)] text-ink-soft">
           {houseCount[0]?.toUpperCase()}
-          {houseCount.slice(1)} houses in Austin, looked after by the{" "}
-          {hostCount} of us — {listNames(hosts.map((host) => host.name))} —
-          rather than by a management company. The same standard at every one,
-          and a real person on the other end of every message.
+          {houseCount.slice(1)} homes in Austin, looked after by the {hostCount}{" "}
+          of us — {listNames(hosts.map((host) => host.name))} — rather than by a
+          management company. The same standard at every one, and a real person
+          on the other end of every message.
         </p>
 
         <PhotoFrame
@@ -60,30 +59,6 @@ export function Hero() {
           preload
           caption={site.heroCollage.caption}
         />
-
-        {/*
-         * From 760px the label sits in its own row and the map starts on the
-         * search box's row, so the tops of the search box and the map line up.
-         * Below that, the label, search box, and map stack in order.
-         */}
-        <div className="mt-[clamp(1.25rem,2.5vw,1.75rem)] grid items-start gap-[clamp(1.5rem,4vw,3rem)] min-[760px]:grid-cols-[minmax(0,1fr)_auto] min-[760px]:gap-y-[0.8rem]">
-          <div className="flex flex-col gap-[0.8rem] min-[760px]:contents">
-            <p
-              id="search-label"
-              className="font-mono text-[0.72rem] tracking-[0.13em] text-muted uppercase min-[760px]:col-start-1 min-[760px]:row-start-1"
-            >
-              Check dates across all {houseCount}
-            </p>
-            <div
-              aria-labelledby="search-label"
-              role="group"
-              className="min-[760px]:col-start-1 min-[760px]:row-start-2"
-            >
-              <SearchWidget />
-            </div>
-          </div>
-          <CityMap className="min-[760px]:col-start-2 min-[760px]:row-start-2 min-[760px]:justify-self-end" />
-        </div>
       </Container>
     </section>
   );

@@ -18,7 +18,7 @@ export function OtherHouses({
           id="other-houses-heading"
           className="font-display text-[clamp(1.55rem,3vw,2.05rem)] leading-[1.12] font-normal tracking-[-0.01em]"
         >
-          Other houses
+          Other homes
         </h2>
         <p className="font-mono text-[0.78rem] tracking-[0.05em] text-muted uppercase">
           {properties.length === 1

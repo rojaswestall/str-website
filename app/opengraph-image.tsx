@@ -60,7 +60,7 @@ export default async function Image() {
       >
         <span>{site.name}</span>
         <span style={{ color: MUTED, fontSize: 26 }}>
-          {houses} houses · Austin, Texas
+          {houses} homes · Austin, Texas
         </span>
       </div>
 

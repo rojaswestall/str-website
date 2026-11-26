@@ -16,7 +16,7 @@ type CitySketchProps = {
 function countLabel(count: number) {
   const words = ["no", "one", "two", "three", "four", "five", "six"];
   const word = words[count] ?? String(count);
-  return `${word} ${count === 1 ? "house" : "houses"}`;
+  return `${word} ${count === 1 ? "home" : "homes"}`;
 }
 
 /** Legend lines grouped by neighbourhood, in property order. */
@@ -55,10 +55,10 @@ export function CitySketch({ highlightSlug, className }: CitySketchProps) {
     ? [
         {
           kind: "house" as const,
-          label: `${highlighted.shortName} · this house`,
+          label: `${highlighted.shortName} · this home`,
         },
         ...(properties.length > 1
-          ? [{ kind: "other" as const, label: "The other houses" }]
+          ? [{ kind: "other" as const, label: "The other homes" }]
           : []),
       ]
     : houseLegend(properties).map((entry) => ({
@@ -81,11 +81,11 @@ export function CitySketch({ highlightSlug, className }: CitySketchProps) {
         aria-labelledby={`${titleId} ${descId}`}
         className="block size-[200px] max-w-full flex-none"
       >
-        <title id={titleId}>Where the houses are in Austin</title>
+        <title id={titleId}>Where the homes are in Austin</title>
         <desc id={descId}>
           A circular map of Austin. The Colorado River runs east across the top
           through downtown. Interstate 35 and MoPac run north to south, Ben
-          White Boulevard east to west. Two houses are marked in South Austin,
+          White Boulevard east to west. Two homes are marked in South Austin,
           below Ben White, and one in Oak Hill to the south-west where Highways
           290 and 71 split. Green marks Zilker Park and the Barton Creek
           greenbelt.

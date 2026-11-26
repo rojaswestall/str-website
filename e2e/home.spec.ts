@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const SLUGS = ["oak-hill", "south-austin", "fire-side"] as const;
 const LICENSES = ["OL2026086598", "OL2026040319", "OL2026031718"];
@@ -17,7 +17,10 @@ test.describe("home page", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Places we look after, properly.",
     );
-    await expect(page.getByText("Three houses · one small team")).toBeVisible();
+    await expect(page.getByText("Three homes · one small team")).toBeVisible();
+    await expect(
+      page.getByText("Three homes in Austin, looked after by the three of us"),
+    ).toBeVisible();
     // The lede names every host.
     const lede = page.locator("#hero-heading + p");
     for (const host of ["Alexis", "Gabe", "Aaron"]) {
@@ -60,7 +63,7 @@ test.describe("home page", () => {
         band.getByRole("link", { name: "Book direct" }),
       ).toHaveAttribute("href", `/stays/${slug}#book`);
       await expect(
-        band.getByRole("link", { name: "See the whole house" }),
+        band.getByRole("link", { name: "See the whole home" }),
       ).toHaveAttribute("href", `/stays/${slug}`);
       await expect(band.getByRole("heading", { level: 3 })).toBeVisible();
     }
@@ -114,9 +117,9 @@ test.describe("home page", () => {
 
     await expect(page.getByText("Check dates across all three")).toBeVisible();
     const search = page.getByTestId("hospitable-search-stub");
-    await expect(search).toContainText("Search all 3 houses");
+    await expect(search).toContainText("Search all 3 homes");
     await expect(
-      search.getByRole("link", { name: "See the houses" }),
+      search.getByRole("link", { name: "See the homes" }),
     ).toHaveAttribute("href", "/#stays");
 
     const feature = page.getByTestId("video-feature");
@@ -171,14 +174,14 @@ test.describe("home page", () => {
 
     const map = page.getByTestId("city-map");
     await expect(
-      map.getByRole("img", { name: /Where the houses are/ }),
+      map.getByRole("img", { name: /Where the homes are/ }),
     ).toBeVisible();
     await expect(map.locator("[data-map-pin]")).toHaveCount(3);
     for (const slug of SLUGS) {
       await expect(map.locator(`[data-map-pin="${slug}"]`)).toHaveCount(1);
     }
-    await expect(map).toContainText("Oak Hill · one house");
-    await expect(map).toContainText("South Austin · two houses");
+    await expect(map).toContainText("Oak Hill · one home");
+    await expect(map).toContainText("South Austin · two homes");
 
     expect(await mapGroundFill(page)).toBe(MAP_GROUND_LIGHT);
 
@@ -259,14 +262,18 @@ test.describe("home page", () => {
       reviews.getByRole("button", { name: "Play slideshow" }),
     ).toHaveAttribute("aria-pressed", "true");
 
-    // Order on the page: Why book direct, reviews, the area guide, hosts.
+    // Order on the page: the hero's collage, Why book direct, the search and
+    // map, the stays, reviews, the area guide, hosts.
     const ids = await page
-      .locator("main section[id], main section[aria-labelledby=hosts-heading]")
+      .locator("main > section")
       .evaluateAll((sections) =>
         sections.map((s) => s.id || s.getAttribute("aria-labelledby")),
       );
-    expect(ids.slice(-4)).toEqual([
+    expect(ids).toEqual([
+      "hero-heading",
       "direct",
+      "search",
+      "stays",
       "reviews",
       "area",
       "hosts-heading",
@@ -314,13 +321,64 @@ test.describe("home page", () => {
     const direct = page.locator("section#direct");
     await expect(direct).toContainText("What direct booking changes");
     await expect(direct.locator("li")).toHaveCount(4);
-    await expect(direct.getByTestId("contact-form-slot")).toBeVisible();
+    // The contact form moved to the Contact us pop-up.
+    await expect(direct.getByRole("form")).toHaveCount(0);
   });
 });
 
 // The shell (header, footer, skip link) is the same on every route; it is
 // asserted once here, on the home page. The 404 shell is in stays.spec.ts.
 test.describe("site shell", () => {
+  test("the nav marks the area guide as the current page only on /area", async ({
+    page,
+  }) => {
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    await page.goto("/area");
+    await expect(nav.getByRole("link", { name: "The area" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(nav.locator("[aria-current]")).toHaveCount(1);
+    await page.goto("/");
+    await expect(nav.locator("[aria-current]")).toHaveCount(0);
+  });
+
+  test("header items share one centre line, and fit two rows on a phone", async ({
+    page,
+  }) => {
+    const centre = async (locator: Locator) => {
+      const box = await locator.boundingBox();
+      return box!.y + box!.height / 2;
+    };
+    const header = page.getByRole("banner");
+    const name = header.getByRole("link", { name: "The Austin Collection" });
+    const stays = header.getByRole("link", { name: "Stays" });
+    const contact = header.getByRole("button", { name: "Contact us" });
+    const toggle = header.locator("[data-theme-toggle]");
+
+    // Desktop: name, nav, Contact us, and the toggle on one centre line.
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    const line = await centre(name);
+    for (const item of [stays, contact, toggle]) {
+      expect(Math.abs((await centre(item)) - line)).toBeLessThan(2);
+    }
+
+    // Every header control is at least WCAG 2.2's 24px minimum target.
+    for (const item of await header.locator("a, button").all()) {
+      expect((await item.boundingBox())!.height).toBeGreaterThanOrEqual(24);
+    }
+
+    // A 360px phone: the name and both buttons on the top row, the nav below.
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.evaluate(() => document.fonts.ready);
+    const top = await centre(name);
+    expect(Math.abs((await centre(contact)) - top)).toBeLessThan(2);
+    expect(Math.abs((await centre(toggle)) - top)).toBeLessThan(2);
+    expect(await centre(stays)).toBeGreaterThan(top + 20);
+  });
+
   test("header, nav, and footer render on the home page", async ({ page }) => {
     await page.goto("/");
 
@@ -342,12 +400,13 @@ test.describe("site shell", () => {
       );
     }
     await expect(header.locator("[data-theme-toggle]")).toBeVisible();
+    await expect(
+      header.getByRole("button", { name: "Contact us" }),
+    ).toHaveAttribute("aria-haspopup", "dialog");
 
     await expect(page.getByRole("main")).toHaveAttribute("id", "main");
     const footer = page.getByRole("contentinfo");
-    await expect(footer).toContainText(
-      "Phone shared with guests after booking",
-    );
+    await expect(footer).not.toContainText("Phone shared with guests");
     // The colophon links to the public production domain.
     await expect(
       footer.getByRole("link", { name: "www.theaustincollection.com" }),
@@ -355,25 +414,25 @@ test.describe("site shell", () => {
     await expect(footer).not.toContainText("domain to confirm");
     // No public email or Instagram; the footer opens the contact form.
     await expect(
-      footer.getByRole("button", { name: "Send us a message" }),
+      footer.getByRole("button", { name: "Contact us" }),
     ).toHaveAttribute("aria-haspopup", "dialog");
     await expect(footer.locator('a[href^="mailto:"]')).toHaveCount(0);
   });
 
-  test("the footer's Send us a message opens the contact form in a pop-up", async ({
+  test("the footer's Contact us opens the contact form in a pop-up", async ({
     page,
   }) => {
     await page.goto("/");
     const open = page
       .getByRole("contentinfo")
-      .getByRole("button", { name: "Send us a message" });
+      .getByRole("button", { name: "Contact us" });
     const popup = page.getByRole("dialog", { name: "Send us a message" });
     const form = popup.getByRole("form", { name: "Send us a message" });
 
     // Opens with the full form; on the home page the house is "General".
     await open.click();
     await expect(popup).toBeVisible();
-    await expect(form.getByLabel("House")).toHaveValue("");
+    await expect(form.getByLabel("Home")).toHaveValue("");
     await expect(
       form.getByRole("button", { name: "Send message" }),
     ).toBeVisible();
@@ -421,10 +480,10 @@ test.describe("site shell", () => {
     await page.goto("/stays/south-austin");
     await page
       .getByRole("contentinfo")
-      .getByRole("button", { name: "Send us a message" })
+      .getByRole("button", { name: "Contact us" })
       .click();
     const popup = page.getByRole("dialog", { name: "Send us a message" });
-    await expect(popup.getByLabel("House")).toHaveValue("south-austin");
+    await expect(popup.getByLabel("Home")).toHaveValue("south-austin");
   });
 
   test("footer lists the three STR licenses", async ({ page }) => {

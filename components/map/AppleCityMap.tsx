@@ -229,7 +229,7 @@ export function AppleCityMap({
         <div
           ref={containerRef}
           data-testid="apple-map"
-          aria-label="Map of the houses in Austin"
+          aria-label="Map of the homes in Austin"
           className="absolute inset-0"
         />
         {status === "loading" ? (
@@ -261,7 +261,7 @@ export function AppleCityMap({
                   )}
                 />
                 {house === highlighted ? (
-                  <span>{house.name} · this house</span>
+                  <span>{house.name} · this home</span>
                 ) : (
                   <Link
                     href={`/stays/${house.slug}`}

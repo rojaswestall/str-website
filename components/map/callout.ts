@@ -96,7 +96,7 @@ export function buildCallout(
     const link = el(
       "a",
       "mt-[0.35rem] self-start border-b border-ink font-mono text-[0.72rem] tracking-[0.06em] text-ink uppercase hover:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
-      "See the house →",
+      "See the home →",
     );
     link.href = href;
     link.addEventListener("click", (event) => {

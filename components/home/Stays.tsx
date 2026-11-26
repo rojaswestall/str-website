@@ -4,10 +4,10 @@ import { getAllProperties, getSite } from "@/content";
 
 const COUNT_WORDS = ["no", "one", "two", "three", "four", "five", "six"];
 
-/** "Three houses · all sleep 8" when every house sleeps the same number, else just the count. */
+/** "Three homes · all sleep 8" when every house sleeps the same number, else just the count. */
 function staysMeta(sleeps: readonly number[]) {
   const count = COUNT_WORDS[sleeps.length] ?? String(sleeps.length);
-  const label = `${count[0]?.toUpperCase()}${count.slice(1)} ${sleeps.length === 1 ? "house" : "houses"}`;
+  const label = `${count[0]?.toUpperCase()}${count.slice(1)} ${sleeps.length === 1 ? "home" : "homes"}`;
   const first = sleeps[0];
   const same = first !== undefined && sleeps.every((n) => n === first);
   return same ? `${label} · all sleep ${first}` : label;

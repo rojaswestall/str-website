@@ -3,7 +3,7 @@ import { cx } from "@/lib/cx";
 
 type SectionHeadProps = {
   title: ReactNode;
-  /** Right-aligned mono line, e.g. "Three houses · all sleep 8". */
+  /** Right-aligned mono line, e.g. "Three homes · all sleep 8". */
   meta?: ReactNode;
   /** Optional paragraph pulled up under the head with the artifact's negative margin. */
   lede?: ReactNode;

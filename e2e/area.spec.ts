@@ -74,7 +74,7 @@ test.describe("area guide", () => {
   test("Closest to sorts the picks for the chosen house", async ({ page }) => {
     await page.goto("/area");
     const filter = page.getByTestId("area-filter");
-    const any = filter.getByRole("button", { name: "Any house" });
+    const any = filter.getByRole("button", { name: "Any home" });
     await expect(any).toHaveAttribute("aria-pressed", "true");
     const ids = () =>
       page

@@ -7,9 +7,8 @@ import { cx } from "@/lib/cx";
 import { ContactForm, type ContactFormProperty } from "./ContactForm";
 
 /**
- * The footer's "Send us a message" button and the pop-up it opens: the same
- * contact form as the home page's "Why book direct" section, on whatever page
- * the guest is reading. On a house page (`/stays/<slug>`) that house is
+ * The "Contact us" button (in the header and the footer) and the pop-up it
+ * opens: the site's contact form, on whatever page the guest is reading. On a house page (`/stays/<slug>`) that house is
  * pre-selected in the form.
  *
  * The pop-up is a native modal `<dialog>`: the browser traps focus, closes it
@@ -20,9 +19,12 @@ import { ContactForm, type ContactFormProperty } from "./ContactForm";
  */
 export function MessageDialog({
   properties,
+  placement = "footer",
   className,
 }: {
   properties: readonly ContactFormProperty[];
+  /** "header": solid, the toggle's height. "footer": the ghost button. */
+  placement?: "header" | "footer";
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -34,14 +36,28 @@ export function MessageDialog({
 
   return (
     <>
-      <Button
-        variant="ghost"
-        onClick={() => setOpen(true)}
-        aria-haspopup="dialog"
-        className={className}
-      >
-        Send us a message
-      </Button>
+      {placement === "header" ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          className={cx(
+            "inline-flex h-[2.25rem] shrink-0 items-center border border-ink bg-ink px-[0.55rem] font-mono text-[0.72rem] tracking-[0.04em] whitespace-nowrap text-paper uppercase transition-[background-color,border-color] duration-[120ms] hover:border-muted hover:bg-muted min-[760px]:px-3 min-[760px]:tracking-[0.06em]",
+            className,
+          )}
+        >
+          Contact us
+        </button>
+      ) : (
+        <Button
+          variant="ghost"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          className={className}
+        >
+          Contact us
+        </Button>
+      )}
       {open ? (
         <MessagePopup
           properties={properties}

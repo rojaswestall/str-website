@@ -228,7 +228,7 @@ test.describe("city map on Apple Maps (MapKit token set)", () => {
       /map-callout-in/,
     );
 
-    const link = callout.getByRole("link", { name: "See the house →" });
+    const link = callout.getByRole("link", { name: "See the home →" });
     await expect(link).toHaveAttribute("href", "/stays/fire-side");
     await link.click();
     await expect(page).toHaveURL(/\/stays\/fire-side$/);

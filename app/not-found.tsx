@@ -15,12 +15,12 @@ export default function NotFound() {
       </h1>
       <Prose className="mt-[1.4rem] text-[clamp(1.02rem,1.6vw,1.18rem)]">
         <p>
-          The link may be old or mistyped. The three houses, the area guide, and
+          The link may be old or mistyped. The three homes, the area guide, and
           direct booking are all on the home page.
         </p>
       </Prose>
       <div className="mt-8">
-        <Button href="/">Back to the houses</Button>
+        <Button href="/">Back to the homes</Button>
       </div>
     </Section>
   );

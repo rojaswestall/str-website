@@ -47,7 +47,7 @@ export async function GET(
   try {
     const property = await getBookingProperty(propertyId);
     if (!property) {
-      return bookingError("NOT_FOUND", "We don't have that house.", 404);
+      return bookingError("NOT_FOUND", "We don't have that home.", 404);
     }
 
     const window = await getCalendarWindow(property.id);

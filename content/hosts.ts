@@ -24,7 +24,7 @@ export const hosts: Host[] = [
       width: 480,
       height: 480,
     },
-    line: "Keeps an eye on the big picture, so the houses keep getting better.",
+    line: "Keeps an eye on the big picture, so the homes keep getting better.",
   },
   {
     name: "Aaron",

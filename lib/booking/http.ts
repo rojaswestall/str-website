@@ -46,7 +46,7 @@ export function errorResponse(
       return bookingError(mapped.code, mapped.message, mapped.status);
     }
     if (error.status === 404) {
-      return bookingError("NOT_FOUND", "We don't have that house.", 404);
+      return bookingError("NOT_FOUND", "We don't have that home.", 404);
     }
     return bookingError("UPSTREAM", UPSTREAM, 502);
   }

@@ -475,7 +475,7 @@ export function BookingWidget({
 
             {property === undefined ? (
               <Failure
-                message="This house isn't available to book online."
+                message="This home isn't available to book online."
                 onRetry={null}
               />
             ) : calendar.status === "loading" ? (
@@ -606,7 +606,7 @@ function PropertySwitcher({
   return (
     <div
       role="group"
-      aria-label="Choose a house"
+      aria-label="Choose a home"
       className="flex flex-wrap gap-2"
     >
       {properties.map((p) => {

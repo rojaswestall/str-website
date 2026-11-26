@@ -57,7 +57,7 @@ test.describe("property pages", () => {
       await expect(airbnb).toHaveAttribute("rel", "noopener noreferrer");
 
       // The other two houses, never this one.
-      const others = page.getByRole("navigation", { name: "Other houses" });
+      const others = page.getByRole("navigation", { name: "Other homes" });
       for (const other of HOUSES.filter((h) => h.slug !== house.slug)) {
         await expect(
           others.getByRole("link", { name: other.name }),
@@ -199,7 +199,7 @@ test.describe("property pages", () => {
     await expect(
       map.locator("[data-map-pin][data-highlighted]"),
     ).toHaveAttribute("data-map-pin", "south-austin");
-    await expect(map).toContainText("South Austin · this house");
+    await expect(map).toContainText("South Austin · this home");
   });
 
   test("the booking column is sticky on wide screens and stacks on phones", async ({
@@ -235,14 +235,12 @@ test.describe("property pages", () => {
       await expect(page.getByRole("banner")).toBeVisible();
       await expect(page.getByRole("contentinfo")).toBeVisible();
       await expect(
-        page
-          .getByRole("main")
-          .getByRole("link", { name: "Back to the houses" }),
+        page.getByRole("main").getByRole("link", { name: "Back to the homes" }),
       ).toHaveAttribute("href", "/");
     });
   }
 
-  test("lists walkable area picks first under Near this house", async ({
+  test("lists walkable area picks first under Near this home", async ({
     page,
   }) => {
     // The South Austin houses have picks within walking distance.
@@ -264,7 +262,7 @@ test.describe("property pages", () => {
     await page.goto("/stays/oak-hill");
     const nearby = page.getByTestId("nearby-picks");
     await expect(
-      nearby.getByRole("heading", { level: 2, name: "Near this house" }),
+      nearby.getByRole("heading", { level: 2, name: "Near this home" }),
     ).toBeVisible();
     const items = nearby.locator("li");
     await expect(items).toHaveCount(3);

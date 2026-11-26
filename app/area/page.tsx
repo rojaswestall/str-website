@@ -14,7 +14,7 @@ import { TRAVEL_BANDS, travelBand } from "@/lib/area-travel";
 import { canonicalUrl, openGraphDefaults } from "@/lib/seo";
 
 const description =
-  "Where to eat, where to get outside, and what locals know in Austin, with the drive time from each of our three houses.";
+  "Where to eat, where to get outside, and what locals know in Austin, with the drive time from each of our three homes.";
 
 export const metadata: Metadata = {
   title: "Area guide",
@@ -96,10 +96,10 @@ export default function AreaPage() {
           What&apos;s worth doing
         </h1>
         <p className="max-w-[60ch] text-ink-soft">
-          Oak Hill sits on the southwest edge of town and the other two houses
+          Oak Hill sits on the southwest edge of town and the other two homes
           are in South Austin, so the same place can be a short hop from one and
           a longer drive from another. Every pick lists the drive time from each
-          house, or the walk when it&apos;s close. Choose the house you&apos;re
+          home, or the walk when it&apos;s close. Choose the home you&apos;re
           booking to see what&apos;s closest first, or narrow it to coffee,
           food, the outdoors, or local knowledge.
         </p>
