@@ -69,6 +69,14 @@ test.describe("property pages", () => {
     });
   }
 
+  test("South Austin Stay's gallery has no stairs photo", async ({ page }) => {
+    await page.goto("/stays/south-austin");
+    const gallery = page.getByTestId("gallery");
+    await expect(gallery.getByRole("img", { name: "Stairs" })).toHaveCount(0);
+    // Hero plus 37 gallery photos.
+    await expect(gallery.getByRole("img")).toHaveCount(38);
+  });
+
   test("the gallery is a carousel that opens every photo in a pop-up", async ({
     page,
   }) => {
@@ -137,8 +145,17 @@ test.describe("property pages", () => {
     const specs = page.getByRole("list", { name: "Key facts" });
     await expect(specs).toContainText("Sleeps 8");
     await expect(specs).toContainText("2.5 bath");
-    await expect(specs).toContainText("min nights t.b.c.");
+    // Minimum nights is not shown (the booking calendar enforces it per date).
+    await expect(specs).not.toContainText("min");
     await expect(specs).toContainText("rate t.b.c.");
+
+    // Pets: just "Welcome", with the fee still to confirm.
+    await expect(
+      page.locator("section#practicals").getByText("Welcome. Fee per stay"),
+    ).toBeVisible();
+    await expect(page.locator("section#practicals")).not.toContainText(
+      "at all three",
+    );
 
     await expect(
       page
