@@ -26,8 +26,8 @@ export const policies: PolicyRow[] = [
   },
   {
     term: "Pets",
-    // The "to confirm" marker completes this sentence while `tbc` is true; once the fee is confirmed, rewrite as e.g. "Welcome at all three homes. $X per stay." and set `tbc: false`.
-    detail: "Welcome at all three homes. Fee per stay",
+    // The "to confirm" marker completes this sentence while `tbc` is true; once the fee is confirmed, rewrite as e.g. "Welcome. $X per stay." and set `tbc: false`.
+    detail: "Welcome. Fee per stay",
     tbc: true,
   },
   {

@@ -96,13 +96,6 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
             { label: `${house.bathrooms} bath` },
             {
               label:
-                house.minNights === null
-                  ? "min nights t.b.c."
-                  : `${house.minNights} nights min`,
-              tbc: house.minNights === null,
-            },
-            {
-              label:
                 house.rateFrom === null
                   ? "rate t.b.c."
                   : `from $${house.rateFrom} / night`,
@@ -171,8 +164,7 @@ export function Showcase({ theme }: { theme: "light" | "dark" }) {
                 term: "Pets",
                 detail: (
                   <>
-                    Welcome at all three homes.{" "}
-                    <Tbc>Fee per stay to confirm.</Tbc>
+                    Welcome. <Tbc>Fee per stay to confirm.</Tbc>
                   </>
                 ),
               },

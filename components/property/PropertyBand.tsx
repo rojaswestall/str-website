@@ -22,17 +22,13 @@ export function propertyRoomItems(property: Property): SpecItem[] {
 }
 
 /**
- * The full mono spec strip for a house page: the rooms plus minimum nights and
- * rate, which render as Tbc until confirmed.
+ * The full mono spec strip for a house page: the rooms plus the nightly rate,
+ * which renders as Tbc until confirmed. (Minimum nights was removed
+ * 2026-11-27; the booking calendar enforces the real minimum per date.)
  */
 export function propertySpecItems(property: Property): SpecItem[] {
   return [
     ...propertyRoomItems(property),
-    property.minNights === null
-      ? { label: "min nights t.b.c.", tbc: true }
-      : {
-          label: `${property.minNights} ${property.minNights === 1 ? "night" : "nights"} min`,
-        },
     property.rateFrom === null
       ? { label: "rate t.b.c.", tbc: true }
       : { label: `from $${property.rateFrom} / night`, strong: true },

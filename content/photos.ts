@@ -164,13 +164,6 @@ export const photos = {
       role: "gallery",
     },
     {
-      src: "/photos/south-austin/gallery-06.jpg",
-      alt: "Stairs",
-      width: 1067,
-      height: 1600,
-      role: "gallery",
-    },
-    {
       src: "/photos/south-austin/gallery-07.jpg",
       alt: "Living room",
       width: 1600,
